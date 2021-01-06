@@ -1,0 +1,19 @@
+.entity-label {
+  padding: 3px 4px;
+  margin-left: 13px;
+  display: flex;
+  align-items: center;
+  &--cursor {
+    background: #282c34;
+    color: white;
+  }
+
+  &--selected {
+    background: #961204;
+    color: white;
+  }
+
+  &__label {
+    margin-left: 8px;
+  }
+}

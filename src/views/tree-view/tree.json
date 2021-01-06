@@ -1,0 +1,48 @@
+{
+  "name": "root",
+  "type": 1,
+  "children": [
+    {
+      "name": "dir1",
+      "type": 1,
+      "children": [
+        {
+          "name": "file1",
+          "type": 2
+        },
+        {
+          "name": "file2",
+          "type": 2
+        }
+      ]
+    },
+    {
+      "name": "dir2",
+      "type": 1,
+      "children": [
+        {
+          "name": "file3",
+          "type": 2
+        },
+        {
+          "name": "file4",
+          "type": 2
+        },
+        {
+          "name": "dir3",
+          "type": 1,
+          "children": [
+            {
+              "name": "file5",
+              "type": 2
+            },
+            {
+              "name": "file6",
+              "type": 2
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

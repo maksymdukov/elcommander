@@ -1,0 +1,44 @@
+.node {
+  &__children-line {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background-color: #282c34;
+  }
+  &__title {
+    padding: 7px;
+    position: relative;
+    display: flex;
+    align-content: center;
+  }
+  &__arrow {
+    position: absolute;
+    top: 50%;
+    height: 15px;
+    width: 15px;
+    padding: 2px;
+    background-color: white;
+    background-position: center;
+    background-size: 12px 12px;
+    background-repeat: no-repeat;
+    transform: translate(calc(-50% + 1px), -50%) rotate(90deg);
+    &--opened {
+      transform: translate(calc(-50% + 1px), -50%);
+    }
+  }
+
+  &__image {
+    width: 20px;
+    height: 20px;
+    color: white;
+    &--selected {
+      color: white;
+      fill: white;
+    }
+  }
+
+  &__children {
+    position: relative;
+  }
+}
