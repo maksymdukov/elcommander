@@ -1,11 +1,13 @@
 import React, { useReducer } from 'react';
-import { DragDropContext } from 'react-beautiful-dnd';
 import NodeView from '../../components/tree/node-view';
 import { IFSBackend } from '../../backends/interfaces/fs-backend.interface';
 import { DirectoryNode } from '../../classes/dir-node';
 import { treeStateReducer } from './tree-view-state';
 import { useTreeHandlersHook } from './hooks/use-tree-handlers.hook';
 import classes from './tree.view.scss';
+import { useDnd } from './hooks/use-dnd.hook';
+import TreeDndHandlersProvider from './context/tree-dnd-handlers.provider';
+import { FileNode } from '../../classes/file-node';
 
 interface TreeViewProps {
   initTree: DirectoryNode;
@@ -33,15 +35,24 @@ function TreeView({ fsManager, initTree }: TreeViewProps) {
     fsManager,
   });
 
-  // // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  // const onDragEnd = (result: DropResult, provided: ResponderProvided) => {
-  //   // console.log(result);
-  // };
+  const { getDndHandlers, getNodeHandlers } = useDnd({
+    onNodeDragEnter: (n) => console.log('enter', n.name),
+    onNodeDragLeave: (n) => console.log('leave', n.name),
+    onNodeDrop: (n) => console.log('drop', n.name),
+    droppableFilter: (start, end) =>
+      start !== end && !(end instanceof FileNode),
+  });
+
   const {
     lassoCoords: { current, start },
   } = treeState;
   return (
-    <div className={classes.TreeView} tabIndex={0} {...getContainerProps()}>
+    <div
+      className={classes.TreeView}
+      tabIndex={0}
+      {...getContainerProps()}
+      {...getDndHandlers()}
+    >
       {treeState.lassoActive && current !== null && start !== null && (
         <div
           className={classes.Lasso}
@@ -51,9 +62,9 @@ function TreeView({ fsManager, initTree }: TreeViewProps) {
           }}
         />
       )}
-      <DragDropContext onDragEnd={() => {}}>
+      <TreeDndHandlersProvider {...getNodeHandlers()}>
         <NodeView node={treeState.tree} />
-      </DragDropContext>
+      </TreeDndHandlersProvider>
     </div>
   );
 }

@@ -115,9 +115,7 @@ export const useTreeHandlersHook = ({
       e.treeEventType === TreeEventType.LassoSelectStart &&
       !treeState.lassoActive
     ) {
-      // TODO
-      // ignore when clicked on label
-      handleMouseDownClick(e);
+      return handleMouseDownClick(e);
     }
   };
 

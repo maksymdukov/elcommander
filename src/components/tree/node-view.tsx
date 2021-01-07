@@ -6,7 +6,9 @@ import NodeControlIcon from './node-control-icon';
 import NodeIcon from './node-icon';
 import { TreeNode } from '../../classes/tree-node';
 import { DirectoryNode } from '../../classes/dir-node';
+import plusIcon from '../../../assets/plus.png';
 import './node.global.scss';
+import { useDndNodeHandlers } from '../../views/tree-view/hooks/use-dnd-node-handlers.hook';
 
 interface DirectoryProps {
   node: TreeNode;
@@ -15,8 +17,17 @@ interface DirectoryProps {
 
 const CHILDREN_OFFSET_PX = 26;
 
+const dragImage = new Image();
+dragImage.src = plusIcon;
+
 const NodeViewRaw: React.FC<DirectoryProps> = ({ node, offset = 0 }) => {
   const ref = useNodeRef(node);
+  const {
+    onMouseUp: handleMouseUp,
+    onMouseEnter: handleMouseEnter,
+    onMouseLeave: handleMouseLeave,
+    onMouseDown: handleMouseDown,
+  } = useDndNodeHandlers();
 
   const childrenOffset = offset + CHILDREN_OFFSET_PX;
 
@@ -31,21 +42,7 @@ const NodeViewRaw: React.FC<DirectoryProps> = ({ node, offset = 0 }) => {
   const onIconPicClick = (e: React.MouseEvent) => {
     e.treeEventType = TreeEventType.DirectoryToggle;
     e.treeNode = node;
-  };
-
-  const onTitleClick = (e: React.MouseEvent) => {
-    if (e.ctrlKey) {
-      e.treeEventType = TreeEventType.ItemCtrlSelect;
-      e.treeNode = node;
-      return;
-    }
-    e.treeEventType = TreeEventType.ItemCursorSelect;
-    e.treeNode = node;
-  };
-
-  const onTitleMouseDown = (e: React.MouseEvent) => {
-    e.treeEventType = TreeEventType.SelectionMoveMaybeStart;
-    e.treeNode = node;
+    // catch on bubbling
   };
 
   const onMouseDown = (e: React.MouseEvent) => {
@@ -58,14 +55,50 @@ const NodeViewRaw: React.FC<DirectoryProps> = ({ node, offset = 0 }) => {
     e.treeNode = node;
   };
 
+  const onTitleClick = (e: React.MouseEvent) => {
+    e.treeNode = node;
+    if (e.ctrlKey) {
+      e.treeEventType = TreeEventType.ItemCtrlSelect;
+      return;
+    }
+    e.treeEventType = TreeEventType.ItemCursorSelect;
+    // catch on bubbling
+  };
+
+  const onTitleMouseDown = (e: React.MouseEvent) => {
+    e.treeNode = node;
+    e.treeEventType = TreeEventType.ItemCursorSelect;
+    handleMouseDown(e);
+  };
+
+  const onTitleMouseEnter = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.treeNode = node;
+    e.treeEventType = TreeEventType.MoveSelectionEnter;
+    handleMouseEnter(e);
+  };
+  const onTitleMouseLeave = (e: React.MouseEvent) => {
+    e.treeNode = node;
+    e.treeEventType = TreeEventType.MoveSelectionLeave;
+    handleMouseLeave(e);
+  };
+  const onTitleMouseUp = (e: React.MouseEvent) => {
+    e.treeNode = node;
+    e.treeEventType = TreeEventType.MoveSelectionFinish;
+    handleMouseUp(e);
+  };
+
   return (
     <div ref={ref} onMouseDown={onMouseDown} data-tree="node">
       <div className="node__title" style={{ paddingLeft: offset }}>
         <NodeControlIcon node={node} onClick={onIconPicClick} offset={offset} />
         <EntityLabel
+          ref={ref}
           onClick={onTitleClick}
-          node={node}
           onMouseDown={onTitleMouseDown}
+          onMouseUp={onTitleMouseUp}
+          onMouseLeave={onTitleMouseLeave}
+          onMouseEnter={onTitleMouseEnter}
+          node={node}
         >
           <NodeIcon node={node} />
         </EntityLabel>

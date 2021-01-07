@@ -3,6 +3,7 @@ import { DirectoryNode } from '../../classes/dir-node';
 import TreeView from './tree.view';
 import { IFSBackend } from '../../backends/interfaces/fs-backend.interface';
 import ContainerRefProvider from './context/container-ref.provider';
+import TreeDndProvider from './context/tree-dnd.provider';
 
 export interface TreeViewInitProps {
   localFs: IFSBackend;
@@ -22,9 +23,11 @@ const TreeViewInit = ({ localFs }: TreeViewInitProps) => {
   }, [localFs]);
   return (
     (initTree && (
-      <ContainerRefProvider>
-        <TreeView initTree={initTree} fsManager={localFs} />
-      </ContainerRefProvider>
+      <TreeDndProvider>
+        <ContainerRefProvider>
+          <TreeView initTree={initTree} fsManager={localFs} />
+        </ContainerRefProvider>
+      </TreeDndProvider>
     )) ||
     null
   );

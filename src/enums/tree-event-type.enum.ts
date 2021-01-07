@@ -3,6 +3,8 @@ export enum TreeEventType {
   ItemCursorSelect,
   LassoSelectStart,
   ItemCtrlSelect,
-  SelectionMoveMaybeStart,
-  MoveSelectionMove,
+  MoveSelectionMaybeStart,
+  MoveSelectionEnter,
+  MoveSelectionLeave,
+  MoveSelectionFinish,
 }
