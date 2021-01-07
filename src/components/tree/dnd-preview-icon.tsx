@@ -2,24 +2,21 @@ import React from 'react';
 import PlusIcon from '../icons/plus-icon';
 import MinusIcon from '../icons/minus-icon';
 import classes from './dnd-preview-icon.scss';
+import { useDndPreviewContext } from '../../views/tree-view/hooks/use-dnd-preview-context.hook';
+import { useDndContext } from '../../views/tree-view/hooks/use-dnd-context.hook';
 
-interface DndPreviewIconProps {
-  top: number;
-  left: number;
-  isDroppable: boolean;
-}
+const DndPreviewIcon: React.FC = () => {
+  const { mouseY, mouseX } = useDndPreviewContext();
+  const { state } = useDndContext();
 
-const DndPreviewIcon: React.FC<DndPreviewIconProps> = ({
-  top,
-  left,
-  isDroppable,
-}) => {
+  if (mouseY === null || mouseX === null) return null;
+
   return (
     <div
-      style={{ top: top + 15, left: left + 15 }}
+      style={{ top: mouseY + 15, left: mouseX + 15 }}
       className={classes['preview-icon']}
     >
-      {isDroppable ? (
+      {state.isDroppable ? (
         <PlusIcon className={classes.icon} />
       ) : (
         <MinusIcon className={classes.icon} />

@@ -1,24 +1,35 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { TreeDNDContext } from './tree-dnd.context';
-import DndPreviewIcon from '../../../components/tree/dnd-preview-icon';
-import { TreeDNDState } from '../interfaces/tree-dnd-state.interface';
+import {
+  DNDPreviewState,
+  DNDState,
+} from '../interfaces/tree-dnd-state.interface';
+import DndPreviewProvider from './dnd-preview.provider';
+import { CtxRef } from '../interfaces/tree-dnd-context-val.interface';
 
 const TreeDndProvider: React.FC = ({ children }) => {
-  const [state, setState] = useState<TreeDNDState>({
-    mouseX: null,
-    mouseY: null,
+  const [state, setState] = useState<DNDState>({
     isDroppable: false,
   });
 
+  const [mouseState, setMouseState] = useState<DNDPreviewState>({
+    mouseX: null,
+    mouseY: null,
+  });
+
+  const ctxRef = useRef<CtxRef>({
+    isActive: false,
+  });
+
   const setMouseCoords = useCallback(
-    (x: TreeDNDState['mouseX'], y: TreeDNDState['mouseY']) => {
-      setState((oldState) => ({
+    (x: DNDPreviewState['mouseX'], y: DNDPreviewState['mouseY']) => {
+      setMouseState((oldState) => ({
         ...oldState,
         mouseX: x,
         mouseY: y,
       }));
     },
-    [setState]
+    [setMouseState]
   );
 
   const setIsDroppable = useCallback(
@@ -36,19 +47,15 @@ const TreeDndProvider: React.FC = ({ children }) => {
       state,
       setMouseCoords,
       setIsDroppable,
+      ctxRef,
     }),
-    [state, setMouseCoords, setIsDroppable]
+    [state, setMouseCoords, setIsDroppable, ctxRef]
   );
   return (
     <TreeDNDContext.Provider value={memoizedState}>
-      {children}
-      {state.mouseY !== null && state.mouseX !== null && (
-        <DndPreviewIcon
-          top={state.mouseY}
-          left={state.mouseX}
-          isDroppable={state.isDroppable}
-        />
-      )}
+      <DndPreviewProvider previewState={mouseState}>
+        {children}
+      </DndPreviewProvider>
     </TreeDNDContext.Provider>
   );
 };

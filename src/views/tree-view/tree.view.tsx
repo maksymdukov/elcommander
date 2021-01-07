@@ -6,7 +6,7 @@ import { treeStateReducer } from './tree-view-state';
 import { useTreeHandlersHook } from './hooks/use-tree-handlers.hook';
 import classes from './tree.view.scss';
 import { useDnd } from './hooks/use-dnd.hook';
-import TreeDndHandlersProvider from './context/tree-dnd-handlers.provider';
+import Droppable from './context/droppable';
 import { FileNode } from '../../classes/file-node';
 
 interface TreeViewProps {
@@ -29,13 +29,14 @@ function TreeView({ fsManager, initTree }: TreeViewProps) {
     lassoScrolling: false,
     lassoStartCandidate: null,
   });
-  const { getContainerProps } = useTreeHandlersHook({
+  const { getContainerProps, handleItemCursorMouseDown } = useTreeHandlersHook({
     treeState,
     dispatch,
     fsManager,
   });
 
   const { getDndHandlers, getNodeHandlers } = useDnd({
+    onInitialMouseDown: handleItemCursorMouseDown,
     onNodeDragEnter: (n) => console.log('enter', n.name),
     onNodeDragLeave: (n) => console.log('leave', n.name),
     onNodeDrop: (n) => console.log('drop', n.name),
@@ -62,9 +63,9 @@ function TreeView({ fsManager, initTree }: TreeViewProps) {
           }}
         />
       )}
-      <TreeDndHandlersProvider {...getNodeHandlers()}>
+      <Droppable {...getNodeHandlers()}>
         <NodeView node={treeState.tree} />
-      </TreeDndHandlersProvider>
+      </Droppable>
     </div>
   );
 }

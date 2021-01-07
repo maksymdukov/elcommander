@@ -8,7 +8,7 @@ export interface TreeDndHandlersVal {
   onMouseLeave: React.MouseEventHandler;
 }
 
-export const TreeDndHandlersContext = createContext<TreeDndHandlersVal>({
+export const DroppableContext = createContext<TreeDndHandlersVal>({
   onMouseDown: noop,
   onMouseEnter: noop,
   onMouseLeave: noop,

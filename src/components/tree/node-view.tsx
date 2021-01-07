@@ -6,7 +6,6 @@ import NodeControlIcon from './node-control-icon';
 import NodeIcon from './node-icon';
 import { TreeNode } from '../../classes/tree-node';
 import { DirectoryNode } from '../../classes/dir-node';
-import plusIcon from '../../../assets/plus.png';
 import './node.global.scss';
 import { useDndNodeHandlers } from '../../views/tree-view/hooks/use-dnd-node-handlers.hook';
 
@@ -16,9 +15,6 @@ interface DirectoryProps {
 }
 
 const CHILDREN_OFFSET_PX = 26;
-
-const dragImage = new Image();
-dragImage.src = plusIcon;
 
 const NodeViewRaw: React.FC<DirectoryProps> = ({ node, offset = 0 }) => {
   const ref = useNodeRef(node);

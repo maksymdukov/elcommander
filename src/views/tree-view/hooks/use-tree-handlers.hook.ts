@@ -38,6 +38,7 @@ export const useTreeHandlersHook = ({
     handleItemCursorClick,
     handleMouseDownClick,
     handleCtrlMouseClick,
+    handleItemCursorMouseDown,
   } = useTreeMouseHandlers({
     dispatch,
     fsManager,
@@ -128,5 +129,6 @@ export const useTreeHandlersHook = ({
 
   return {
     getContainerProps,
+    handleItemCursorMouseDown,
   };
 };

@@ -1,4 +1,4 @@
 import { useContext } from 'react';
-import { TreeDndHandlersContext } from '../context/tree-dnd-handlers.context';
+import { DroppableContext } from '../context/droppable.context';
 
-export const useDndNodeHandlers = () => useContext(TreeDndHandlersContext);
+export const useDndNodeHandlers = () => useContext(DroppableContext);

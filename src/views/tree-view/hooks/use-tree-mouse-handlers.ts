@@ -11,6 +11,7 @@ import { IFSBackend } from '../../../backends/interfaces/fs-backend.interface';
 import { DirectoryNode } from '../../../classes/dir-node';
 import { useTreeActions } from './use-tree-actions.hook';
 import { useLassoSelection } from './use-lasso-selection.hook';
+import { TreeNode } from '../../../classes/tree-node';
 
 interface UseTreeMouseHandlersProps {
   treeState: TreeState;
@@ -84,6 +85,10 @@ export const useTreeMouseHandlers = ({
     dispatch(moveCursorAction(treeNode));
   };
 
+  const handleItemCursorMouseDown = (node: TreeNode) => {
+    dispatch(moveCursorAction(node));
+  };
+
   const handleMouseDownClick = (e: React.MouseEvent) => {
     throwIfContainerNotSet();
     // set initial value for scrollPosition state
@@ -100,6 +105,7 @@ export const useTreeMouseHandlers = ({
     handleShiftMouseClick,
     handleToggleDirectoryClick,
     handleItemCursorClick,
+    handleItemCursorMouseDown,
     handleMouseDownClick,
     handleCtrlMouseClick,
   };

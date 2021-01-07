@@ -1,12 +1,13 @@
 import React, { useCallback, useRef } from 'react';
 import { useDndContext } from './use-dnd-context.hook';
-import { TreeDndHandlersVal } from '../context/tree-dnd-handlers.context';
+import { TreeDndHandlersVal } from '../context/droppable.context';
 import { TreeNode } from '../../../classes/tree-node';
 
 interface UseDndHookProps {
   onNodeDragEnter: (node: TreeNode) => void;
   onNodeDragLeave: (node: TreeNode) => void;
   onNodeDrop: (node: TreeNode) => void;
+  onInitialMouseDown?: (node: TreeNode) => void;
   droppableFilter?: (startNode: TreeNode, currentNode: TreeNode) => boolean;
 }
 
@@ -17,38 +18,38 @@ export const useDnd = ({
   onNodeDragEnter,
   onNodeDragLeave,
   onNodeDrop,
+  onInitialMouseDown,
   droppableFilter = defaultFilter,
 }: UseDndHookProps) => {
-  const { setMouseCoords, setIsDroppable } = useDndContext();
+  const { setMouseCoords, setIsDroppable, ctxRef } = useDndContext();
   const startNodeRef = useRef<TreeNode | null>(null);
-  const isDndActiveRef = useRef(false);
 
   const onGlobalMouseMove = useCallback(
     (e: MouseEvent) => {
       setMouseCoords(e.pageX, e.pageY);
-      isDndActiveRef.current = true;
+      ctxRef.current.isActive = true;
     },
-    [setMouseCoords]
+    [setMouseCoords, ctxRef]
   );
 
   const onGlobalMouseUp = useCallback(
     (_: MouseEvent) => {
       setMouseCoords(null, null);
       startNodeRef.current = null;
-      isDndActiveRef.current = false;
+      ctxRef.current.isActive = false;
       window.removeEventListener('mousemove', onGlobalMouseMove);
       window.removeEventListener('mouseup', onGlobalMouseUp);
     },
-    [setMouseCoords, onGlobalMouseMove, startNodeRef]
+    [setMouseCoords, onGlobalMouseMove, startNodeRef, ctxRef]
   );
 
   const onLabelMouseDown = (e: React.MouseEvent) => {
     if (!e.treeEventType) {
       return;
     }
-    // TODO
-    // introduce onInitialMouseDown
-    // only do dispatch(moveCursorAction(treeNode));
+    if (onInitialMouseDown) {
+      onInitialMouseDown(e.treeNode);
+    }
     e.preventDefault();
     startNodeRef.current = e.treeNode;
     console.log('onLabelMouseDown');
@@ -57,10 +58,7 @@ export const useDnd = ({
   };
 
   const onLabelMouseUp = (e: React.MouseEvent) => {
-    if (!isDndActiveRef.current) {
-      return;
-    }
-    if (!e.treeEventType) {
+    if (!ctxRef.current.isActive) {
       return;
     }
     e.preventDefault();
@@ -68,13 +66,10 @@ export const useDnd = ({
   };
 
   const onLabelMouseEnter = (e: React.MouseEvent) => {
-    if (!isDndActiveRef.current || !startNodeRef.current) {
+    if (!ctxRef.current.isActive) {
       return;
     }
-    if (!e.treeEventType) {
-      return;
-    }
-    if (!droppableFilter(startNodeRef.current, e.treeNode)) {
+    if (!droppableFilter(startNodeRef.current!, e.treeNode)) {
       setIsDroppable(false);
     } else {
       setIsDroppable(true);
@@ -83,14 +78,10 @@ export const useDnd = ({
   };
 
   const onLabelMouseLeave = (e: React.MouseEvent) => {
-    if (!isDndActiveRef.current || !startNodeRef.current) {
+    if (!ctxRef.current.isActive) {
       return;
     }
-    if (!e.treeEventType) {
-      return;
-    }
-    // dont invoke cb if we are leaving startNode
-    if (!droppableFilter(startNodeRef.current, e.treeNode)) {
+    if (!droppableFilter(startNodeRef.current!, e.treeNode)) {
       return;
     }
     setIsDroppable(false);
