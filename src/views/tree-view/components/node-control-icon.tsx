@@ -1,11 +1,10 @@
 import React, { MouseEventHandler } from 'react';
 import clsx from 'clsx';
-import { TreeNode } from '../../classes/tree-node';
-import { DirectoryNode } from '../../classes/dir-node';
-import ArrowIcon from '../icons/arrowIcon';
-import { FileNode } from '../../classes/file-node';
-import CssDot from '../icons/css-dot';
-import { IconProps } from '../icons/icon.interface';
+import ArrowIcon from '../../../components/icons/arrowIcon';
+import CssDot from '../../../components/icons/css-dot';
+import { IconProps } from '../../../components/icons/icon.interface';
+import { TreeNode } from '../../../interfaces/node.interface';
+import { FsItemTypeEnum } from '../../../enums/fs-item-type.enum';
 
 interface NodeControlIconProps {
   node: TreeNode;
@@ -23,15 +22,15 @@ const NodeControlIcon: React.FC<NodeControlIconProps> = ({
     className?: string;
     onClick?: NodeControlIconProps['onClick'];
   };
-  switch (node.constructor) {
-    case DirectoryNode:
+  switch (node.type) {
+    case FsItemTypeEnum.Directory:
       icon = {
         Icon: ArrowIcon,
         className: clsx('node__arrow', node.isOpened && 'node__arrow--opened'),
         onClick,
       };
       break;
-    case FileNode:
+    case FsItemTypeEnum.File:
     default:
       icon = { Icon: CssDot };
   }

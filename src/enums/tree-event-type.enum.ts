@@ -1,8 +1,11 @@
 export enum TreeEventType {
-  DirectoryToggle,
+  OpenNode = 1,
+  CloseNode,
   ItemCursorSelect,
-  LassoSelectStart,
+  ItemShiftSelect,
+  ItemShiftMouseSelect,
   ItemCtrlSelect,
+  LassoSelectStart,
   MoveSelectionMaybeStart,
   MoveSelectionEnter,
   MoveSelectionLeave,

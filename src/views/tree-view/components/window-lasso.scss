@@ -1,14 +1,8 @@
-.TreeView {
-  position: relative;
-  user-select: none;
-  max-height: 95vh;
-  overflow-y: auto;
-}
-
 .Lasso {
   position: absolute;
   left: 0;
   right: 0;
   border: 1px dashed blue;
   background-color: rgba(89, 96, 120, 0.5);
+  will-change: top, height;
 }

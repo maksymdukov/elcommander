@@ -1,22 +1,26 @@
 import fs from 'fs';
-import path from 'path';
+import nPath from 'path';
 import { IFSBackend } from './interfaces/fs-backend.interface';
-import { DirectoryNode } from '../classes/dir-node';
-import { FileNode } from '../classes/file-node';
+import { FsItemTypeEnum } from '../enums/fs-item-type.enum';
 
 export class LocalFs implements IFSBackend {
-  async readDir(paths: string[], parent: DirectoryNode) {
-    const constructedPath = path.join('/', ...paths);
-    const files = await fs.promises.readdir(constructedPath, {
+  async readDir(
+    path: string
+  ): Promise<{ id: string; name: string; type: FsItemTypeEnum }[]> {
+    const files = await fs.promises.readdir(nPath.normalize(path), {
       encoding: 'utf8',
       withFileTypes: true,
     });
     return files
       .filter((file) => file.isDirectory() || file.isFile())
-      .map((dirent, idx) => {
-        return dirent.isDirectory()
-          ? new DirectoryNode({ name: dirent.name, parent, idx })
-          : new FileNode({ name: dirent.name, parent, idx });
+      .map((dirent) => {
+        return {
+          type: dirent.isDirectory()
+            ? FsItemTypeEnum.Directory
+            : FsItemTypeEnum.File,
+          name: dirent.name,
+          id: `${path}/${dirent.name}`,
+        };
       });
   }
 }

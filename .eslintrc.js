@@ -20,6 +20,7 @@ module.exports = {
     'jsx-a11y/no-noninteractive-tabindex': 'off',
     'no-case-declarations': 'off',
     'consistent-return': 'off',
+    'spaced-comment': 'off',
   },
   parserOptions: {
     ecmaVersion: 2020,

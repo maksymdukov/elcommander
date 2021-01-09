@@ -1,9 +1,9 @@
 import React from 'react';
-import PlusIcon from '../icons/plus-icon';
-import MinusIcon from '../icons/minus-icon';
+import PlusIcon from '../../../components/icons/plus-icon';
+import MinusIcon from '../../../components/icons/minus-icon';
 import classes from './dnd-preview-icon.scss';
-import { useDndPreviewContext } from '../../views/tree-view/hooks/use-dnd-preview-context.hook';
-import { useDndContext } from '../../views/tree-view/hooks/use-dnd-context.hook';
+import { useDndPreviewContext } from '../hook/use-dnd-preview-context.hook';
+import { useDndContext } from '../hook/use-dnd-context.hook';
 
 const DndPreviewIcon: React.FC = () => {
   const { mouseY, mouseX } = useDndPreviewContext();

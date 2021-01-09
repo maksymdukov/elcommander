@@ -1,11 +1,10 @@
 import React from 'react';
 import clsx from 'clsx';
-import { TreeNode } from '../../classes/tree-node';
-import { DirectoryNode } from '../../classes/dir-node';
-import { IconProps } from '../icons/icon.interface';
-import FolderIcon from '../icons/folder-icon';
-import { FileNode } from '../../classes/file-node';
-import FileIcon from '../icons/file-icon';
+import { IconProps } from '../../../components/icons/icon.interface';
+import FolderIcon from '../../../components/icons/folder-icon';
+import FileIcon from '../../../components/icons/file-icon';
+import { TreeNode } from '../../../interfaces/node.interface';
+import { FsItemTypeEnum } from '../../../enums/fs-item-type.enum';
 
 interface NodeIconProps {
   node: TreeNode;
@@ -13,23 +12,23 @@ interface NodeIconProps {
 
 const NodeIcon: React.FC<NodeIconProps> = ({ node }) => {
   let icon: { Element: React.FC<IconProps<SVGSVGElement>>; className?: string };
-  switch (node.constructor) {
-    case DirectoryNode:
+  switch (node.type) {
+    case FsItemTypeEnum.Directory:
       icon = {
         Element: FolderIcon,
         className: clsx(
           'node__image',
-          node.isCursor && 'node__image--selected'
+          node.isCursored && 'node__image--selected'
         ),
       };
       break;
-    case FileNode:
+    case FsItemTypeEnum.File:
     default:
       icon = {
         Element: FileIcon,
         className: clsx(
           'node__image',
-          node.isCursor && 'node__image--selected'
+          node.isCursored && 'node__image--selected'
         ),
       };
   }

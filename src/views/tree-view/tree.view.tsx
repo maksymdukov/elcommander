@@ -1,73 +1,20 @@
-import React, { useReducer } from 'react';
-import NodeView from '../../components/tree/node-view';
+import React from 'react';
 import { IFSBackend } from '../../backends/interfaces/fs-backend.interface';
-import { DirectoryNode } from '../../classes/dir-node';
-import { treeStateReducer } from './tree-view-state';
-import { useTreeHandlersHook } from './hooks/use-tree-handlers.hook';
-import classes from './tree.view.scss';
-import { useDnd } from './hooks/use-dnd.hook';
-import Droppable from './context/droppable';
-import { FileNode } from '../../classes/file-node';
+import TreeList from './tree-list';
+import TreeViewProvider from './context/treeViewProvider';
 
 interface TreeViewProps {
-  initTree: DirectoryNode;
   fsManager: IFSBackend;
+  index: number;
+  height: number;
 }
 
-function TreeView({ fsManager, initTree }: TreeViewProps) {
-  const [treeState, dispatch] = useReducer(treeStateReducer, {
-    tree: initTree,
-    cursor: null,
-    selected: [],
-    lassoActive: false,
-    selectedHash: new Map(),
-    lassoCoords: {
-      current: null,
-      start: null,
-      mousePageY: 0,
-    },
-    lassoScrolling: false,
-    lassoStartCandidate: null,
-  });
-  const { getContainerProps, handleItemCursorMouseDown } = useTreeHandlersHook({
-    treeState,
-    dispatch,
-    fsManager,
-  });
-
-  const { getDndHandlers, getNodeHandlers } = useDnd({
-    onInitialMouseDown: handleItemCursorMouseDown,
-    onNodeDragEnter: (n) => console.log('enter', n.name),
-    onNodeDragLeave: (n) => console.log('leave', n.name),
-    onNodeDrop: (n) => console.log('drop', n.name),
-    droppableFilter: (start, end) =>
-      start !== end && !(end instanceof FileNode),
-  });
-
-  const {
-    lassoCoords: { current, start },
-  } = treeState;
+function TreeViewRaw({ fsManager, index, height }: TreeViewProps) {
   return (
-    <div
-      className={classes.TreeView}
-      tabIndex={0}
-      {...getContainerProps()}
-      {...getDndHandlers()}
-    >
-      {treeState.lassoActive && current !== null && start !== null && (
-        <div
-          className={classes.Lasso}
-          style={{
-            top: Math.min(start, current),
-            height: current > start ? current - start : start - current,
-          }}
-        />
-      )}
-      <Droppable {...getNodeHandlers()}>
-        <NodeView node={treeState.tree} />
-      </Droppable>
-    </div>
+    <TreeViewProvider viewIndex={index}>
+      <TreeList index={index} height={height} fsManager={fsManager} />
+    </TreeViewProvider>
   );
 }
-
+const TreeView = React.memo(TreeViewRaw);
 export default TreeView;

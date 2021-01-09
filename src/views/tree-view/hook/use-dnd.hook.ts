@@ -1,14 +1,13 @@
 import React, { useCallback, useRef } from 'react';
 import { useDndContext } from './use-dnd-context.hook';
 import { TreeDndHandlersVal } from '../context/droppable.context';
-import { TreeNode } from '../../../classes/tree-node';
 
 interface UseDndHookProps {
-  onNodeDragEnter: (node: TreeNode) => void;
-  onNodeDragLeave: (node: TreeNode) => void;
-  onNodeDrop: (node: TreeNode) => void;
-  onInitialMouseDown?: (node: TreeNode) => void;
-  droppableFilter?: (startNode: TreeNode, currentNode: TreeNode) => boolean;
+  onNodeDragEnter: (node: number) => void;
+  onNodeDragLeave: (node: number) => void;
+  onNodeDrop: (node: number) => void;
+  onInitialMouseDown?: (node: number) => void;
+  droppableFilter?: (startNode: number, currentNode: number) => boolean;
 }
 
 const defaultFilter: UseDndHookProps['droppableFilter'] = (start, curr) =>
@@ -22,7 +21,7 @@ export const useDnd = ({
   droppableFilter = defaultFilter,
 }: UseDndHookProps) => {
   const { setMouseCoords, setIsDroppable, ctxRef } = useDndContext();
-  const startNodeRef = useRef<TreeNode | null>(null);
+  const startNodeRef = useRef<number | null>(null);
 
   const onGlobalMouseMove = useCallback(
     (e: MouseEvent) => {
@@ -48,10 +47,10 @@ export const useDnd = ({
       return;
     }
     if (onInitialMouseDown) {
-      onInitialMouseDown(e.treeNode);
+      onInitialMouseDown(e.treeIndex);
     }
     e.preventDefault();
-    startNodeRef.current = e.treeNode;
+    startNodeRef.current = e.treeIndex;
     console.log('onLabelMouseDown');
     window.addEventListener('mousemove', onGlobalMouseMove);
     window.addEventListener('mouseup', onGlobalMouseUp);
@@ -62,18 +61,18 @@ export const useDnd = ({
       return;
     }
     e.preventDefault();
-    onNodeDrop(e.treeNode);
+    onNodeDrop(e.treeIndex);
   };
 
   const onLabelMouseEnter = (e: React.MouseEvent) => {
     if (!ctxRef.current.isActive) {
       return;
     }
-    if (!droppableFilter(startNodeRef.current!, e.treeNode)) {
+    if (!droppableFilter(startNodeRef.current!, e.treeIndex)) {
       setIsDroppable(false);
     } else {
       setIsDroppable(true);
-      onNodeDragEnter(e.treeNode);
+      onNodeDragEnter(e.treeIndex);
     }
   };
 
@@ -81,11 +80,11 @@ export const useDnd = ({
     if (!ctxRef.current.isActive) {
       return;
     }
-    if (!droppableFilter(startNodeRef.current!, e.treeNode)) {
+    if (!droppableFilter(startNodeRef.current!, e.treeIndex)) {
       return;
     }
     setIsDroppable(false);
-    onNodeDragLeave(e.treeNode);
+    onNodeDragLeave(e.treeIndex);
   };
 
   const onDragOver = (e: React.DragEvent) => {

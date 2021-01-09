@@ -1,14 +1,14 @@
 import React, { ReactNode } from 'react';
 import clsx from 'clsx';
-import { TreeNode } from '../../classes/tree-node';
 import './entity-label.global.scss';
+import { TreeNode } from '../../../interfaces/node.interface';
 
 interface EntityLabelProps {
-  onClick: React.DOMAttributes<HTMLDivElement>['onClick'];
-  onMouseDown: React.DOMAttributes<HTMLDivElement>['onMouseDown'];
-  onMouseUp: React.DOMAttributes<HTMLDivElement>['onMouseUp'];
-  onMouseEnter: React.DOMAttributes<HTMLDivElement>['onMouseEnter'];
-  onMouseLeave: React.DOMAttributes<HTMLDivElement>['onMouseLeave'];
+  onClick?: React.DOMAttributes<HTMLDivElement>['onClick'];
+  onMouseDown?: React.DOMAttributes<HTMLDivElement>['onMouseDown'];
+  onMouseUp?: React.DOMAttributes<HTMLDivElement>['onMouseUp'];
+  onMouseEnter?: React.DOMAttributes<HTMLDivElement>['onMouseEnter'];
+  onMouseLeave?: React.DOMAttributes<HTMLDivElement>['onMouseLeave'];
   children: ReactNode;
   node: TreeNode;
 }
@@ -34,7 +34,7 @@ const EntityLabelRaw: React.ForwardRefRenderFunction<
       data-label="label"
       className={clsx(
         'entity-label',
-        node.isCursor && 'entity-label--cursor',
+        node.isCursored && 'entity-label--cursor',
         node.isSelected && 'entity-label--selected'
       )}
       onDragLeave={(_e) => {
