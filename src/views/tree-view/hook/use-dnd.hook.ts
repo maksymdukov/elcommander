@@ -1,17 +1,39 @@
 import React, { useCallback, useRef } from 'react';
 import { useDndContext } from './use-dnd-context.hook';
 import { TreeDndHandlersVal } from '../context/droppable.context';
+import { TreeNode } from '../../../interfaces/node.interface';
+import { TreeEventType } from '../../../enums/tree-event-type.enum';
 
 interface UseDndHookProps {
-  onNodeDragEnter: (node: number) => void;
-  onNodeDragLeave: (node: number) => void;
-  onNodeDrop: (node: number) => void;
-  onInitialMouseDown?: (node: number) => void;
-  droppableFilter?: (startNode: number, currentNode: number) => boolean;
+  onNodeDragEnter: (nodeIndex: number, node: TreeNode) => void;
+  onNodeExternalDragEnter: (nodeIndex: number, node: TreeNode) => void;
+  onNodeDragLeave: (nodeIndex: number, node: TreeNode) => void;
+  onNodeExternalDragLeave: (nodeIndex: number, node: TreeNode) => void;
+  onNodeDrop: (nodeIndex: number, node: TreeNode) => void;
+  onInitialMouseDown?: (nodeIndex: number, node: TreeNode) => void;
+  droppableFilter?: ({
+    startNode,
+    currentNode,
+    startNodeIndex,
+    currentNodeIndex,
+  }: {
+    startNode: TreeNode | null;
+    currentNode: TreeNode;
+    startNodeIndex: number | null;
+    currentNodeIndex: number;
+  }) => boolean;
+  onContainerEnter: () => void;
+  onContainerLeave: () => void;
+  onContainerDrop: () => void;
+  onContainerExternalDrop: () => void;
+  onNodeExternalDrop: (index: number, node: TreeNode) => void;
+  onDndFinish: () => void;
 }
 
-const defaultFilter: UseDndHookProps['droppableFilter'] = (start, curr) =>
-  start !== curr;
+const defaultFilter: UseDndHookProps['droppableFilter'] = ({
+  currentNodeIndex,
+  startNodeIndex,
+}) => startNodeIndex !== currentNodeIndex;
 
 export const useDnd = ({
   onNodeDragEnter,
@@ -19,9 +41,18 @@ export const useDnd = ({
   onNodeDrop,
   onInitialMouseDown,
   droppableFilter = defaultFilter,
+  onContainerEnter,
+  onContainerLeave,
+  onDndFinish,
+  onContainerDrop,
+  onContainerExternalDrop,
+  onNodeExternalDrop,
+  onNodeExternalDragEnter,
+  onNodeExternalDragLeave,
 }: UseDndHookProps) => {
   const { setMouseCoords, setIsDroppable, ctxRef } = useDndContext();
-  const startNodeRef = useRef<number | null>(null);
+  const startNodeRef = useRef<TreeNode | null>(null);
+  const startNodeIndexRef = useRef<number | null>(null);
 
   const onGlobalMouseMove = useCallback(
     (e: MouseEvent) => {
@@ -36,22 +67,25 @@ export const useDnd = ({
       setMouseCoords(null, null);
       startNodeRef.current = null;
       ctxRef.current.isActive = false;
+      onDndFinish();
       window.removeEventListener('mousemove', onGlobalMouseMove);
       window.removeEventListener('mouseup', onGlobalMouseUp);
     },
-    [setMouseCoords, onGlobalMouseMove, startNodeRef, ctxRef]
+    [setMouseCoords, onGlobalMouseMove, startNodeRef, ctxRef, onDndFinish]
   );
 
   const onLabelMouseDown = (e: React.MouseEvent) => {
     if (!e.treeEventType) {
       return;
     }
+    const { treeIndex, treeNode } = e;
     if (onInitialMouseDown) {
-      onInitialMouseDown(e.treeIndex);
+      onInitialMouseDown(treeIndex, treeNode);
     }
     e.preventDefault();
-    startNodeRef.current = e.treeIndex;
-    console.log('onLabelMouseDown');
+    startNodeRef.current = treeNode;
+    startNodeIndexRef.current = treeIndex;
+    setIsDroppable(false);
     window.addEventListener('mousemove', onGlobalMouseMove);
     window.addEventListener('mouseup', onGlobalMouseUp);
   };
@@ -60,19 +94,38 @@ export const useDnd = ({
     if (!ctxRef.current.isActive) {
       return;
     }
+    e.treeEventType = TreeEventType.DNDNodeDrop;
+    const { treeIndex, treeNode } = e;
     e.preventDefault();
-    onNodeDrop(e.treeIndex);
+    if (
+      droppableFilter({
+        startNode: startNodeRef.current!,
+        startNodeIndex: startNodeIndexRef.current!,
+        currentNode: treeNode,
+        currentNodeIndex: treeIndex,
+      })
+    ) {
+      onNodeDrop(treeIndex, treeNode);
+    }
   };
 
   const onLabelMouseEnter = (e: React.MouseEvent) => {
     if (!ctxRef.current.isActive) {
       return;
     }
-    if (!droppableFilter(startNodeRef.current!, e.treeIndex)) {
+    const { treeIndex, treeNode } = e;
+    if (
+      !droppableFilter({
+        startNode: startNodeRef.current!,
+        startNodeIndex: startNodeIndexRef.current!,
+        currentNode: treeNode,
+        currentNodeIndex: treeIndex,
+      })
+    ) {
       setIsDroppable(false);
     } else {
       setIsDroppable(true);
-      onNodeDragEnter(e.treeIndex);
+      onNodeDragEnter(treeIndex, treeNode);
     }
   };
 
@@ -80,22 +133,130 @@ export const useDnd = ({
     if (!ctxRef.current.isActive) {
       return;
     }
-    if (!droppableFilter(startNodeRef.current!, e.treeIndex)) {
-      return;
+    const { treeIndex, treeNode } = e;
+    if (
+      droppableFilter({
+        currentNodeIndex: treeIndex,
+        currentNode: treeNode,
+        startNodeIndex: startNodeIndexRef.current!,
+        startNode: startNodeRef.current!,
+      })
+    ) {
+      onNodeDragLeave(treeIndex, treeNode);
     }
-    setIsDroppable(false);
-    onNodeDragLeave(e.treeIndex);
+    setIsDroppable(true);
   };
 
-  const onDragOver = (e: React.DragEvent) => {
-    if (!e.treeEventType) {
+  const onContainerMouseEnter = () => {
+    if (!ctxRef.current.isActive) {
       return;
     }
+    onContainerEnter();
+  };
+  const onContainerMouseLeave = () => {
+    if (!ctxRef.current.isActive) {
+      return;
+    }
+    onContainerLeave();
+  };
+
+  const onContainerMouseUp = (e: React.MouseEvent) => {
+    if (!ctxRef.current.isActive) {
+      return;
+    }
+    if (e.treeEventType) {
+      return;
+    }
+    onContainerDrop();
+  };
+
+  const onContainerDragOver = (e: React.DragEvent) => {
     e.preventDefault();
+    e.stopPropagation();
+    e.dataTransfer.dropEffect = 'copy';
+  };
+
+  const onContainerDragEnter = (e: React.DragEvent) => {
+    // e.preventDefault();
+    // e.dataTransfer.dropEffect = 'move';
+  };
+
+  const onContainerDragLeave = (e: React.DragEvent) => {};
+
+  const onContainerDragDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    onContainerExternalDrop();
+  };
+
+  const onLabelDragEnter = (index: number, node: TreeNode) => (
+    e: React.DragEvent
+  ) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (
+      droppableFilter({
+        startNode: null,
+        currentNode: node,
+        startNodeIndex: null,
+        currentNodeIndex: index,
+      })
+    ) {
+      e.dataTransfer.dropEffect = 'copy';
+      onNodeExternalDragEnter(index, node);
+    } else {
+      e.dataTransfer.dropEffect = 'none';
+    }
+  };
+  const onLabelDragLeave = (index: number, node: TreeNode) => (
+    e: React.DragEvent
+  ) => {
+    e.stopPropagation();
+    if (
+      droppableFilter({
+        startNode: null,
+        currentNode: node,
+        startNodeIndex: null,
+        currentNodeIndex: index,
+      })
+    ) {
+      onNodeExternalDragLeave(index, node);
+    }
+  };
+  const onLabelDragDrop = (index: number, node: TreeNode) => (
+    e: React.DragEvent
+  ) => {
+    e.preventDefault();
+    e.stopPropagation();
+    onNodeExternalDrop(index, node);
+  };
+
+  const onLabelDragOver = (index: number, node: TreeNode) => (
+    e: React.DragEvent
+  ) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (
+      droppableFilter({
+        startNode: null,
+        currentNode: node,
+        startNodeIndex: null,
+        currentNodeIndex: index,
+      })
+    ) {
+      e.dataTransfer.dropEffect = 'copy';
+    } else {
+      e.dataTransfer.dropEffect = 'none';
+    }
   };
 
   const getDndHandlers = () => ({
-    onDragOver,
+    onDragOver: onContainerDragOver,
+    onMouseEnter: onContainerMouseEnter,
+    onMouseLeave: onContainerMouseLeave,
+    onMouseUp: onContainerMouseUp,
+    onDragEnter: onContainerDragEnter,
+    onDragLeave: onContainerDragLeave,
+    onDrop: onContainerDragDrop,
   });
 
   const getNodeHandlers = (): TreeDndHandlersVal => ({
@@ -103,6 +264,10 @@ export const useDnd = ({
     onMouseUp: onLabelMouseUp,
     onMouseEnter: onLabelMouseEnter,
     onMouseLeave: onLabelMouseLeave,
+    onDragEnter: onLabelDragEnter,
+    onDragLeave: onLabelDragLeave,
+    onDragOver: onLabelDragOver,
+    onDrop: onLabelDragDrop,
   });
 
   return {

@@ -9,14 +9,6 @@ export interface TreeState {
   allIds: string[];
   cursor: null | number;
   selectedIds: Set<string>;
-  lassoActive: boolean;
-  lassoCoords: {
-    start: number | null;
-    current: number | null;
-    mousePageY: number;
-  };
-  lassoScrolling: boolean;
-  lassoStartCandidate: null;
 }
 
 export interface ViewsState {

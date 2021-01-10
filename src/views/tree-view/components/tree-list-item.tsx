@@ -9,6 +9,7 @@ import { RootState } from '../../../redux/root-types';
 import { TreeEventType } from '../../../enums/tree-event-type.enum';
 import { useNodeRef } from '../hook/use-node-ref';
 import { useDndNodeHandlers } from '../hook/use-dnd-node-handlers.hook';
+import './node.global.scss';
 
 interface TreeListItemRawProps {
   index: number;
@@ -29,6 +30,10 @@ const TreeListItemRaw: React.FC<TreeListItemRawProps> = ({
     onMouseEnter: handleMouseEnter,
     onMouseLeave: handleMouseLeave,
     onMouseDown: handleMouseDown,
+    onDragEnter,
+    onDragLeave,
+    onDrop,
+    onDragOver,
   } = useDndNodeHandlers();
   const node = useSelector((state: RootState) =>
     getNodeById(state, data.viewIndex, data.allIds[index])
@@ -59,6 +64,7 @@ const TreeListItemRaw: React.FC<TreeListItemRawProps> = ({
 
   const onTitleMouseDown = (e: React.MouseEvent) => {
     e.treeIndex = index;
+    e.treeNode = node;
     if (e.shiftKey) {
       e.treeEventType = TreeEventType.ItemShiftSelect;
       return;
@@ -81,16 +87,19 @@ const TreeListItemRaw: React.FC<TreeListItemRawProps> = ({
 
   const onTitleMouseEnter = (e: React.MouseEvent<HTMLDivElement>) => {
     e.treeIndex = index;
+    e.treeNode = node;
     e.treeEventType = TreeEventType.MoveSelectionEnter;
     handleMouseEnter(e);
   };
   const onTitleMouseLeave = (e: React.MouseEvent) => {
     e.treeIndex = index;
+    e.treeNode = node;
     e.treeEventType = TreeEventType.MoveSelectionLeave;
     handleMouseLeave(e);
   };
   const onTitleMouseUp = (e: React.MouseEvent) => {
     e.treeIndex = index;
+    e.treeNode = node;
     e.treeEventType = TreeEventType.MoveSelectionFinish;
     handleMouseUp(e);
   };
@@ -106,6 +115,10 @@ const TreeListItemRaw: React.FC<TreeListItemRawProps> = ({
         <NodeControlIcon node={node} onClick={onIconPicClick} offset={offset} />
         <EntityLabel
           // ref={ref}
+          onDragLeave={onDragLeave(index, node)}
+          onDragEnter={onDragEnter(index, node)}
+          onDragOver={onDragOver(index, node)}
+          onDrop={onDrop(index, node)}
           onClick={onTitleClick}
           onMouseDown={onTitleMouseDown}
           onMouseUp={onTitleMouseUp}

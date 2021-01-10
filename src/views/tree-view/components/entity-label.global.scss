@@ -3,6 +3,9 @@
   margin-left: 13px;
   display: flex;
   align-items: center;
+  & * {
+    pointer-events: none;
+  }
   &--cursor {
     background: #282c34;
     color: white;
@@ -15,5 +18,10 @@
 
   &__label {
     margin-left: 8px;
+  }
+
+  &--highlighted {
+    background: #201f9f;
+    color: white;
   }
 }

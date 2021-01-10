@@ -5,6 +5,8 @@ import classes from './dnd-preview-icon.scss';
 import { useDndPreviewContext } from '../hook/use-dnd-preview-context.hook';
 import { useDndContext } from '../hook/use-dnd-context.hook';
 
+const PREVIEW_OFFSET = 15;
+
 const DndPreviewIcon: React.FC = () => {
   const { mouseY, mouseX } = useDndPreviewContext();
   const { state } = useDndContext();
@@ -13,7 +15,11 @@ const DndPreviewIcon: React.FC = () => {
 
   return (
     <div
-      style={{ top: mouseY + 15, left: mouseX + 15 }}
+      style={{
+        transform: `translate(${mouseX + PREVIEW_OFFSET}px, ${
+          mouseY + PREVIEW_OFFSET
+        }px)`,
+      }}
       className={classes['preview-icon']}
     >
       {state.isDroppable ? (

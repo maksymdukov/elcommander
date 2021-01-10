@@ -1,10 +1,12 @@
 import { TreeEventType } from '../enums/tree-event-type.enum';
+import { TreeNode } from './node.interface';
 
 declare global {
   namespace React {
     interface MouseEvent {
       treeEventType: TreeEventType;
       treeIndex: number;
+      treeNode: TreeNode;
     }
   }
 }

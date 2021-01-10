@@ -38,6 +38,7 @@ type LassoSelection = {
   end: number;
   direction: boolean;
 } & ViewIndexPayload;
+type ToggleNodeHighlight = IndexPayload & ViewIndexPayload;
 
 export const openDirectoryAction = createAction<OpenDirectory>(
   'views/openDirectory'
@@ -57,6 +58,9 @@ export const resetSelectionAction = createAction<ResetSelection>(
 );
 export const lassoSelectionAction = createAction<LassoSelection>(
   'views/lassoSelection'
+);
+export const toggleNodeHighlight = createAction<ToggleNodeHighlight>(
+  'views/toggleNodeHighlight'
 );
 
 export const openDirThunk = (

@@ -6,6 +6,10 @@ const Droppable: React.FC<TreeDndHandlersVal> = ({
   onMouseEnter,
   onMouseDown,
   onMouseUp,
+  onDragLeave,
+  onDragEnter,
+  onDrop,
+  onDragOver,
   children,
 }) => {
   const valueRef = useRef<TreeDndHandlersVal>({
@@ -13,6 +17,10 @@ const Droppable: React.FC<TreeDndHandlersVal> = ({
     onMouseEnter,
     onMouseDown,
     onMouseUp,
+    onDrop,
+    onDragLeave,
+    onDragEnter,
+    onDragOver,
   });
   return (
     <DroppableContext.Provider value={valueRef.current}>

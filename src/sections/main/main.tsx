@@ -7,6 +7,7 @@ import TreeDndProvider from '../../views/tree-view/context/tree-dnd.provider';
 import DndPreviewIcon from '../../views/tree-view/components/dnd-preview-icon';
 import { getViewsSelector } from '../../redux/features/views/views.selectors';
 import TreeView from '../../views/tree-view/tree.view';
+import DndAutoScroll from '../../views/tree-view/components/dnd-auto-scroll';
 
 const localFs = new LocalFs();
 
@@ -32,6 +33,7 @@ const Main = () => {
         </AutoSizer>
       </div>
       <DndPreviewIcon />
+      <DndAutoScroll />
     </TreeDndProvider>
   );
 };

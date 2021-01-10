@@ -15,6 +15,7 @@ const TreeDndProvider: React.FC = ({ children }) => {
   const [mouseState, setMouseState] = useState<DNDPreviewState>({
     mouseX: null,
     mouseY: null,
+    container: null,
   });
 
   const ctxRef = useRef<CtxRef>({
@@ -27,6 +28,16 @@ const TreeDndProvider: React.FC = ({ children }) => {
         ...oldState,
         mouseX: x,
         mouseY: y,
+      }));
+    },
+    [setMouseState]
+  );
+
+  const setContainerElement = useCallback(
+    (container: null | HTMLDivElement) => {
+      setMouseState((prevState) => ({
+        ...prevState,
+        container,
       }));
     },
     [setMouseState]
@@ -47,9 +58,10 @@ const TreeDndProvider: React.FC = ({ children }) => {
       state,
       setMouseCoords,
       setIsDroppable,
+      setContainerElement,
       ctxRef,
     }),
-    [state, setMouseCoords, setIsDroppable, ctxRef]
+    [state, setMouseCoords, setIsDroppable, ctxRef, setContainerElement]
   );
   return (
     <TreeDNDContext.Provider value={memoizedState}>

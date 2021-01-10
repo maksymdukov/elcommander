@@ -9,6 +9,10 @@ interface EntityLabelProps {
   onMouseUp?: React.DOMAttributes<HTMLDivElement>['onMouseUp'];
   onMouseEnter?: React.DOMAttributes<HTMLDivElement>['onMouseEnter'];
   onMouseLeave?: React.DOMAttributes<HTMLDivElement>['onMouseLeave'];
+  onDragEnter: React.DragEventHandler;
+  onDragLeave: React.DragEventHandler;
+  onDragOver: React.DragEventHandler;
+  onDrop: React.DragEventHandler;
   children: ReactNode;
   node: TreeNode;
 }
@@ -25,6 +29,10 @@ const EntityLabelRaw: React.ForwardRefRenderFunction<
     onMouseUp,
     node,
     onMouseDown,
+    onDrop,
+    onDragEnter,
+    onDragLeave,
+    onDragOver,
   },
   ref
 ) => {
@@ -35,30 +43,19 @@ const EntityLabelRaw: React.ForwardRefRenderFunction<
       className={clsx(
         'entity-label',
         node.isCursored && 'entity-label--cursor',
-        node.isSelected && 'entity-label--selected'
+        node.isSelected && 'entity-label--selected',
+        node.isHighlighted && 'entity-label--highlighted'
       )}
-      onDragLeave={(_e) => {
-        // for external dnd
-        console.log('external leave');
-      }}
-      onDragEnter={(e) => {
-        // for external dnd
-        console.log('external enter');
-        e.dataTransfer.dropEffect = 'none';
-      }}
-      onDragOver={(e) => {
-        // for external dnd
-        e.preventDefault();
-        e.dataTransfer.dropEffect = 'copy';
-        console.log('external drag occurring');
-      }}
-      onDrop={(_e) => console.log('drop occurred')}
+      onDrop={onDrop}
+      onDragEnter={onDragEnter}
+      onDragLeave={onDragLeave}
+      onDragOver={onDragOver}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
       onMouseDown={onMouseDown}
       onMouseUp={onMouseUp}
       onClick={onClick}
-      draggable="true"
+      // draggable="true"
     >
       {children}
       <span className="entity-label__label">{node.name}</span>

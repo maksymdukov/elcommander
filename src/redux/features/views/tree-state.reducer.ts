@@ -12,6 +12,7 @@ import {
   resetSelectionAction,
   selectFromToAction,
   setCursoredAction,
+  toggleNodeHighlight,
   toggleSelectionAction,
 } from './tree-state.actions';
 
@@ -21,14 +22,6 @@ export const treeStateReducer = createReducer<TreeState>(
     allIds: [],
     cursor: null,
     selectedIds: new Set(),
-    lassoActive: false,
-    lassoCoords: {
-      current: null,
-      start: null,
-      mousePageY: 0,
-    },
-    lassoScrolling: false,
-    lassoStartCandidate: null,
   },
   (builder) => {
     builder.addCase(
@@ -53,6 +46,7 @@ export const treeStateReducer = createReducer<TreeState>(
             isCursored: false,
             isOpened: false,
             isSelected: false,
+            isHighlighted: false,
             nestLevel,
             type: node.type,
           };
@@ -216,5 +210,11 @@ export const treeStateReducer = createReducer<TreeState>(
         }
       }
     );
+
+    builder.addCase(toggleNodeHighlight, (state, { payload: { index } }) => {
+      const nodeId = state.allIds[index];
+      const node = state.byIds[nodeId];
+      node.isHighlighted = !node.isHighlighted;
+    });
   }
 );

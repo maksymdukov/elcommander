@@ -1,5 +1,5 @@
 import React, { RefObject, useMemo, useRef, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { FixedSizeList } from 'react-window';
 import { RootState } from '../../redux/root-types';
 import { getAllIdxByIndex } from '../../redux/features/views/views.selectors';
@@ -10,8 +10,7 @@ import { LassoContextRef, LassoContextState } from './context/lasso.context';
 import LassoContextProvider from './context/lasso-context.provider';
 import { IFSBackend } from '../../backends/interfaces/fs-backend.interface';
 import Droppable from './context/droppable';
-import { useDnd } from './hook/use-dnd.hook';
-import { setCursoredAction } from '../../redux/features/views/tree-state.actions';
+import { useTreeDnd } from './hook/use-tree-dnd.hook';
 
 interface TreeListProps {
   index: number;
@@ -25,19 +24,9 @@ const TreeList: React.FC<TreeListProps> = ({
   height,
   itemSize = 40,
 }) => {
-  const dispatch = useDispatch();
   const allIds = useSelector((state: RootState) =>
     getAllIdxByIndex(state, index)
   );
-
-  const { getDndHandlers, getNodeHandlers } = useDnd({
-    onInitialMouseDown: (nodeIdx) =>
-      dispatch(setCursoredAction({ viewIndex: index, index: nodeIdx })),
-    onNodeDragEnter: (n) => console.log('enter', n),
-    onNodeDragLeave: (n) => console.log('leave', n),
-    onNodeDrop: (n) => console.log('drop', n),
-    droppableFilter: (start, end) => start !== end,
-  });
 
   // used in lasso
   const itemCfgRef = useRef({ count: 0, size: itemSize });
@@ -60,6 +49,11 @@ const TreeList: React.FC<TreeListProps> = ({
     scrollRef,
     viewIndex: index,
     lassoState,
+  });
+
+  const { getNodeHandlers, getDndHandlers } = useTreeDnd({
+    viewIndex: index,
+    scrollableRef: outerRef,
   });
 
   const itemData = useMemo(() => ({ allIds, viewIndex: index }), [

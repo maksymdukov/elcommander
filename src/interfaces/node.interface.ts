@@ -9,4 +9,5 @@ export interface TreeNode {
   isOpened: boolean;
   isSelected: boolean;
   isCursored: boolean;
+  isHighlighted: boolean;
 }

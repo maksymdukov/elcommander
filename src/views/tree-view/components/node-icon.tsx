@@ -18,7 +18,8 @@ const NodeIcon: React.FC<NodeIconProps> = ({ node }) => {
         Element: FolderIcon,
         className: clsx(
           'node__image',
-          node.isCursored && 'node__image--selected'
+          node.isCursored && 'node__image--selected',
+          node.isHighlighted && 'node__image--highlighted'
         ),
       };
       break;
@@ -28,7 +29,8 @@ const NodeIcon: React.FC<NodeIconProps> = ({ node }) => {
         Element: FileIcon,
         className: clsx(
           'node__image',
-          node.isCursored && 'node__image--selected'
+          node.isCursored && 'node__image--selected',
+          node.isHighlighted && 'node__image--highlighted'
         ),
       };
   }

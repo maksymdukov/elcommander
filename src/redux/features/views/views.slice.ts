@@ -21,14 +21,6 @@ export const initialState: ViewsState = {
       allIds: ['/'],
       cursor: null,
       selectedIds: new Set(),
-      lassoActive: false,
-      lassoCoords: {
-        current: null,
-        start: null,
-        mousePageY: 0,
-      },
-      lassoScrolling: false,
-      lassoStartCandidate: null,
     },
     {
       byIds: {
@@ -46,14 +38,6 @@ export const initialState: ViewsState = {
       allIds: ['/'],
       cursor: null,
       selectedIds: new Set(),
-      lassoActive: false,
-      lassoCoords: {
-        current: null,
-        start: null,
-        mousePageY: 0,
-      },
-      lassoScrolling: false,
-      lassoStartCandidate: null,
     },
   ],
 };
@@ -78,14 +62,6 @@ export const viewsSlice = createSlice({
         allIds: [],
         cursor: null,
         selectedIds: new Set(),
-        lassoActive: false,
-        lassoCoords: {
-          current: null,
-          start: null,
-          mousePageY: 0,
-        },
-        lassoScrolling: false,
-        lassoStartCandidate: null,
       });
     },
   },

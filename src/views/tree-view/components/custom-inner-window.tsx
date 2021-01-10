@@ -5,6 +5,8 @@ interface CustomInnerWindowProps {
   style: CSSProperties;
 }
 
+// TODO
+// pass data needed by WindowLasso through ref
 const CustomInnerWindow: React.ForwardRefRenderFunction<
   HTMLDivElement,
   CustomInnerWindowProps

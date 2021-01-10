@@ -5,4 +5,5 @@ export interface DNDState {
 export interface DNDPreviewState {
   mouseX: number | null;
   mouseY: number | null;
+  container: HTMLDivElement | null;
 }

@@ -1,5 +1,5 @@
-import { DNDPreviewState, DNDState } from './tree-dnd-state.interface';
 import { MutableRefObject } from 'react';
+import { DNDPreviewState, DNDState } from './tree-dnd-state.interface';
 
 export interface CtxRef {
   isActive: boolean;
@@ -13,4 +13,5 @@ export interface TreeDndContextVal {
     y: DNDPreviewState['mouseY']
   ) => void;
   setIsDroppable: (isDroppable: boolean) => void;
+  setContainerElement: (container: null | HTMLDivElement) => void;
 }
