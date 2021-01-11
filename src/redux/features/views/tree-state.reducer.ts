@@ -1,60 +1,46 @@
 import { createReducer } from '@reduxjs/toolkit';
 import { TreeState } from './tree-state.interface';
 import {
-  changeSelectionFromTo,
-  findDeepestOpenedChildId,
-  updateCursorPosition,
-} from './tree-state.utils';
-import {
   closeDirectoryAction,
-  lassoSelectionAction,
+  enterDirectoryAction,
+  enterDirectoryByPathAction,
+  exitDirectoryAction,
   openDirectoryAction,
+} from './actions/tree-dir.actions';
+import { setCursoredAction } from './actions/tree-cursor.action';
+import {
+  lassoSelectionAction,
   resetSelectionAction,
   selectFromToAction,
-  setCursoredAction,
-  toggleNodeHighlight,
+  toggleNodeHighlightAction,
   toggleSelectionAction,
-} from './tree-state.actions';
+} from './actions/tree-selection.actions';
+import { initialState } from './views-init-state';
+import { DirectoryStateUtils } from './utils/directory-state.utils';
+import { CursorStateUtils } from './utils/cursor-state.utils';
+import { TreeStateUtils } from './tree-state.utils';
+import { SelectionStateUtils } from './utils/selection-state.utils';
 
 export const treeStateReducer = createReducer<TreeState>(
-  {
-    byIds: {},
-    allIds: [],
-    cursor: null,
-    selectedIds: new Set(),
-  },
+  initialState.views[0],
   (builder) => {
     builder.addCase(
       openDirectoryAction,
       (state, { payload: { parentIndex, nodes } }) => {
         // find parentId
-        const parentId = state.allIds[parentIndex];
-        const parent = state.byIds[parentId];
+        const parent = TreeStateUtils.getNodeByIndex(state, parentIndex);
         parent.isOpened = true;
-
         const nestLevel = parent.nestLevel + 1;
-
-        const ids: string[] = [];
-
-        // insert nodes
-        nodes.forEach((node) => {
-          ids.push(node.id);
-          state.byIds[node.id] = {
-            id: node.id,
-            name: node.name,
-            children: [],
-            isCursored: false,
-            isOpened: false,
-            isSelected: false,
-            isHighlighted: false,
-            nestLevel,
-            type: node.type,
-          };
+        const ids = DirectoryStateUtils.insertNodes({
+          state,
+          nestLevel,
+          nodes,
+          parentId: parent.id,
         });
-
         // add children to parent.children node
         parent.children = ids;
-        updateCursorPosition(state, () => {
+        // update cursor pos due to possible shift in allIds
+        CursorStateUtils.updateCursorPosition(state, () => {
           state.allIds.splice(parentIndex + 1, 0, ...ids);
         });
       }
@@ -64,7 +50,10 @@ export const treeStateReducer = createReducer<TreeState>(
       // find deepest opened item
       const parentId = state.allIds[index];
       const parent = state.byIds[parentId];
-      const lastChildId = findDeepestOpenedChildId(state, parentId);
+      const lastChildId = CursorStateUtils.findDeepestOpenedChildId(
+        state,
+        parentId
+      );
       parent.isOpened = false;
       if (parentId === lastChildId) {
         // parent dir is empty
@@ -73,43 +62,28 @@ export const treeStateReducer = createReducer<TreeState>(
       }
 
       // splice allIds array from start to this node
-      let lastChildIndex: number;
       // find lastChild index in allIds array
-      for (let i = index; i < state.allIds.length; i += 1) {
-        if (state.allIds[i] === lastChildId) {
-          lastChildIndex = i;
-          break;
-        }
-      }
+      const lastChildIndex = TreeStateUtils.findNodeIndexById(
+        state,
+        lastChildId,
+        index
+      );
 
-      updateCursorPosition(state, () => {
-        const removed = state.allIds.splice(index + 1, lastChildIndex! - index);
-
-        // remove nodes from byIds
-        removed.forEach((r) => {
-          delete state.byIds[r];
-          // remove potential selected
-          state.selectedIds.delete(r);
-        });
+      CursorStateUtils.updateCursorPosition(state, () => {
+        TreeStateUtils.removeNodes(state, index + 1, lastChildIndex! - index);
       });
     });
 
     builder.addCase(setCursoredAction, (state, { payload: { index } }) => {
-      const newCursorId = state.allIds[index];
-      const newCursor = state.byIds[newCursorId];
-
+      const newCursor = TreeStateUtils.getNodeByIndex(state, index);
       if (state.cursor === index) {
         // do nothing
         return;
       }
 
-      if (state.cursor !== null) {
-        // unset current cursor
-        const currentCursor = state.byIds[state.allIds[state.cursor]];
-        if (currentCursor) {
-          currentCursor.isCursored = false;
-        }
-      }
+      // in cursor is set - unset current cursor
+      CursorStateUtils.tryUnsetCurrentCursor(state);
+
       newCursor.isCursored = true;
       state.cursor = index;
     });
@@ -126,7 +100,7 @@ export const treeStateReducer = createReducer<TreeState>(
     });
 
     builder.addCase(selectFromToAction, (state, { payload: { index } }) => {
-      if (!state.cursor || index === state.cursor) {
+      if (state.cursor === null || index === state.cursor) {
         return;
       }
       const isGoingDown = index > state.cursor;
@@ -142,10 +116,7 @@ export const treeStateReducer = createReducer<TreeState>(
     });
 
     builder.addCase(resetSelectionAction, (state) => {
-      state.selectedIds.forEach((id) => {
-        state.byIds[id].isSelected = false;
-      });
-      state.selectedIds.clear();
+      SelectionStateUtils.resetSelection(state);
     });
 
     builder.addCase(
@@ -161,13 +132,13 @@ export const treeStateReducer = createReducer<TreeState>(
           } else {
             // do nothing but check that no one else is added at the position of end + 1 and end - 1
             // check to see two sides
-            changeSelectionFromTo({
+            SelectionStateUtils.changeSelectionFromTo({
               state,
               isSelect: false,
               start: end + 1,
               fwd: true,
             });
-            changeSelectionFromTo({
+            SelectionStateUtils.changeSelectionFromTo({
               state,
               isSelect: false,
               start: end - 1,
@@ -183,7 +154,7 @@ export const treeStateReducer = createReducer<TreeState>(
         if (state.selectedIds.has(endId)) {
           // it's already there
           // lets remove potential end + 1
-          changeSelectionFromTo({
+          SelectionStateUtils.changeSelectionFromTo({
             state,
             isSelect: false,
             start: isGoingDown ? end + 1 : end - 1,
@@ -192,7 +163,7 @@ export const treeStateReducer = createReducer<TreeState>(
         } else {
           // not there
           // go from the end and towards the start and add
-          changeSelectionFromTo({
+          SelectionStateUtils.changeSelectionFromTo({
             state,
             isSelect: true,
             start: end,
@@ -201,7 +172,7 @@ export const treeStateReducer = createReducer<TreeState>(
           });
           // check start - 1 position
           // in case we abruptly went from negative to positive selection
-          changeSelectionFromTo({
+          SelectionStateUtils.changeSelectionFromTo({
             state,
             isSelect: false,
             start: isGoingDown ? start - 1 : start + 1,
@@ -211,10 +182,44 @@ export const treeStateReducer = createReducer<TreeState>(
       }
     );
 
-    builder.addCase(toggleNodeHighlight, (state, { payload: { index } }) => {
-      const nodeId = state.allIds[index];
-      const node = state.byIds[nodeId];
-      node.isHighlighted = !node.isHighlighted;
-    });
+    builder.addCase(
+      toggleNodeHighlightAction,
+      (state, { payload: { index } }) => {
+        const nodeId = state.allIds[index];
+        const node = state.byIds[nodeId];
+        node.isHighlighted = !node.isHighlighted;
+      }
+    );
+
+    builder.addCase(
+      enterDirectoryAction,
+      (state, { payload: { index, nodes } }) => {
+        const targetNode = TreeStateUtils.getNodeByIndex(state, index);
+        DirectoryStateUtils.enterDirByPath(state, nodes, targetNode.id);
+        CursorStateUtils.trySetCursorAt(state);
+      }
+    );
+
+    builder.addCase(
+      enterDirectoryByPathAction,
+      (state, { payload: { nodes, path } }) => {
+        DirectoryStateUtils.enterDirByPath(state, nodes, path);
+        CursorStateUtils.trySetCursorAt(state);
+      }
+    );
+
+    builder.addCase(
+      exitDirectoryAction,
+      (state, { payload: { nodes, parentPath } }) => {
+        const currentPath = state.startPath;
+        DirectoryStateUtils.enterDirByPath(state, nodes, parentPath);
+        const cursorIndex = CursorStateUtils.findCursorIndex(
+          state,
+          currentPath
+        );
+        // try to set cursor on the exited dir
+        CursorStateUtils.trySetCursorAt(state, cursorIndex);
+      }
+    );
   }
 );

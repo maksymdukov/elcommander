@@ -1,6 +1,7 @@
 export enum TreeEventType {
   OpenNode = 1,
   CloseNode,
+  EnterNode,
   ItemCursorSelect,
   ItemShiftSelect,
   ItemShiftMouseSelect,

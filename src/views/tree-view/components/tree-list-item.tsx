@@ -10,14 +10,16 @@ import { TreeEventType } from '../../../enums/tree-event-type.enum';
 import { useNodeRef } from '../hook/use-node-ref';
 import { useDndNodeHandlers } from '../hook/use-dnd-node-handlers.hook';
 import './node.global.scss';
+import {
+  CHILDREN_OFFSET_PX,
+  INITIAL_NODE_OFFSET,
+} from '../tree-view.constants';
 
 interface TreeListItemRawProps {
   index: number;
   data: { viewIndex: number; allIds: string[] };
   style: CSSProperties;
 }
-
-const CHILDREN_OFFSET_PX = 26;
 
 const TreeListItemRaw: React.FC<TreeListItemRawProps> = ({
   index,
@@ -38,7 +40,7 @@ const TreeListItemRaw: React.FC<TreeListItemRawProps> = ({
   const node = useSelector((state: RootState) =>
     getNodeById(state, data.viewIndex, data.allIds[index])
   );
-  const offset = node.nestLevel * CHILDREN_OFFSET_PX;
+  const offset = node.nestLevel * CHILDREN_OFFSET_PX + INITIAL_NODE_OFFSET;
 
   const onIconPicClick = (e: React.MouseEvent) => {
     if (node.isOpened) {
@@ -60,6 +62,12 @@ const TreeListItemRaw: React.FC<TreeListItemRawProps> = ({
       return;
     }
     e.treeEventType = TreeEventType.ItemCursorSelect;
+  };
+
+  const onTitleDoubleClick = (e: React.MouseEvent) => {
+    e.treeIndex = index;
+    e.treeNode = node;
+    e.treeEventType = TreeEventType.EnterNode;
   };
 
   const onTitleMouseDown = (e: React.MouseEvent) => {
@@ -114,12 +122,12 @@ const TreeListItemRaw: React.FC<TreeListItemRawProps> = ({
       <div className="node__title" style={{ paddingLeft: offset }}>
         <NodeControlIcon node={node} onClick={onIconPicClick} offset={offset} />
         <EntityLabel
-          // ref={ref}
           onDragLeave={onDragLeave(index, node)}
           onDragEnter={onDragEnter(index, node)}
           onDragOver={onDragOver(index, node)}
           onDrop={onDrop(index, node)}
           onClick={onTitleClick}
+          onDoubleClick={onTitleDoubleClick}
           onMouseDown={onTitleMouseDown}
           onMouseUp={onTitleMouseUp}
           onMouseLeave={onTitleMouseLeave}

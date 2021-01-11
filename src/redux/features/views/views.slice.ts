@@ -1,50 +1,7 @@
 import { AnyAction, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { treeStateReducer } from './tree-state.reducer';
-import { ViewsState } from './tree-state.interface';
-import { FsItemTypeEnum } from '../../../enums/fs-item-type.enum';
-
-export const initialState: ViewsState = {
-  views: [
-    {
-      byIds: {
-        '/': {
-          type: FsItemTypeEnum.Directory,
-          children: [],
-          nestLevel: 0,
-          isSelected: false,
-          isOpened: false,
-          isCursored: false,
-          id: '/',
-          name: '/',
-        },
-      },
-      allIds: ['/'],
-      cursor: null,
-      selectedIds: new Set(),
-    },
-    {
-      byIds: {
-        '/': {
-          type: FsItemTypeEnum.Directory,
-          children: [],
-          nestLevel: 0,
-          isSelected: false,
-          isOpened: false,
-          isCursored: false,
-          id: '/',
-          name: '/',
-        },
-      },
-      allIds: ['/'],
-      cursor: null,
-      selectedIds: new Set(),
-    },
-  ],
-};
-
-export interface ViewIndexPayload {
-  viewIndex: number;
-}
+import { initialState } from './views-init-state';
+import { ViewIndexPayload } from './tree-state.interface';
 
 function isTreeStateAction(
   action: AnyAction
@@ -58,10 +15,13 @@ export const viewsSlice = createSlice({
   reducers: {
     addView(state) {
       state.views.push({
+        viewName: 'boo',
+        viewId: state.views.length ? state.views.length.toString() : '0',
         byIds: {},
         allIds: [],
         cursor: null,
         selectedIds: new Set(),
+        startPath: '/',
       });
     },
   },

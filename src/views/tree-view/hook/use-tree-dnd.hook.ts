@@ -1,13 +1,11 @@
 import { MutableRefObject } from 'react';
 import { useDispatch } from 'react-redux';
 import { useDnd } from './use-dnd.hook';
-import {
-  setCursoredAction,
-  toggleNodeHighlight,
-} from '../../../redux/features/views/tree-state.actions';
 import { UNDROPPABLE_NODE_TYPES } from '../tree-view.constants';
 import { useDndContext } from './use-dnd-context.hook';
 import { TreeNode } from '../../../interfaces/node.interface';
+import { setCursoredAction } from '../../../redux/features/views/actions/tree-cursor.action';
+import { toggleNodeHighlightAction } from '../../../redux/features/views/actions/tree-selection.actions';
 
 interface UseTreeDndProps {
   viewIndex: number;
@@ -38,11 +36,11 @@ export const useTreeDnd = ({ viewIndex, scrollableRef }: UseTreeDndProps) => {
       }
     },
     onNodeDragEnter: (nodeIndex) =>
-      dispatch(toggleNodeHighlight({ viewIndex, index: nodeIndex })),
+      dispatch(toggleNodeHighlightAction({ viewIndex, index: nodeIndex })),
     onNodeDragLeave: (nodeIndex) =>
-      dispatch(toggleNodeHighlight({ viewIndex, index: nodeIndex })),
+      dispatch(toggleNodeHighlightAction({ viewIndex, index: nodeIndex })),
     onNodeDrop: (nodeIndex) => {
-      dispatch(toggleNodeHighlight({ viewIndex, index: nodeIndex }));
+      dispatch(toggleNodeHighlightAction({ viewIndex, index: nodeIndex }));
       console.log('drop on node index:', nodeIndex);
     },
     droppableFilter,
@@ -61,14 +59,16 @@ export const useTreeDnd = ({ viewIndex, scrollableRef }: UseTreeDndProps) => {
       setContainerElement(null);
     },
     onNodeExternalDragEnter: (index) => {
-      dispatch(toggleNodeHighlight({ viewIndex, index }));
+      dispatch(toggleNodeHighlightAction({ viewIndex, index }));
     },
     onNodeExternalDragLeave: (index) => {
-      dispatch(toggleNodeHighlight({ viewIndex, index }));
+      dispatch(toggleNodeHighlightAction({ viewIndex, index }));
     },
-    onContainerExternalDrop: () => console.log('external container drop'),
+    onContainerExternalDrop: () =>
+      console.log('external container drop viewIndex:', viewIndex),
     onNodeExternalDrop: (index) => {
-      dispatch(toggleNodeHighlight({ viewIndex, index }));
+      dispatch(toggleNodeHighlightAction({ viewIndex, index }));
+      console.log('external node drop index, viewIndex:', index, viewIndex);
     },
   });
   return { getDndHandlers, getNodeHandlers };

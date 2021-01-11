@@ -1,4 +1,8 @@
 import { FsItemTypeEnum } from '../../enums/fs-item-type.enum';
+// UI
+export const INITIAL_NODE_OFFSET = 15; // px
+export const CHILDREN_OFFSET_PX = 26; // px
+export const OPENABLE_NODE_TYPES = [FsItemTypeEnum.Directory];
 
 // represents top and bottom threshold in container
 // when autoscroll starts to kick in

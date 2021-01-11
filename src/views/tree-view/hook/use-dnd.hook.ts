@@ -82,7 +82,7 @@ export const useDnd = ({
     if (onInitialMouseDown) {
       onInitialMouseDown(treeIndex, treeNode);
     }
-    e.preventDefault();
+    // e.preventDefault();
     startNodeRef.current = treeNode;
     startNodeIndexRef.current = treeIndex;
     setIsDroppable(false);
@@ -176,13 +176,6 @@ export const useDnd = ({
     e.dataTransfer.dropEffect = 'copy';
   };
 
-  const onContainerDragEnter = (e: React.DragEvent) => {
-    // e.preventDefault();
-    // e.dataTransfer.dropEffect = 'move';
-  };
-
-  const onContainerDragLeave = (e: React.DragEvent) => {};
-
   const onContainerDragDrop = (e: React.DragEvent) => {
     e.preventDefault();
     onContainerExternalDrop();
@@ -254,8 +247,6 @@ export const useDnd = ({
     onMouseEnter: onContainerMouseEnter,
     onMouseLeave: onContainerMouseLeave,
     onMouseUp: onContainerMouseUp,
-    onDragEnter: onContainerDragEnter,
-    onDragLeave: onContainerDragLeave,
     onDrop: onContainerDragDrop,
   });
 

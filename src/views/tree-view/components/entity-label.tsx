@@ -5,6 +5,7 @@ import { TreeNode } from '../../../interfaces/node.interface';
 
 interface EntityLabelProps {
   onClick?: React.DOMAttributes<HTMLDivElement>['onClick'];
+  onDoubleClick: React.DOMAttributes<HTMLDivElement>['onDoubleClick'];
   onMouseDown?: React.DOMAttributes<HTMLDivElement>['onMouseDown'];
   onMouseUp?: React.DOMAttributes<HTMLDivElement>['onMouseUp'];
   onMouseEnter?: React.DOMAttributes<HTMLDivElement>['onMouseEnter'];
@@ -23,6 +24,7 @@ const EntityLabelRaw: React.ForwardRefRenderFunction<
 > = (
   {
     onClick,
+    onDoubleClick,
     children,
     onMouseEnter,
     onMouseLeave,
@@ -46,6 +48,7 @@ const EntityLabelRaw: React.ForwardRefRenderFunction<
         node.isSelected && 'entity-label--selected',
         node.isHighlighted && 'entity-label--highlighted'
       )}
+      onDoubleClick={onDoubleClick}
       onDrop={onDrop}
       onDragEnter={onDragEnter}
       onDragLeave={onDragLeave}

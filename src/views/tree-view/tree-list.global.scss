@@ -1,0 +1,15 @@
+.tree-list {
+  &:focus {
+    outline: 2px solid #201f9f;
+  }
+}
+
+.tree-view {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  flex-shrink: 1;
+  &:not(:first-child) {
+    margin-left: 2px;
+  }
+}

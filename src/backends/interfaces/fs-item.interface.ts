@@ -1,6 +1,7 @@
 import { FsItemTypeEnum } from '../../enums/fs-item-type.enum';
 
-export interface FSItem {
+export interface IFSNode {
+  id: string;
   name: string;
   type: FsItemTypeEnum;
 }

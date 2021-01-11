@@ -5,13 +5,10 @@
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP&display=swap');
 @import '~@csstools/normalize.css';
 
-html {
-  box-sizing: border-box;
-}
 *,
 *:before,
 *:after {
-  box-sizing: inherit;
+  box-sizing: border-box;
 }
 
 body {

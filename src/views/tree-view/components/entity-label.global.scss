@@ -18,6 +18,8 @@
 
   &__label {
     margin-left: 8px;
+    word-break: keep-all;
+    white-space: nowrap;
   }
 
   &--highlighted {

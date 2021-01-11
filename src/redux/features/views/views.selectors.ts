@@ -6,10 +6,21 @@ export const getViewsSelector = createSelector(
   getRootViewsSelector,
   (state) => state.views
 );
+export const getViewIds = createSelector(getRootViewsSelector, (state) =>
+  state.views.map((v) => v.viewId)
+);
+export const getViewNames = createSelector(getRootViewsSelector, (state) =>
+  state.views.map((v) => v.viewName)
+);
 export const getViewByIndex = createSelector(
   getViewsSelector,
   (_: RootState, index: number) => index,
   (state, index) => state[index]
+);
+
+export const getViewId = createSelector(
+  getViewByIndex,
+  (state) => state.viewId
 );
 
 export const getAllIdxByIndex = createSelector(
@@ -55,4 +66,9 @@ export const getCursorNode = createSelector(
 export const getSelectedIds = createSelector(
   getViewByIndex,
   (state) => state.selectedIds
+);
+
+export const getStartPath = createSelector(
+  getViewByIndex,
+  (state) => state.startPath
 );

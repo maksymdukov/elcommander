@@ -1,18 +1,27 @@
 import { useDispatch } from 'react-redux';
-import {
-  closeDirThunk,
-  moveCursorThunk,
-  openDirThunk,
-  selectAndMoveCursorThunk,
-  selectFromToThunk,
-  setCursoredAction,
-  setItemCursoredByClick,
-  toggleDirByCursorThunk,
-  toggleSelectionAction,
-} from '../../../redux/features/views/tree-state.actions';
 import { ScrollRef } from '../types/scroll-ref';
 import { TreeEventType } from '../../../enums/tree-event-type.enum';
 import { LassoContextState } from '../context/lasso.context';
+import { OPENABLE_NODE_TYPES } from '../tree-view.constants';
+import { useFsManagerCtx } from './use-fs-manager-ctx.hook';
+import {
+  closeDirThunk,
+  enterDirByCursorThunk,
+  enterDirThunk,
+  exitDirThunk,
+  openDirThunk,
+  toggleDirByCursorThunk,
+} from '../../../redux/features/views/actions/tree-dir.actions';
+import {
+  moveCursorThunk,
+  setCursoredAction,
+  setItemCursoredByClick,
+} from '../../../redux/features/views/actions/tree-cursor.action';
+import {
+  selectAndMoveCursorThunk,
+  selectFromToThunk,
+  toggleSelectionAction,
+} from '../../../redux/features/views/actions/tree-selection.actions';
 
 interface UseContainerProps {
   scrollRef: ScrollRef;
@@ -20,11 +29,12 @@ interface UseContainerProps {
   lassoState: LassoContextState;
 }
 
-export const useContainer = ({
+export const useTreeHandlers = ({
   scrollRef,
   viewIndex,
   lassoState,
 }: UseContainerProps) => {
+  const { fsManager } = useFsManagerCtx();
   const dispatch = useDispatch();
   const onKeyDown = (e: React.KeyboardEvent) => {
     // Shift + Down
@@ -53,13 +63,23 @@ export const useContainer = ({
     // right
     if (e.key === 'ArrowRight') {
       e.preventDefault();
-      dispatch(toggleDirByCursorThunk(viewIndex));
+      dispatch(toggleDirByCursorThunk(viewIndex, true, fsManager));
       return;
+    }
+    // enter
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      dispatch(enterDirByCursorThunk(viewIndex, fsManager));
+    }
+    // backspace
+    if (e.key === 'Backspace') {
+      e.preventDefault();
+      dispatch(exitDirThunk(viewIndex, fsManager));
     }
     // left
     if (e.key === 'ArrowLeft') {
       e.preventDefault();
-      dispatch(toggleDirByCursorThunk(viewIndex, false));
+      dispatch(toggleDirByCursorThunk(viewIndex, false, fsManager));
       return;
     }
 
@@ -108,12 +128,12 @@ export const useContainer = ({
     }
 
     if (e.treeEventType === TreeEventType.OpenNode) {
-      dispatch(openDirThunk(treeIndex, viewIndex));
+      dispatch(openDirThunk(treeIndex, viewIndex, fsManager));
       return;
     }
 
     if (e.treeEventType === TreeEventType.CloseNode) {
-      dispatch(closeDirThunk(treeIndex, viewIndex));
+      dispatch(closeDirThunk(treeIndex, viewIndex, fsManager));
       return;
     }
 
@@ -122,10 +142,24 @@ export const useContainer = ({
     }
   };
 
+  const onDoubleClick = (e: React.MouseEvent) => {
+    if (!e.treeEventType) {
+      return;
+    }
+    const { treeNode, treeIndex } = e;
+    if (
+      e.treeEventType === TreeEventType.EnterNode &&
+      OPENABLE_NODE_TYPES.includes(treeNode.type)
+    ) {
+      dispatch(enterDirThunk(treeIndex, viewIndex, fsManager));
+    }
+  };
+
   const getContainerProps = () => ({
     onKeyDown,
     onMouseDown,
     onClick,
+    onDoubleClick,
   });
   return { getContainerProps };
 };

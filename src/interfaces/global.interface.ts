@@ -15,4 +15,11 @@ declare global {
   interface HTMLElement {
     $$treeNode?: number;
   }
+
+  interface Error {
+    path: string;
+    syscall: string;
+    code: string;
+    errno: number;
+  }
 }

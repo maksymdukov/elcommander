@@ -4,18 +4,20 @@ import { FixedSizeList } from 'react-window';
 import { RootState } from '../../redux/root-types';
 import { getAllIdxByIndex } from '../../redux/features/views/views.selectors';
 import TreeListItem from './components/tree-list-item';
-import { useContainer } from './hook/use-container.hook';
+import { useTreeHandlers } from './hook/use-tree-handlers.hook';
 import CustomInnerWindow from './components/custom-inner-window';
 import { LassoContextRef, LassoContextState } from './context/lasso.context';
 import LassoContextProvider from './context/lasso-context.provider';
-import { IFSBackend } from '../../backends/interfaces/fs-backend.interface';
+import { FSBackend } from '../../backends/interfaces/fs-backend.interface';
 import Droppable from './context/droppable';
 import { useTreeDnd } from './hook/use-tree-dnd.hook';
+import './tree-list.global.scss';
+import AutoCursorScroll from './components/auto-cursor-scroll';
 
 interface TreeListProps {
   index: number;
   height: number;
-  fsManager: IFSBackend;
+  fsManager: FSBackend;
   itemSize?: number;
 }
 
@@ -45,7 +47,7 @@ const TreeList: React.FC<TreeListProps> = ({
     itemCfgRef,
   });
 
-  const { getContainerProps } = useContainer({
+  const { getContainerProps } = useTreeHandlers({
     scrollRef,
     viewIndex: index,
     lassoState,
@@ -69,6 +71,7 @@ const TreeList: React.FC<TreeListProps> = ({
         setState={setLassoState}
       >
         <div
+          className="tree-list"
           tabIndex={0}
           {...getContainerProps()}
           {...getDndHandlers()}
@@ -89,6 +92,7 @@ const TreeList: React.FC<TreeListProps> = ({
             {TreeListItem}
           </FixedSizeList>
         </div>
+        <AutoCursorScroll scrollRef={scrollRef} index={index} />
       </LassoContextProvider>
     </Droppable>
   );
