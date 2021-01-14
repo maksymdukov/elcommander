@@ -18,9 +18,15 @@ interface FSSubscription {
 }
 
 export class LocalFs extends FSBackend {
+  static get options() {
+    return {
+      tabSpinner: false,
+    };
+  }
+
   get options() {
     return {
-      spinner: false,
+      pathSpinner: false,
     };
   }
 
@@ -38,12 +44,14 @@ export class LocalFs extends FSBackend {
     return files
       .filter((file) => file.isDirectory() || file.isFile())
       .map((dirent) => {
+        const constructedPath = `${path === '/' ? '' : path}/${dirent.name}`;
         return {
+          id: constructedPath,
           type: dirent.isDirectory()
             ? FsItemTypeEnum.Directory
             : FsItemTypeEnum.File,
           name: dirent.name,
-          path: `${path === '/' ? '' : path}/${dirent.name}`,
+          path: constructedPath,
           meta: {},
         };
       });
@@ -109,9 +117,9 @@ export class LocalFs extends FSBackend {
 
   // Recursively unwatch directories
   unwatchDir(node: TreeNode) {
-    const { path } = node;
+    const { id } = node;
     this.subscriptions = this.subscriptions.filter((sub) => {
-      if (sub.path.substr(0, path.length) === path) {
+      if (sub.path.substr(0, id.length) === id) {
         sub.emitter.emit('close');
         this.removeSubListeners(sub);
         return false;

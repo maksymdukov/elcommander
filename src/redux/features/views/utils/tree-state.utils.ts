@@ -2,15 +2,15 @@ import { TreeState } from '../tree-state.interface';
 import { TreeNode } from '../../../../interfaces/node.interface';
 
 export class TreeStateUtils {
-  static getNodeByPath(
+  static getNodeById(
     state: TreeState,
-    path: TreeNode['path']
+    id: TreeNode['id']
   ): TreeNode | undefined {
-    return state.byPath[path];
+    return state.byId[id];
   }
 
   static getNodeByIndex(state: TreeState, index: number) {
-    return state.byPath[state.allPath[index]];
+    return state.byId[state.allIds[index]];
   }
 
   static resetTreeStateBy(
@@ -20,17 +20,17 @@ export class TreeStateUtils {
     Object.keys(by).forEach((key) => {
       const objKey = key as keyof TreeState;
       switch (objKey) {
-        case 'allPath':
-          state.allPath.splice(0, state.allPath.length);
+        case 'allIds':
+          state.allIds.splice(0, state.allIds.length);
           break;
-        case 'byPath':
-          Object.keys(state.byPath).forEach((k) => delete state.byPath[k]);
+        case 'byId':
+          Object.keys(state.byId).forEach((k) => delete state.byId[k]);
           break;
         case 'cursor':
           state.cursor = null;
           break;
-        case 'selectedPaths':
-          state.selectedPaths.clear();
+        case 'selectedIds':
+          state.selectedIds.clear();
           break;
         case 'startPathLoading':
           state.startPathLoading = false;
@@ -45,26 +45,26 @@ export class TreeStateUtils {
   }
 
   static removeNodes(state: TreeState, start: number, deleteCount: number) {
-    const removed = state.allPath.splice(start, deleteCount);
+    const removed = state.allIds.splice(start, deleteCount);
 
-    // remove nodes from byPath
+    // remove nodes from byId
     removed.forEach((path) => {
-      delete state.byPath[path];
+      delete state.byId[path];
       // remove potential selected
-      state.selectedPaths.delete(path);
+      state.selectedIds.delete(path);
     });
   }
 
-  static findNodeIndexByPath(
+  static findNodeIndexById(
     state: TreeState,
-    path: TreeNode['path'],
+    id: TreeNode['id'],
     from: number,
-    to = state.allPath.length
+    to = state.allIds.length
   ) {
     // unsafe
     let lastChildIndex = 0;
     for (let i = from; i < to; i += 1) {
-      if (state.allPath[i] === path) {
+      if (state.allIds[i] === id) {
         lastChildIndex = i;
         break;
       }

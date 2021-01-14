@@ -7,6 +7,7 @@ import { TreeNode } from '../../interfaces/node.interface';
 import { IFSRawNode } from '../interfaces/fs-raw-node.interface';
 import { FsItemTypeEnum } from '../../enums/fs-item-type.enum';
 import { CONFIG } from '../../config/config';
+import { extractParentPath } from '../../utils/path';
 
 export class GoogleDrive {
   private server: Server | null = null;
@@ -38,7 +39,7 @@ export class GoogleDrive {
     const lastStackItem = enterStack?.length
       ? enterStack[enterStack.length - 1]
       : null;
-    if (lastStackItem && lastStackItem.path === path) {
+    if (lastStackItem && extractParentPath(lastStackItem.path) === path) {
       parentId = lastStackItem.meta.parents[0] as string;
     }
     if (node) {
@@ -46,24 +47,28 @@ export class GoogleDrive {
     }
     const list = await this.driveClient.files.list({
       fields:
-        'nextPageToken, files(id, name, mimeType, parents, fileExtension)',
+        'nextPageToken, files(id, name, mimeType, parents, fileExtension, version, md5Checksum)',
       q: `"${parentId}" in parents`,
       orderBy: 'name',
     });
     console.log(list.data.files);
     if (!list.data.files) return [];
-    return list.data.files.map((item) => ({
-      path: `${path === '/' ? '' : path}/${item.name}`,
-      name: item.name!,
-      type:
-        item.mimeType === 'application/vnd.google-apps.folder'
-          ? FsItemTypeEnum.Directory
-          : FsItemTypeEnum.File,
-      meta: {
-        id: item.id,
-        parents: item.parents,
-      },
-    }));
+    return list.data.files.map((item) => {
+      const constructedPath = `${path === '/' ? '' : path}/${item.name}`;
+      return {
+        id: item.id!,
+        path: constructedPath,
+        name: item.name!,
+        type:
+          item.mimeType === 'application/vnd.google-apps.folder'
+            ? FsItemTypeEnum.Directory
+            : FsItemTypeEnum.File,
+        meta: {
+          id: item.id,
+          parents: item.parents,
+        },
+      };
+    });
   }
 
   async authenticateByCode(code: string) {

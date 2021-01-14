@@ -17,7 +17,7 @@ export class SelectionStateUtils {
     end,
     fwd,
   }: ChangeSelectionFromTo) {
-    let arrayBound = fwd ? state.allPath.length - 1 : 0;
+    let arrayBound = fwd ? state.allIds.length - 1 : 0;
     if (end) {
       arrayBound = end;
     }
@@ -25,25 +25,25 @@ export class SelectionStateUtils {
       ? (idx: number) => idx <= arrayBound
       : (idx: number) => idx >= arrayBound;
     const predicate = isSelect
-      ? (path: string, idx: number) =>
-          !state.selectedPaths.has(path) && arrayBoundsPredicate(idx)
-      : (path: string, idx: number) =>
-          state.selectedPaths.has(path) && arrayBoundsPredicate(idx);
+      ? (id: string, idx: number) =>
+          !state.selectedIds.has(id) && arrayBoundsPredicate(idx)
+      : (id: string, idx: number) =>
+          state.selectedIds.has(id) && arrayBoundsPredicate(idx);
     const method = isSelect ? 'add' : 'delete';
-    let toChangePath = state.allPath[start];
+    let toChangeId = state.allIds[start];
     let toChangeIdx = start;
-    while (predicate(toChangePath, toChangeIdx)) {
-      state.selectedPaths[method](toChangePath);
-      state.byPath[toChangePath].isSelected = isSelect;
+    while (predicate(toChangeId, toChangeIdx)) {
+      state.selectedIds[method](toChangeId);
+      state.byId[toChangeId].isSelected = isSelect;
       toChangeIdx += fwd ? 1 : -1;
-      toChangePath = state.allPath[toChangeIdx];
+      toChangeId = state.allIds[toChangeIdx];
     }
   }
 
   static resetSelection(state: TreeState) {
-    state.selectedPaths.forEach((path) => {
-      state.byPath[path].isSelected = false;
+    state.selectedIds.forEach((path) => {
+      state.byId[path].isSelected = false;
     });
-    TreeStateUtils.resetTreeStateBy(state, { selectedPaths: true });
+    TreeStateUtils.resetTreeStateBy(state, { selectedIds: true });
   }
 }

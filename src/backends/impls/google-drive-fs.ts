@@ -21,8 +21,15 @@ export class GoogleDriveFs extends FSBackend {
     this.googleDriveWorker = workerClassInst;
   }
 
-  get options(): { spinner?: boolean } {
-    return { spinner: true };
+  static get options() {
+    return { tabSpinner: true };
+  }
+
+  get options() {
+    return {
+      pathSpinner: true,
+      treeSpinner: true,
+    };
   }
 
   static async createInstance({ viewId }: { viewId: string }) {
@@ -31,9 +38,7 @@ export class GoogleDriveFs extends FSBackend {
     ) as unknown) as typeof GoogleDrive;
 
     const workerClassInst = await new GDWorkerClass();
-    const instance = new GoogleDriveFs({ viewId, workerClassInst });
-    await instance.onInit();
-    return instance;
+    return new GoogleDriveFs({ viewId, workerClassInst });
   }
 
   async readDir(
@@ -64,8 +69,10 @@ export class GoogleDriveFs extends FSBackend {
   async onInit(): Promise<any> {
     // if google refresh token exists
     // take that from the fs
-    if (false) {
-      // await this.googleDriveWorker.setCredentials();
+    if (true) {
+      await this.googleDriveWorker.setCredentials(
+        process.env.DEV_REFRESH_TOKEN!
+      );
     } else {
       // full auth flow
       const url = await this.googleDriveWorker.getAuthUrl();

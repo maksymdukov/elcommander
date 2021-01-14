@@ -3,11 +3,13 @@ import { TreeState } from './tree-state.interface';
 import {
   closeDirectoryAction,
   enterDirectorySuccessAction,
-  openDirectoryAction,
+  openDirectorySuccessAction,
   enterDirectoryStartAction,
   enterDirectoryFailAction,
   exitDirectoryAction,
   resetEnterStackAction,
+  openDirectoryStartAction,
+  openDirectoryFailAction,
 } from './actions/tree-dir.actions';
 import { setCursoredAction } from './actions/tree-cursor.action';
 import {
@@ -27,37 +29,58 @@ export const treeStateReducer = createReducer<TreeState>(
   initialState.views[0],
   (builder) => {
     builder.addCase(
-      openDirectoryAction,
+      openDirectoryStartAction,
+      (state, { payload: { index } }) => {
+        const node = TreeStateUtils.getNodeByIndex(state, index);
+        node.error = null;
+        node.isLoading = true;
+        node.isOpened = true;
+      }
+    );
+    builder.addCase(
+      openDirectorySuccessAction,
       (state, { payload: { parentIndex, nodes } }) => {
         // find parent
         const parent = TreeStateUtils.getNodeByIndex(state, parentIndex);
         parent.isOpened = true;
+        parent.error = null;
+        parent.isLoading = false;
         const nestLevel = parent.nestLevel + 1;
         const paths = DirectoryStateUtils.insertNodes({
           state,
           nestLevel,
           nodes,
-          parentPath: parent.path,
+          parentId: parent.id,
         });
         // add children to parent.children node
         parent.children = paths;
         // update cursor pos due to possible shift in allPath
         CursorStateUtils.updateCursorPosition(state, () => {
-          state.allPath.splice(parentIndex + 1, 0, ...paths);
+          state.allIds.splice(parentIndex + 1, 0, ...paths);
         });
+      }
+    );
+    builder.addCase(
+      openDirectoryFailAction,
+      (state, { payload: { error, index } }) => {
+        const node = TreeStateUtils.getNodeByIndex(state, index);
+        node.error = error;
+        node.isLoading = false;
       }
     );
 
     builder.addCase(closeDirectoryAction, (state, { payload: { index } }) => {
       // find deepest opened item
-      const parentPath = state.allPath[index];
-      const parent = state.byPath[parentPath];
-      const lastChildPath = CursorStateUtils.findDeepestOpenedChildPath(
+      const parentId = state.allIds[index];
+      const parent = state.byId[parentId];
+      const lastChildId = CursorStateUtils.findDeepestOpenedChildPath(
         state,
-        parentPath
+        parentId
       );
       parent.isOpened = false;
-      if (parentPath === lastChildPath) {
+      parent.isLoading = false;
+      parent.error = null;
+      if (parentId === lastChildId) {
         // parent dir is empty
         // just flip isOpened
         return;
@@ -65,9 +88,9 @@ export const treeStateReducer = createReducer<TreeState>(
 
       // splice allPath array from start to this node
       // find lastChild index in allPath array
-      const lastChildIndex = TreeStateUtils.findNodeIndexByPath(
+      const lastChildIndex = TreeStateUtils.findNodeIndexById(
         state,
-        lastChildPath,
+        lastChildId,
         index
       );
 
@@ -91,14 +114,14 @@ export const treeStateReducer = createReducer<TreeState>(
     });
 
     builder.addCase(toggleSelectionAction, (state, { payload: { index } }) => {
-      const candidatePath = state.allPath[index];
-      const isSelected = state.selectedPaths.has(candidatePath);
+      const candidatePath = state.allIds[index];
+      const isSelected = state.selectedIds.has(candidatePath);
       if (isSelected) {
-        state.selectedPaths.delete(candidatePath);
+        state.selectedIds.delete(candidatePath);
       } else {
-        state.selectedPaths.add(candidatePath);
+        state.selectedIds.add(candidatePath);
       }
-      state.byPath[candidatePath].isSelected = !isSelected;
+      state.byId[candidatePath].isSelected = !isSelected;
     });
 
     builder.addCase(selectFromToAction, (state, { payload: { index } }) => {
@@ -109,10 +132,10 @@ export const treeStateReducer = createReducer<TreeState>(
       let i = state.cursor;
 
       while ((isGoingDown && i <= index) || (!isGoingDown && i >= index)) {
-        const path = state.allPath[i];
-        const node = state.byPath[path];
+        const path = state.allIds[i];
+        const node = state.byId[path];
         node.isSelected = true;
-        state.selectedPaths.add(node.path);
+        state.selectedIds.add(node.id);
         i = isGoingDown ? i + 1 : i - 1;
       }
     });
@@ -126,11 +149,11 @@ export const treeStateReducer = createReducer<TreeState>(
       (state, { payload: { start, end } }) => {
         if (start === end) {
           // one node selection case
-          const nodePath = state.allPath[end];
-          if (!state.selectedPaths.has(nodePath)) {
+          const nodePath = state.allIds[end];
+          if (!state.selectedIds.has(nodePath)) {
             // just add;
-            state.selectedPaths.add(nodePath);
-            state.byPath[nodePath].isSelected = true;
+            state.selectedIds.add(nodePath);
+            state.byId[nodePath].isSelected = true;
           } else {
             // do nothing but check that no one else is added at the position of end + 1 and end - 1
             // check to see two sides
@@ -151,9 +174,9 @@ export const treeStateReducer = createReducer<TreeState>(
         }
 
         const isGoingDown = start < end;
-        const endPath = state.allPath[end];
+        const endPath = state.allIds[end];
 
-        if (state.selectedPaths.has(endPath)) {
+        if (state.selectedIds.has(endPath)) {
           // it's already there
           // lets remove potential end + 1
           SelectionStateUtils.changeSelectionFromTo({
@@ -199,19 +222,17 @@ export const treeStateReducer = createReducer<TreeState>(
       state.enterStack.splice(0, state.enterStack.length);
     });
 
-    builder.addCase(
-      enterDirectoryStartAction,
-      (state, { payload: { path } }) => {
-        if (path) {
-          const nodeToEnter = TreeStateUtils.getNodeByPath(state, path);
-          if (nodeToEnter) {
-            state.enterStack.push(nodeToEnter);
-          }
+    builder.addCase(enterDirectoryStartAction, (state, { payload: { id } }) => {
+      if (id) {
+        const nodeToEnter = TreeStateUtils.getNodeById(state, id);
+        if (nodeToEnter) {
+          state.enterStack.push(nodeToEnter);
         }
-        DirectoryStateUtils.resetTreeState(state);
-        state.startPathLoading = true;
       }
-    );
+      DirectoryStateUtils.resetTreeState(state);
+      state.startPathLoading = true;
+      state.startPathError = null;
+    });
 
     builder.addCase(
       enterDirectorySuccessAction,

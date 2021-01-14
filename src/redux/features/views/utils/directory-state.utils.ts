@@ -2,15 +2,16 @@ import { TreeState } from '../tree-state.interface';
 import { TreeStateUtils } from './tree-state.utils';
 import { TreeNode } from '../../../../interfaces/node.interface';
 import { IFSRawNode } from '../../../../backends/interfaces/fs-raw-node.interface';
+import { extractParentPath } from '../../../../utils/path';
 
 export class DirectoryStateUtils {
   static resetTreeState(state: TreeState) {
     // reset state except from the startPath
     TreeStateUtils.resetTreeStateBy(state, {
-      byPath: true,
-      allPath: true,
+      byId: true,
+      allIds: true,
       cursor: true,
-      selectedPaths: true,
+      selectedIds: true,
       startPathError: true,
       startPathLoading: true,
     });
@@ -18,35 +19,38 @@ export class DirectoryStateUtils {
 
   static insertNodes({
     state,
-    parentPath,
+    parentId,
     nestLevel = 0,
     nodes,
   }: {
     state: TreeState;
     nodes: IFSRawNode[];
-    parentPath?: TreeNode['path'];
+    parentId?: TreeNode['id'];
     nestLevel?: TreeNode['nestLevel'];
   }) {
-    const paths: string[] = [];
+    const ids: string[] = [];
 
     // insert nodes
     nodes.forEach((node) => {
-      paths.push(node.path);
-      state.byPath[node.path] = {
+      ids.push(node.id);
+      state.byId[node.id] = {
+        id: node.id,
         path: node.path,
         name: node.name,
         meta: node.meta,
+        nestLevel,
+        type: node.type,
         children: [],
         isCursored: false,
-        ...(parentPath !== undefined && { parent: parentPath }),
+        ...(parentId !== undefined && { parent: parentId }),
         isOpened: false,
         isSelected: false,
         isHighlighted: false,
-        nestLevel,
-        type: node.type,
+        isLoading: false,
+        error: null,
       };
     });
-    return paths;
+    return ids;
   }
 
   static enterDirByPath(
@@ -57,14 +61,10 @@ export class DirectoryStateUtils {
     state.startPath = path;
     this.resetTreeState(state);
     const newNodeIds = this.insertNodes({ state, nodes });
-    state.allPath.push(...newNodeIds);
+    state.allIds.push(...newNodeIds);
   }
 
   static getParentPath(currentPath: TreeState['startPath']) {
-    const currentPathArr = currentPath.split('/');
-    const parentPath = currentPathArr
-      .slice(0, currentPathArr.length - 1)
-      .join('/');
-    return parentPath || '/';
+    return extractParentPath(currentPath);
   }
 }

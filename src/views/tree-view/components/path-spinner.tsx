@@ -13,7 +13,7 @@ const PathSpinnerRaw = () => {
   const isLoadingPath = useSelector((state: RootState) =>
     getIsLoadingStartPath(state, viewIndex)
   );
-  return isLoadingPath && fsManager.options.spinner ? (
+  return isLoadingPath && fsManager.options.pathSpinner ? (
     <div className="path-spinner-container">
       <DashSpinner />
       <span>Loading directory...</span>

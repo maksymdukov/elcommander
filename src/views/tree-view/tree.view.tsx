@@ -33,8 +33,8 @@ function TreeViewRaw({ index, viewId }: TreeViewProps) {
         const instance = await FSBackendsMap[viewName].createInstance({
           viewId,
         });
-        await instance.onInit();
         setFsManager(instance);
+        await instance.onInit();
         setInstantiating(false);
       })();
     }
@@ -56,13 +56,17 @@ function TreeViewRaw({ index, viewId }: TreeViewProps) {
     }
   }, [dispatch, fsManager, index, instantiating]);
 
-  if (instantiating || !fsManager)
+  if (instantiating && FSBackendsMap[viewName].options.tabSpinner)
     return (
       <div className="spinner-container">
         <DashSpinner />
         <span>Loading tab...</span>
       </div>
     );
+
+  if (instantiating || !fsManager) {
+    return null;
+  }
 
   return (
     <FsManagerCtxProvider fsManager={fsManager}>

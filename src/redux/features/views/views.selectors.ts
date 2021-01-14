@@ -30,15 +30,15 @@ export const getViewId = createSelector(
 
 export const getAllPathByIndex = createSelector(
   getViewByIndex,
-  (state) => state.allPath
+  (state) => state.allIds
 );
 
 export const getNodeHash = createSelector(
   getViewByIndex,
-  (state) => state.byPath
+  (state) => state.byId
 );
 
-export const getNodeByPath = createSelector(
+export const getNodeById = createSelector(
   [getNodeHash, (_state, _idx, nodePath: string) => nodePath],
   (state, nodeId: string) => state[nodeId]
 );
@@ -46,8 +46,8 @@ export const getNodeByPath = createSelector(
 export const getNodeByIdx = createSelector(
   [getViewByIndex, (_state, _viewIndex, nodeIndex) => nodeIndex],
   (treeState, nodeIndex) => {
-    const nodePath = treeState.allPath[nodeIndex];
-    return treeState.byPath[nodePath];
+    const nodePath = treeState.allIds[nodeIndex];
+    return treeState.byId[nodePath];
   }
 );
 
@@ -68,14 +68,14 @@ export const getCursorNode = createSelector(
     if (cursor === null) {
       return null;
     }
-    const cursorPath = treeState.allPath[cursor];
-    return treeState.byPath[cursorPath];
+    const cursorPath = treeState.allIds[cursor];
+    return treeState.byId[cursorPath];
   }
 );
 
 export const getSelectedPaths = createSelector(
   getViewByIndex,
-  (state) => state.selectedPaths
+  (state) => state.selectedIds
 );
 
 export const getStartPath = createSelector(

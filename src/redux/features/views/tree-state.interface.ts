@@ -1,17 +1,17 @@
 import { TreeNode } from '../../../interfaces/node.interface';
 
-export interface ByPathState {
+export interface ByIdState {
   [k: string]: TreeNode;
 }
 
 export interface TreeState {
   viewName: string;
   viewId: string;
-  byPath: ByPathState;
-  allPath: string[];
+  byId: ByIdState;
+  allIds: string[];
   cursor: null | number;
   enterStack: TreeNode[];
-  selectedPaths: Set<string>;
+  selectedIds: Set<string>;
   startPath: string;
   startPathLoading: boolean;
   startPathError: string | null;

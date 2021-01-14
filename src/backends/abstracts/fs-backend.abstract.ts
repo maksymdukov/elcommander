@@ -19,17 +19,22 @@ export abstract class FSBackend {
   // async instantiation
   static async createInstance(prop: IFSConstructorProps) {
     // @ts-ignore
-    const instance = new this(prop);
-    await instance.onInit();
-    return instance;
+    return new this(prop);
   }
 
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   private viewId: string;
 
-  public abstract get options(): {
-    spinner?: boolean;
+  public static get options() {
+    return {
+      tabSpinner: false,
+    };
+  }
+
+  abstract get options(): {
+    pathSpinner?: boolean;
+    treeSpinner?: boolean;
   };
 
   protected constructor({ viewId }: IFSConstructorProps) {

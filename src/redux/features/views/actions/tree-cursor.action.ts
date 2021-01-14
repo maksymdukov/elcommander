@@ -18,12 +18,12 @@ export const moveCursorThunk = (
   const treeState = getViewByIndex(getState(), viewIndex);
   let index = 0;
   // no current cursor ? - set to the first
-  if (treeState.cursor === null && !treeState.allPath.length) {
+  if (treeState.cursor === null && !treeState.allIds.length) {
     return;
   }
   // going down
   if (down && treeState.cursor !== null) {
-    index = Math.min(treeState.cursor + 1, treeState.allPath.length - 1);
+    index = Math.min(treeState.cursor + 1, treeState.allIds.length - 1);
   }
   // going up
   if (!down && treeState.cursor !== null) {
