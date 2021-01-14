@@ -1,5 +1,5 @@
 import { TreeState } from '../tree-state.interface';
-import { TreeStateUtils } from '../tree-state.utils';
+import { TreeStateUtils } from './tree-state.utils';
 
 interface ChangeSelectionFromTo {
   state: TreeState;
@@ -17,7 +17,7 @@ export class SelectionStateUtils {
     end,
     fwd,
   }: ChangeSelectionFromTo) {
-    let arrayBound = fwd ? state.allIds.length - 1 : 0;
+    let arrayBound = fwd ? state.allPath.length - 1 : 0;
     if (end) {
       arrayBound = end;
     }
@@ -25,25 +25,25 @@ export class SelectionStateUtils {
       ? (idx: number) => idx <= arrayBound
       : (idx: number) => idx >= arrayBound;
     const predicate = isSelect
-      ? (id: string, idx: number) =>
-          !state.selectedIds.has(id) && arrayBoundsPredicate(idx)
-      : (id: string, idx: number) =>
-          state.selectedIds.has(id) && arrayBoundsPredicate(idx);
+      ? (path: string, idx: number) =>
+          !state.selectedPaths.has(path) && arrayBoundsPredicate(idx)
+      : (path: string, idx: number) =>
+          state.selectedPaths.has(path) && arrayBoundsPredicate(idx);
     const method = isSelect ? 'add' : 'delete';
-    let toChangeId = state.allIds[start];
+    let toChangePath = state.allPath[start];
     let toChangeIdx = start;
-    while (predicate(toChangeId, toChangeIdx)) {
-      state.selectedIds[method](toChangeId);
-      state.byIds[toChangeId].isSelected = isSelect;
+    while (predicate(toChangePath, toChangeIdx)) {
+      state.selectedPaths[method](toChangePath);
+      state.byPath[toChangePath].isSelected = isSelect;
       toChangeIdx += fwd ? 1 : -1;
-      toChangeId = state.allIds[toChangeIdx];
+      toChangePath = state.allPath[toChangeIdx];
     }
   }
 
   static resetSelection(state: TreeState) {
-    state.selectedIds.forEach((id) => {
-      state.byIds[id].isSelected = false;
+    state.selectedPaths.forEach((path) => {
+      state.byPath[path].isSelected = false;
     });
-    TreeStateUtils.resetTreeStateBy(state, { selectedIds: true });
+    TreeStateUtils.resetTreeStateBy(state, { selectedPaths: true });
   }
 }

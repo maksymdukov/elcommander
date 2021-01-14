@@ -27,7 +27,7 @@ const AutoCursorScroll: React.FC<AutoScrollProps> = ({ scrollRef, index }) => {
       prevStartPath !== startPath &&
       cursorIndex !== null
     ) {
-      scrollRef.current.scrollToItem(cursorIndex, 'center');
+      scrollRef.current.scrollToItem(cursorIndex, 'smart');
     }
   }, [startPath, scrollRef, cursorIndex, prevStartPath]);
   return null;

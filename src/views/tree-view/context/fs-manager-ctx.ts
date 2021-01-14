@@ -1,6 +1,6 @@
 import { createContext } from 'react';
-import { FSBackend } from '../../../backends/interfaces/fs-backend.interface';
-import { LocalFs } from '../../../backends/local-fs';
+import { FSBackend } from '../../../backends/abstracts/fs-backend.abstract';
+import { LocalFs } from '../../../backends/impls/local-fs';
 
 export interface IFsManagerCtxVal {
   fsManager: FSBackend;

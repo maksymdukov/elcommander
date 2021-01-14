@@ -1,11 +1,11 @@
 import fs from 'fs';
 import nPath from 'path';
-import {
-  FSBackend,
-  FSEventEmitter,
-  FSEventNames,
-} from './interfaces/fs-backend.interface';
-import { FsItemTypeEnum } from '../enums/fs-item-type.enum';
+import chokidar from 'chokidar';
+import { FSBackend } from '../abstracts/fs-backend.abstract';
+import { FsItemTypeEnum } from '../../enums/fs-item-type.enum';
+import { FSEventEmitter, FSEventNames } from '../classes/fs-event-emitter';
+import { IFSRawNode } from '../interfaces/fs-raw-node.interface';
+import { TreeNode } from '../../interfaces/node.interface';
 
 /*
   Subscriptions array look:
@@ -18,15 +18,19 @@ interface FSSubscription {
 }
 
 export class LocalFs extends FSBackend {
+  get options() {
+    return {
+      spinner: false,
+    };
+  }
+
   subscriptions: FSSubscription[] = [];
 
   constructor({ viewId }: { viewId: string }) {
     super({ viewId });
   }
 
-  async readDir(
-    path: string
-  ): Promise<{ id: string; name: string; type: FsItemTypeEnum }[]> {
+  async readDir(_: TreeNode | undefined, path: string): Promise<IFSRawNode[]> {
     const files = await fs.promises.readdir(nPath.normalize(path), {
       encoding: 'utf8',
       withFileTypes: true,
@@ -39,18 +43,24 @@ export class LocalFs extends FSBackend {
             ? FsItemTypeEnum.Directory
             : FsItemTypeEnum.File,
           name: dirent.name,
-          id: `${path === '/' ? '' : path}/${dirent.name}`,
+          path: `${path === '/' ? '' : path}/${dirent.name}`,
+          meta: {},
         };
       });
   }
 
-  readWatchDir(path: string) {
+  readWatchDir(
+    node: TreeNode | undefined,
+    path: string,
+    enterStack: TreeNode[] | undefined
+  ) {
+    console.log('enterStack', enterStack);
     const sub = this.tryGetSubscription(path);
     if (sub) {
       // emit directory read
       (async () => {
         try {
-          const nodes = await this.readDir(path);
+          const nodes = await this.readDir(node, path);
           sub.emitter.emit('dirRead', nodes);
         } catch (e) {
           sub.emitter.emit('error', e);
@@ -67,23 +77,29 @@ export class LocalFs extends FSBackend {
     };
     this.subscriptions.push(fsSubscription);
 
-    const watcher = fs
-      .watch(path, { encoding: 'utf8', recursive: false })
-      .on('change', (...args) => {
-        eventEmitter.emit('change', ...args);
+    const watcher = chokidar
+      .watch(path, { depth: 0, alwaysStat: true, ignoreInitial: true })
+      .on('error', (error) => {
+        eventEmitter.emit('error', error);
       })
-      .on('error', (err) => {
-        eventEmitter.emit('error', err);
+      .on('ready', () => {
+        watcher.on('all', (...args) => {
+          eventEmitter.emit('change', ...args);
+        });
+        (async () => {
+          try {
+            const nodes = await this.readDir(node, path);
+            eventEmitter.emit('dirRead', nodes);
+          } catch (e) {
+            eventEmitter.emit('error', e);
+          }
+        })();
       });
 
     eventEmitter.on('close', () => {
       watcher.close();
     });
 
-    (async () => {
-      const nodes = await this.readDir(path);
-      eventEmitter.emit('dirRead', nodes);
-    })();
     return eventEmitter;
   }
 
@@ -92,7 +108,8 @@ export class LocalFs extends FSBackend {
   }
 
   // Recursively unwatch directories
-  unwatchDir(path: string) {
+  unwatchDir(node: TreeNode) {
+    const { path } = node;
     this.subscriptions = this.subscriptions.filter((sub) => {
       if (sub.path.substr(0, path.length) === path) {
         sub.emitter.emit('close');

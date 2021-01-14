@@ -1,7 +1,7 @@
 import { createAction } from '@reduxjs/toolkit';
 import { ScrollRef } from '../../../../views/tree-view/types/scroll-ref';
 import { AppThunk } from '../../../store';
-import { getSelectedIds, getViewByIndex } from '../views.selectors';
+import { getSelectedPaths, getViewByIndex } from '../views.selectors';
 import { IndexPayload } from './tree-state.actions';
 import { resetSelectionAction } from './tree-selection.actions';
 import { ViewIndexPayload } from '../tree-state.interface';
@@ -18,12 +18,12 @@ export const moveCursorThunk = (
   const treeState = getViewByIndex(getState(), viewIndex);
   let index = 0;
   // no current cursor ? - set to the first
-  if (treeState.cursor === null && !treeState.allIds.length) {
+  if (treeState.cursor === null && !treeState.allPath.length) {
     return;
   }
   // going down
   if (down && treeState.cursor !== null) {
-    index = Math.min(treeState.cursor + 1, treeState.allIds.length - 1);
+    index = Math.min(treeState.cursor + 1, treeState.allPath.length - 1);
   }
   // going up
   if (!down && treeState.cursor !== null) {
@@ -44,7 +44,7 @@ export const setItemCursoredByClick = (
   viewIndex: number
 ): AppThunk => (dispatch, getState) => {
   dispatch(setCursoredAction({ viewIndex, index }));
-  const selectedIds = getSelectedIds(getState(), viewIndex);
+  const selectedIds = getSelectedPaths(getState(), viewIndex);
   if (selectedIds.size) {
     dispatch(resetSelectionAction({ viewIndex }));
   }

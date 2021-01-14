@@ -4,6 +4,7 @@
 
 import path from 'path';
 import webpack from 'webpack';
+import Dotenv from 'dotenv-webpack';
 import { dependencies as externals } from '../../src/package.json';
 
 export default {
@@ -42,5 +43,6 @@ export default {
     new webpack.EnvironmentPlugin({
       NODE_ENV: 'production',
     }),
+    new Dotenv(),
   ],
 };

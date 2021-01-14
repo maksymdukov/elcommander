@@ -1,10 +1,11 @@
 import { FsItemTypeEnum } from '../enums/fs-item-type.enum';
 
 export interface TreeNode {
-  id: string; // full path
+  path: string; // full path
   name: string; // name of file/dir
-  children: TreeNode['id'][];
-  parent?: TreeNode['id'];
+  meta: { [k: string]: any };
+  children: TreeNode['path'][];
+  parent?: TreeNode['path'];
   type: FsItemTypeEnum;
   nestLevel: number;
   isOpened: boolean;

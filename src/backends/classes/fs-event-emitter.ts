@@ -1,20 +1,10 @@
 import { EventEmitter } from 'events';
-import { FsItemTypeEnum } from '../../enums/fs-item-type.enum';
-
-export interface IFSConstructorProps {
-  viewId: string;
-}
-
-export interface FSRawNode {
-  id: string;
-  name: string;
-  type: FsItemTypeEnum;
-}
+import { IFSRawNode } from '../interfaces/fs-raw-node.interface';
 
 export type FSEventNames = 'change' | 'dirRead' | 'error';
 
 export class FSEventEmitter extends EventEmitter {
-  on(event: 'dirRead', listener: (nodes: FSRawNode[]) => void): this;
+  on(event: 'dirRead', listener: (nodes: IFSRawNode[]) => void): this;
   on(
     event: 'change',
     listener: (eventType: string, filename: string | Buffer) => void
@@ -27,7 +17,7 @@ export class FSEventEmitter extends EventEmitter {
 
   emit(event: 'error', error: Error): boolean;
   emit(event: 'change', eventType: string, filename: string | Buffer): boolean;
-  emit(event: 'dirRead', nodes: FSRawNode[]): boolean;
+  emit(event: 'dirRead', nodes: IFSRawNode[]): boolean;
   emit(event: 'close'): boolean;
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
@@ -36,22 +26,4 @@ export class FSEventEmitter extends EventEmitter {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   removeAllListeners(event: FSEventNames): this;
-}
-
-export abstract class FSBackend {
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  private viewId: string;
-
-  protected constructor({ viewId }: IFSConstructorProps) {
-    this.viewId = viewId;
-  }
-
-  abstract readDir(path: string): Promise<FSRawNode[]>;
-
-  abstract readWatchDir(path: string): FSEventEmitter;
-
-  abstract unwatchDir(path: string): void;
-
-  abstract unwatchAllDir(): void;
 }

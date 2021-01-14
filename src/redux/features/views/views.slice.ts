@@ -17,11 +17,13 @@ export const viewsSlice = createSlice({
       state.views.push({
         viewName: 'boo',
         viewId: state.views.length ? state.views.length.toString() : '0',
-        byIds: {},
-        allIds: [],
+        byPath: {},
+        allPath: [],
         cursor: null,
-        selectedIds: new Set(),
+        selectedPaths: new Set(),
         startPath: '/',
+        startPathLoading: false,
+        startPathError: null,
       });
     },
   },

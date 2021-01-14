@@ -18,32 +18,42 @@ export const getViewByIndex = createSelector(
   (state, index) => state[index]
 );
 
+export const getViewName = createSelector(
+  getViewByIndex,
+  (state) => state.viewName
+);
+
 export const getViewId = createSelector(
   getViewByIndex,
   (state) => state.viewId
 );
 
-export const getAllIdxByIndex = createSelector(
+export const getAllPathByIndex = createSelector(
   getViewByIndex,
-  (state) => state.allIds
+  (state) => state.allPath
 );
 
 export const getNodeHash = createSelector(
   getViewByIndex,
-  (state) => state.byIds
+  (state) => state.byPath
 );
 
-export const getNodeById = createSelector(
-  [getNodeHash, (_state, _idx, nodeId: string) => nodeId],
+export const getNodeByPath = createSelector(
+  [getNodeHash, (_state, _idx, nodePath: string) => nodePath],
   (state, nodeId: string) => state[nodeId]
 );
 
 export const getNodeByIdx = createSelector(
   [getViewByIndex, (_state, _viewIndex, nodeIndex) => nodeIndex],
   (treeState, nodeIndex) => {
-    const nodeId = treeState.allIds[nodeIndex];
-    return treeState.byIds[nodeId];
+    const nodePath = treeState.allPath[nodeIndex];
+    return treeState.byPath[nodePath];
   }
+);
+
+export const getEnterStack = createSelector(
+  getViewByIndex,
+  (state) => state.enterStack
 );
 
 export const getCursorIdx = createSelector(
@@ -58,17 +68,22 @@ export const getCursorNode = createSelector(
     if (cursor === null) {
       return null;
     }
-    const cursorId = treeState.allIds[cursor];
-    return treeState.byIds[cursorId];
+    const cursorPath = treeState.allPath[cursor];
+    return treeState.byPath[cursorPath];
   }
 );
 
-export const getSelectedIds = createSelector(
+export const getSelectedPaths = createSelector(
   getViewByIndex,
-  (state) => state.selectedIds
+  (state) => state.selectedPaths
 );
 
 export const getStartPath = createSelector(
   getViewByIndex,
   (state) => state.startPath
+);
+
+export const getIsLoadingStartPath = createSelector(
+  getViewByIndex,
+  (state) => state.startPathLoading
 );

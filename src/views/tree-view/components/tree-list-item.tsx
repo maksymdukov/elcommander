@@ -4,7 +4,7 @@ import { areEqual } from 'react-window';
 import NodeControlIcon from './node-control-icon';
 import EntityLabel from './entity-label';
 import NodeIcon from './node-icon';
-import { getNodeById } from '../../../redux/features/views/views.selectors';
+import { getNodeByPath } from '../../../redux/features/views/views.selectors';
 import { RootState } from '../../../redux/root-types';
 import { TreeEventType } from '../../../enums/tree-event-type.enum';
 import { useNodeRef } from '../hook/use-node-ref';
@@ -38,7 +38,7 @@ const TreeListItemRaw: React.FC<TreeListItemRawProps> = ({
     onDragOver,
   } = useDndNodeHandlers();
   const node = useSelector((state: RootState) =>
-    getNodeById(state, data.viewIndex, data.allIds[index])
+    getNodeByPath(state, data.viewIndex, data.allIds[index])
   );
   const offset = node.nestLevel * CHILDREN_OFFSET_PX + INITIAL_NODE_OFFSET;
 

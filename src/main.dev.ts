@@ -74,6 +74,7 @@ const createWindow = async () => {
     icon: getAssetPath('icon.png'),
     webPreferences: {
       nodeIntegration: true,
+      nodeIntegrationInWorker: true,
     },
   });
 
@@ -124,6 +125,8 @@ app.on('window-all-closed', () => {
 });
 
 app.whenReady().then(createWindow).catch(console.log);
+
+app.setAsDefaultProtocolClient('filemanager');
 
 app.on('activate', () => {
   // On macOS it's common to re-create a window in the app when the

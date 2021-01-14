@@ -7,7 +7,7 @@ import { useFsManagerCtx } from './use-fs-manager-ctx.hook';
 import {
   closeDirThunk,
   enterDirByCursorThunk,
-  enterDirThunk,
+  enterDirByNodeIndex,
   exitDirThunk,
   openDirThunk,
   toggleDirByCursorThunk,
@@ -151,7 +151,7 @@ export const useTreeHandlers = ({
       e.treeEventType === TreeEventType.EnterNode &&
       OPENABLE_NODE_TYPES.includes(treeNode.type)
     ) {
-      dispatch(enterDirThunk(treeIndex, viewIndex, fsManager));
+      dispatch(enterDirByNodeIndex(treeIndex, viewIndex, fsManager));
     }
   };
 

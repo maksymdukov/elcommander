@@ -1,38 +1,48 @@
 import { createAction } from '@reduxjs/toolkit';
 import { batch } from 'react-redux';
-import { FSBackend } from '../../../../backends/interfaces/fs-backend.interface';
+import { FSBackend } from '../../../../backends/abstracts/fs-backend.abstract';
 import { AppThunk } from '../../../store';
 import {
-  getAllIdxByIndex,
+  getAllPathByIndex,
   getCursorIdx,
   getCursorNode,
+  getEnterStack,
   getNodeByIdx,
+  getNodeByPath,
   getStartPath,
 } from '../views.selectors';
 import { OPENABLE_NODE_TYPES } from '../../../../views/tree-view/tree-view.constants';
 import { IndexPayload } from './tree-state.actions';
 import { setCursoredAction } from './tree-cursor.action';
-import { ViewStatePayload } from '../tree-state.interface';
-import { IFSNode } from '../../../../backends/interfaces/fs-item.interface';
+import { ViewIndexPayload, ViewStatePayload } from '../tree-state.interface';
 import { DirectoryStateUtils } from '../utils/directory-state.utils';
+import { IFSRawNode } from '../../../../backends/interfaces/fs-raw-node.interface';
+import { TreeNode } from '../../../../interfaces/node.interface';
 
 type OpenDirectory = ViewStatePayload<{
-  nodes: IFSNode[];
+  nodes: IFSRawNode[];
   parentIndex: number;
 }>;
 
 type CloseDirectory = ViewStatePayload<IndexPayload>;
-type EnterDirectoryAction = ViewStatePayload<
-  IndexPayload & { nodes: IFSNode[] }
->;
-type EnterDirectoryByPathAction = ViewStatePayload<{
-  nodes: IFSNode[];
+type EnterDirectoryAction = ViewStatePayload<{
+  nodes: IFSRawNode[];
   path: string;
+  cursorPath?: string;
 }>;
-type ExitDirectoryByPath = ViewStatePayload<{
-  nodes: IFSNode[];
-  parentPath: string;
+type ReadWatchDirThunk = (arg: {
+  node?: TreeNode;
+  path: string;
+  enterStack?: TreeNode[];
+  fsManager: FSBackend;
+  onDirRead: (nodes: IFSRawNode[]) => void;
+  onChange: (eventType: string, filename: string | Buffer) => void;
+  onError: (error: Error) => void;
+}) => AppThunk;
+type EnterDirectoryFail = ViewStatePayload<{
+  error: string;
 }>;
+type EnterDirectoryStartAction = ViewStatePayload<{ path?: string }>;
 
 export const openDirectoryAction = createAction<OpenDirectory>(
   'views/openDirectory'
@@ -40,15 +50,43 @@ export const openDirectoryAction = createAction<OpenDirectory>(
 export const closeDirectoryAction = createAction<CloseDirectory>(
   'views/closeDirectory'
 );
-export const enterDirectoryAction = createAction<EnterDirectoryAction>(
-  'views/enterDirectory'
+export const enterDirectoryStartAction = createAction<
+  EnterDirectoryStartAction
+>('views/enterDirectoryStart');
+export const enterDirectorySuccessAction = createAction<EnterDirectoryAction>(
+  'views/enterDirectorySuccess'
 );
-export const enterDirectoryByPathAction = createAction<
-  EnterDirectoryByPathAction
->('views/enterDirectoryByPath');
-export const exitDirectoryAction = createAction<ExitDirectoryByPath>(
+export const enterDirectoryFailAction = createAction<EnterDirectoryFail>(
+  'views/enterDirectoryFail'
+);
+export const exitDirectoryAction = createAction<ViewIndexPayload>(
   'views/exitDirectory'
 );
+export const resetEnterStackAction = createAction<ViewIndexPayload>(
+  'views/resetEnterStack'
+);
+
+export const readWatchDirThunk: ReadWatchDirThunk = ({
+  node,
+  path,
+  fsManager,
+  onDirRead,
+  enterStack,
+  onChange,
+  onError,
+}): AppThunk => () => {
+  fsManager
+    .readWatchDir(node, path, enterStack)
+    .on('dirRead', (nodes) => {
+      onDirRead(nodes);
+    })
+    .on('change', (eventType, nodePath) => {
+      onChange(eventType, nodePath);
+    })
+    .on('error', (error) => {
+      onError(error);
+    });
+};
 
 export const openDirThunk = (
   nodeIdx: number,
@@ -59,12 +97,23 @@ export const openDirThunk = (
   if (!OPENABLE_NODE_TYPES.includes(node.type)) {
     return;
   }
-  fsManager.readWatchDir(node.id).on('dirRead', (nodes) => {
-    batch(() => {
-      dispatch(openDirectoryAction({ parentIndex: nodeIdx, nodes, viewIndex }));
-      dispatch(setCursoredAction({ index: nodeIdx, viewIndex }));
-    });
-  });
+  dispatch(
+    readWatchDirThunk({
+      fsManager,
+      node,
+      path: node.path,
+      onDirRead: (nodes) => {
+        batch(() => {
+          dispatch(
+            openDirectoryAction({ parentIndex: nodeIdx, nodes, viewIndex })
+          );
+          dispatch(setCursoredAction({ index: nodeIdx, viewIndex }));
+        });
+      },
+      onChange: () => {},
+      onError: () => {},
+    })
+  );
 };
 
 export const closeDirThunk = (
@@ -74,7 +123,7 @@ export const closeDirThunk = (
 ): AppThunk => (dispatch, getState) => {
   const node = getNodeByIdx(getState(), viewIndex, index);
   // unsubscribe from other prev watched dirs recursively
-  fnManager.unwatchDir(node.id);
+  fnManager.unwatchDir(node);
   batch(() => {
     dispatch(closeDirectoryAction({ index, viewIndex }));
     dispatch(setCursoredAction({ index, viewIndex }));
@@ -103,7 +152,7 @@ export const toggleDirByCursorThunk = (
   if (!cursor!.isOpened) {
     // node is already closed
     // find parent and close it
-    const allIds = getAllIdxByIndex(state, viewIndex);
+    const allIds = getAllPathByIndex(state, viewIndex);
     let parentIdx: null | number = null;
     for (let i = cursorIdx; i >= 0; i -= 1) {
       const nodeId = allIds[i];
@@ -122,50 +171,85 @@ export const toggleDirByCursorThunk = (
 };
 
 export const enterDirThunk = (
-  nodeIndex: number,
+  nodePath: string,
   viewIndex: number,
-  fsManager: FSBackend
+  fsManager: FSBackend,
+  cursorPath?: string
 ): AppThunk => async (dispatch, getState) => {
-  const targetNode = getNodeByIdx(getState(), viewIndex, nodeIndex);
+  const targetNode = getNodeByPath(getState(), viewIndex, nodePath);
   // unsubscribe from any other prev watched dirs
   fsManager.unwatchAllDir();
 
-  fsManager
-    .readWatchDir(targetNode.id)
-    .on('dirRead', (nodes) => {
-      dispatch(enterDirectoryAction({ nodes, viewIndex, index: nodeIndex }));
+  dispatch(enterDirectoryStartAction({ viewIndex, path: targetNode.path }));
+
+  dispatch(
+    readWatchDirThunk({
+      fsManager,
+      node: targetNode,
+      path: nodePath,
+      onDirRead: (nodes) => {
+        dispatch(
+          enterDirectorySuccessAction({
+            nodes,
+            viewIndex,
+            path: nodePath,
+            cursorPath,
+          })
+        );
+      },
+      onChange: (eventType, filename) => {
+        console.log(eventType, 'eventType');
+        console.log(filename, 'filename');
+      },
+      onError: (error) => {
+        console.dir(error);
+      },
     })
-    .on('change', (eventType, filename) => {
-      console.log(eventType, 'eventType');
-      console.log(filename, 'filename');
-    })
-    .on('error', (error) => {
-      console.dir(error);
-    });
+  );
+};
+
+export const enterDirByNodeIndex = (
+  nodeIndex: number,
+  viewIndex: number,
+  fsManager: FSBackend
+): AppThunk => (dispatch, getState) => {
+  const targetNode = getNodeByIdx(getState(), viewIndex, nodeIndex);
+  dispatch(enterDirThunk(targetNode.path, viewIndex, fsManager));
 };
 
 export const enterDirByPathThunk = (
   path = '/',
   viewIndex: number,
-  fsManager: FSBackend
+  fsManager: FSBackend,
+  cursorPath?: string
 ): AppThunk => async (dispatch) => {
-  // const nodes = await fsManager.readDir(path);
   // unsubscribe from any other prev watched dirs
   fsManager.unwatchAllDir();
+  batch(() => {
+    dispatch(resetEnterStackAction({ viewIndex }));
+    dispatch(enterDirectoryStartAction({ viewIndex }));
+  });
+
+  dispatch(
+    readWatchDirThunk({
+      path,
+      fsManager,
+      onDirRead: (nodes) => {
+        dispatch(
+          enterDirectorySuccessAction({ path, nodes, viewIndex, cursorPath })
+        );
+      },
+      onChange: (eventType, filename) => {
+        console.log(eventType, 'eventType');
+        console.log(filename, 'filename');
+      },
+      onError: (error) => {
+        console.dir(error);
+      },
+    })
+  );
 
   // dispatch('loadingStartPath')
-  fsManager
-    .readWatchDir(path)
-    .on('dirRead', (nodes) => {
-      dispatch(enterDirectoryByPathAction({ path, nodes, viewIndex }));
-    })
-    .on('change', (eventType, filename) => {
-      console.log(eventType, 'eventType');
-      console.log(filename, 'filename');
-    })
-    .on('error', (error) => {
-      console.dir(error);
-    });
 };
 
 export const initializeViewThunk = (
@@ -191,7 +275,7 @@ export const enterDirByCursorThunk = (
   if (!OPENABLE_NODE_TYPES.includes(cursor.type)) {
     return;
   }
-  dispatch(enterDirThunk(cursorIdx, viewIndex, fsManager));
+  dispatch(enterDirThunk(cursor.path, viewIndex, fsManager));
 };
 
 export const exitDirThunk = (
@@ -200,15 +284,37 @@ export const exitDirThunk = (
 ): AppThunk => async (dispatch, getState) => {
   const state = getState();
   const currentPath = getStartPath(state, viewIndex);
+  const enterStack = getEnterStack(state, viewIndex);
   if (currentPath === '/') {
     // can't go higher
     return;
   }
   const parentPath = DirectoryStateUtils.getParentPath(currentPath);
-  // unwatchAll from all other prev watched dirs
   fsManager.unwatchAllDir();
-
-  fsManager.readWatchDir(parentPath).on('dirRead', (nodes) => {
-    dispatch(exitDirectoryAction({ nodes, viewIndex, parentPath }));
-  });
+  dispatch(exitDirectoryAction({ viewIndex }));
+  dispatch(enterDirectoryStartAction({ viewIndex }));
+  dispatch(
+    readWatchDirThunk({
+      fsManager,
+      path: parentPath,
+      enterStack,
+      onDirRead: (nodes) => {
+        dispatch(
+          enterDirectorySuccessAction({
+            nodes,
+            viewIndex,
+            path: parentPath,
+            cursorPath: currentPath,
+          })
+        );
+      },
+      onChange: (eventType, filename) => {
+        console.log(eventType, 'eventType');
+        console.log(filename, 'filename');
+      },
+      onError: (error) => {
+        console.dir(error);
+      },
+    })
+  );
 };
