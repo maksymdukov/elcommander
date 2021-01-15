@@ -15,6 +15,11 @@ export interface IFSConstructorProps {
   viewId: string;
 }
 
+export interface ReadWatchDirProps {
+  node: TreeNode;
+  up?: boolean;
+}
+
 export abstract class FSBackend {
   // async instantiation
   static async createInstance(prop: IFSConstructorProps) {
@@ -41,17 +46,9 @@ export abstract class FSBackend {
     this.viewId = viewId;
   }
 
-  public abstract readDir(
-    node: TreeNode | undefined,
-    path: string,
-    enterStack: TreeNode[] | undefined
-  ): Promise<IFSRawNode[]>;
+  public abstract readDir(props: ReadWatchDirProps): Promise<IFSRawNode[]>;
 
-  public abstract readWatchDir(
-    node: TreeNode | undefined,
-    path: string,
-    enterStack: TreeNode[] | undefined
-  ): FSEventEmitter;
+  public abstract readWatchDir(arg: ReadWatchDirProps): FSEventEmitter;
 
   public abstract unwatchDir(node: TreeNode): void;
 

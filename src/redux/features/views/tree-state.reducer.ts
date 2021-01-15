@@ -24,6 +24,7 @@ import { DirectoryStateUtils } from './utils/directory-state.utils';
 import { CursorStateUtils } from './utils/cursor-state.utils';
 import { TreeStateUtils } from './utils/tree-state.utils';
 import { SelectionStateUtils } from './utils/selection-state.utils';
+import { TreeNode } from '../../../interfaces/node.interface';
 
 export const treeStateReducer = createReducer<TreeState>(
   initialState.views[0],
@@ -49,7 +50,7 @@ export const treeStateReducer = createReducer<TreeState>(
         const paths = DirectoryStateUtils.insertNodes({
           state,
           nestLevel,
-          nodes,
+          nodes: nodes.slice(1),
           parentId: parent.id,
         });
         // add children to parent.children node
@@ -222,23 +223,36 @@ export const treeStateReducer = createReducer<TreeState>(
       state.enterStack.splice(0, state.enterStack.length);
     });
 
-    builder.addCase(enterDirectoryStartAction, (state, { payload: { id } }) => {
-      if (id) {
-        const nodeToEnter = TreeStateUtils.getNodeById(state, id);
-        if (nodeToEnter) {
-          state.enterStack.push(nodeToEnter);
+    builder.addCase(
+      enterDirectoryStartAction,
+      (state, { payload: { id, startNode } }) => {
+        let nodeToEnter: TreeNode | undefined;
+        // entering dir out of some list of nodes
+        if (id) {
+          nodeToEnter = TreeStateUtils.getNodeById(state, id);
+          if (nodeToEnter) {
+            state.enterStack.push(nodeToEnter);
+            state.startNode = { ...nodeToEnter, children: [] };
+          }
+        } else if (startNode) {
+          state.startNode = {
+            ...startNode,
+            children: [],
+            path: DirectoryStateUtils.getParentPath(startNode.path),
+          };
+          // TODO handle case where we enter path manually
         }
+        DirectoryStateUtils.resetTreeState(state);
+        state.startPathLoading = true;
+        state.startPathError = null;
       }
-      DirectoryStateUtils.resetTreeState(state);
-      state.startPathLoading = true;
-      state.startPathError = null;
-    });
+    );
 
     builder.addCase(
       enterDirectorySuccessAction,
-      (state, { payload: { path, nodes, cursorPath } }) => {
+      (state, { payload: { nodes, cursorPath } }) => {
         let cursorIndex = 0;
-        DirectoryStateUtils.enterDirByPath(state, nodes, path);
+        DirectoryStateUtils.enterDirByPath(state, nodes);
         // user goes one directory up
         // lets restore cursor
         if (cursorPath) {

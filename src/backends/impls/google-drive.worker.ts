@@ -3,10 +3,10 @@ import http, { Server } from 'http';
 import { Auth, drive_v3, google } from 'googleapis';
 import url from 'url';
 import { AddressInfo } from 'net';
-import { TreeNode } from '../../interfaces/node.interface';
 import { IFSRawNode } from '../interfaces/fs-raw-node.interface';
 import { FsItemTypeEnum } from '../../enums/fs-item-type.enum';
 import { CONFIG } from '../../config/config';
+import { ReadWatchDirProps } from '../abstracts/fs-backend.abstract';
 import { extractParentPath } from '../../utils/path';
 
 export class GoogleDrive {
@@ -30,21 +30,30 @@ export class GoogleDrive {
     this.driveClient = google.drive({ version: 'v3', auth: this.authClient });
   }
 
-  async readDir(
-    node: TreeNode | undefined,
-    path: string,
-    enterStack: TreeNode[] | undefined
-  ): Promise<IFSRawNode[]> {
-    let parentId = 'root';
-    const lastStackItem = enterStack?.length
-      ? enterStack[enterStack.length - 1]
-      : null;
-    if (lastStackItem && extractParentPath(lastStackItem.path) === path) {
-      parentId = lastStackItem.meta.parents[0] as string;
+  async readDir({ up, node }: ReadWatchDirProps): Promise<IFSRawNode[]> {
+    const startNode: IFSRawNode = {
+      id: node.id,
+      name: node.name,
+      path: node.path,
+      type: FsItemTypeEnum.Directory,
+      meta: {
+        ...node.meta,
+      },
+    };
+    let { path } = node;
+    let parentId = node.meta.parents[node.meta.parents.length - 1];
+    let parents = [...node.meta.parents];
+    // user wants to read the parent of this node
+    if (up) {
+      path = extractParentPath(path);
+      // last element is id of current node itself
+      // we want to take the last but one
+      parentId = node.meta.parents[node.meta.parents.length - 2];
+      parents = node.meta.parents.slice(0, node.meta.parents.length - 1);
+      startNode.meta.parents = parents;
+      startNode.path = path;
     }
-    if (node) {
-      parentId = node.meta.id;
-    }
+
     const list = await this.driveClient.files.list({
       fields:
         'nextPageToken, files(id, name, mimeType, parents, fileExtension, version, md5Checksum)',
@@ -53,22 +62,24 @@ export class GoogleDrive {
     });
     console.log(list.data.files);
     if (!list.data.files) return [];
-    return list.data.files.map((item) => {
-      const constructedPath = `${path === '/' ? '' : path}/${item.name}`;
-      return {
-        id: item.id!,
-        path: constructedPath,
-        name: item.name!,
-        type:
-          item.mimeType === 'application/vnd.google-apps.folder'
-            ? FsItemTypeEnum.Directory
-            : FsItemTypeEnum.File,
-        meta: {
-          id: item.id,
-          parents: item.parents,
-        },
-      };
-    });
+    return [
+      startNode,
+      ...list.data.files.map((item) => {
+        const constructedPath = `${path === '/' ? '' : path}/${item.name}`;
+        return {
+          id: item.id!,
+          path: constructedPath,
+          name: item.name!,
+          type:
+            item.mimeType === 'application/vnd.google-apps.folder'
+              ? FsItemTypeEnum.Directory
+              : FsItemTypeEnum.File,
+          meta: {
+            parents: [...parents, item.id],
+          },
+        };
+      }),
+    ];
   }
 
   async authenticateByCode(code: string) {

@@ -2,11 +2,10 @@ import * as Comlink from 'comlink';
 // eslint-disable-next-line import/no-webpack-loader-syntax
 import GDWorker from 'worker-loader!./google-drive.worker';
 import { shell } from 'electron';
-import { FSBackend } from '../abstracts/fs-backend.abstract';
+import { FSBackend, ReadWatchDirProps } from '../abstracts/fs-backend.abstract';
 import { FSEventEmitter } from '../classes/fs-event-emitter';
 import { IFSRawNode } from '../interfaces/fs-raw-node.interface';
 import type { GoogleDrive } from './google-drive.worker';
-import { TreeNode } from '../../interfaces/node.interface';
 
 interface GoogleDriveFsProps {
   viewId: string;
@@ -41,23 +40,15 @@ export class GoogleDriveFs extends FSBackend {
     return new GoogleDriveFs({ viewId, workerClassInst });
   }
 
-  async readDir(
-    node: TreeNode | undefined,
-    path: string,
-    enterStack: TreeNode[] | undefined
-  ): Promise<IFSRawNode[]> {
-    return this.googleDriveWorker.readDir(node, path, enterStack);
+  async readDir(props: ReadWatchDirProps): Promise<IFSRawNode[]> {
+    return this.googleDriveWorker.readDir(props);
   }
 
-  readWatchDir(
-    node: TreeNode | undefined,
-    path: string,
-    enterStack: TreeNode[] | undefined
-  ): FSEventEmitter {
+  readWatchDir(props: ReadWatchDirProps): FSEventEmitter {
     const emitter = new FSEventEmitter();
     (async () => {
       try {
-        const nodes = await this.readDir(node, path, enterStack);
+        const nodes = await this.readDir(props);
         emitter.emit('dirRead', nodes);
       } catch (e) {
         emitter.emit('error', e);

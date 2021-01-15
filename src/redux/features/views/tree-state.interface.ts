@@ -12,7 +12,7 @@ export interface TreeState {
   cursor: null | number;
   enterStack: TreeNode[];
   selectedIds: Set<string>;
-  startPath: string;
+  startNode: TreeNode;
   startPathLoading: boolean;
   startPathError: string | null;
 }

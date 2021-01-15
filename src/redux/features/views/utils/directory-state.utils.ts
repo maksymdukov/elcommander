@@ -5,6 +5,29 @@ import { IFSRawNode } from '../../../../backends/interfaces/fs-raw-node.interfac
 import { extractParentPath } from '../../../../utils/path';
 
 export class DirectoryStateUtils {
+  static convertRawNode(
+    node: IFSRawNode,
+    nestLevel = 0,
+    parentId?: TreeNode['id']
+  ): TreeNode {
+    return {
+      id: node.id,
+      path: node.path,
+      name: node.name,
+      meta: node.meta,
+      nestLevel,
+      type: node.type,
+      children: [],
+      isCursored: false,
+      ...(parentId !== undefined && { parent: parentId }),
+      isOpened: false,
+      isSelected: false,
+      isHighlighted: false,
+      isLoading: false,
+      error: null,
+    };
+  }
+
   static resetTreeState(state: TreeState) {
     // reset state except from the startPath
     TreeStateUtils.resetTreeStateBy(state, {
@@ -33,38 +56,19 @@ export class DirectoryStateUtils {
     // insert nodes
     nodes.forEach((node) => {
       ids.push(node.id);
-      state.byId[node.id] = {
-        id: node.id,
-        path: node.path,
-        name: node.name,
-        meta: node.meta,
-        nestLevel,
-        type: node.type,
-        children: [],
-        isCursored: false,
-        ...(parentId !== undefined && { parent: parentId }),
-        isOpened: false,
-        isSelected: false,
-        isHighlighted: false,
-        isLoading: false,
-        error: null,
-      };
+      state.byId[node.id] = this.convertRawNode(node, nestLevel, parentId);
     });
     return ids;
   }
 
-  static enterDirByPath(
-    state: TreeState,
-    nodes: IFSRawNode[],
-    path: TreeNode['path']
-  ) {
-    state.startPath = path;
+  static enterDirByPath(state: TreeState, nodes: IFSRawNode[]) {
+    state.startNode = this.convertRawNode(nodes[0]);
     this.resetTreeState(state);
-    const newNodeIds = this.insertNodes({ state, nodes });
+    const newNodeIds = this.insertNodes({ state, nodes: nodes.slice(1) });
     state.allIds.push(...newNodeIds);
   }
 
-  static getParentPath(currentPath: TreeState['startPath']) {
+  static getParentPath(currentPath: string) {
     return extractParentPath(currentPath);
   }
 }

@@ -38,6 +38,11 @@ export const getNodeHash = createSelector(
   (state) => state.byId
 );
 
+export const getStartNode = createSelector(
+  getViewByIndex,
+  (state) => state.startNode
+);
+
 export const getNodeById = createSelector(
   [getNodeHash, (_state, _idx, nodePath: string) => nodePath],
   (state, nodeId: string) => state[nodeId]
@@ -78,10 +83,7 @@ export const getSelectedPaths = createSelector(
   (state) => state.selectedIds
 );
 
-export const getStartPath = createSelector(
-  getViewByIndex,
-  (state) => state.startPath
-);
+export const getStartPath = createSelector(getStartNode, (state) => state.path);
 
 export const getIsLoadingStartPath = createSelector(
   getViewByIndex,

@@ -61,7 +61,6 @@ const EntityLabelRaw: React.ForwardRefRenderFunction<
       onMouseDown={onMouseDown}
       onMouseUp={onMouseUp}
       onClick={onClick}
-      // draggable="true"
     >
       {children}
       <span className="entity-label__label">{node.name}</span>
