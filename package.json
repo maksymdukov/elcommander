@@ -259,6 +259,7 @@
   "dependencies": {
     "@csstools/normalize.css": "^11.0.1",
     "@reduxjs/toolkit": "^1.5.0",
+    "abort-controller": "^3.0.0",
     "chokidar": "^3.5.0",
     "clsx": "^1.1.1",
     "comlink": "^4.3.0",

@@ -35,6 +35,8 @@ export class CursorStateUtils {
     const parent = state.byId[parentId];
 
     // empty dir
+    console.log('parent.children.length', parent.children.length);
+    console.log('parent.children', parent.children);
     if (!parent.children.length) {
       return parentId;
     }

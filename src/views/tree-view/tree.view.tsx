@@ -56,7 +56,7 @@ function TreeViewRaw({ index, viewId }: TreeViewProps) {
     }
   }, [dispatch, fsManager, index, instantiating]);
 
-  if (instantiating && FSBackendsMap[viewName].options.tabSpinner)
+  if (instantiating && FSBackendsMap[viewName].tabOptions.tabSpinner)
     return (
       <div className="spinner-container">
         <DashSpinner />

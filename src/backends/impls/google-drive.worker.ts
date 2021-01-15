@@ -3,13 +3,20 @@ import http, { Server } from 'http';
 import { Auth, drive_v3, google } from 'googleapis';
 import url from 'url';
 import { AddressInfo } from 'net';
+import AbortController from 'abort-controller';
 import { IFSRawNode } from '../interfaces/fs-raw-node.interface';
 import { FsItemTypeEnum } from '../../enums/fs-item-type.enum';
 import { CONFIG } from '../../config/config';
 import { ReadWatchDirProps } from '../abstracts/fs-backend.abstract';
 import { extractParentPath } from '../../utils/path';
+import {
+  FSWorker,
+  OnChangeCb,
+  OnErrorCb,
+  OnReadDirCb,
+} from '../abstracts/fs-worker.abstract';
 
-export class GoogleDrive {
+export class GoogleDriveWorker extends FSWorker {
   private server: Server | null = null;
 
   private serverListen: Promise<number> | null = null;
@@ -23,6 +30,7 @@ export class GoogleDrive {
   private redirectUri: string | null = null;
 
   public constructor() {
+    super();
     this.authClient = new google.auth.OAuth2({
       clientId: CONFIG.gClientId,
       clientSecret: CONFIG.gClientSecret,
@@ -30,7 +38,11 @@ export class GoogleDrive {
     this.driveClient = google.drive({ version: 'v3', auth: this.authClient });
   }
 
-  async readDir({ up, node }: ReadWatchDirProps): Promise<IFSRawNode[]> {
+  async readDir({
+    up,
+    node,
+    abortSignal,
+  }: ReadWatchDirProps): Promise<IFSRawNode[]> {
     const startNode: IFSRawNode = {
       id: node.id,
       name: node.name,
@@ -54,12 +66,15 @@ export class GoogleDrive {
       startNode.path = path;
     }
 
-    const list = await this.driveClient.files.list({
-      fields:
-        'nextPageToken, files(id, name, mimeType, parents, fileExtension, version, md5Checksum)',
-      q: `"${parentId}" in parents`,
-      orderBy: 'name',
-    });
+    const list = await this.driveClient.files.list(
+      {
+        fields:
+          'nextPageToken, files(id, name, mimeType, parents, fileExtension, version, md5Checksum)',
+        q: `"${parentId}" in parents`,
+        orderBy: 'name',
+      },
+      { signal: abortSignal }
+    );
     console.log(list.data.files);
     if (!list.data.files) return [];
     return [
@@ -80,6 +95,37 @@ export class GoogleDrive {
         };
       }),
     ];
+  }
+
+  async readWatchDir(
+    { up, node }: ReadWatchDirProps,
+    onReadDir: OnReadDirCb,
+    _: OnChangeCb,
+    onError: OnErrorCb
+  ): Promise<void> {
+    let { path: targetPath } = node;
+    if (up) {
+      targetPath = extractParentPath(targetPath);
+    }
+    const abortController = new AbortController();
+    try {
+      await this.addWatcher(targetPath, {
+        close() {
+          abortController.abort();
+        },
+      });
+      const nodes = await this.readDir({
+        node,
+        up,
+        abortSignal: abortController.signal,
+      });
+      await onReadDir(nodes);
+    } catch (e) {
+      if (e.code === 20 && e.name === 'AbortError') {
+        return;
+      }
+      await onError(e);
+    }
   }
 
   async authenticateByCode(code: string) {
@@ -170,4 +216,4 @@ export class GoogleDrive {
     await this.authenticateByCode(code);
   }
 }
-Comlink.expose(GoogleDrive);
+Comlink.expose(GoogleDriveWorker);

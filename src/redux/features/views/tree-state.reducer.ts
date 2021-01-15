@@ -235,6 +235,8 @@ export const treeStateReducer = createReducer<TreeState>(
             state.startNode = { ...nodeToEnter, children: [] };
           }
         } else if (startNode) {
+          // TODO if we are setting new startNode while state.startPathLoading is true
+          // reset all meta in startNode
           state.startNode = {
             ...startNode,
             children: [],

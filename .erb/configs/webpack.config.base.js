@@ -22,6 +22,13 @@ export default {
           },
         },
       },
+      {
+        test: /\.worker\.ts$/,
+        loader: 'worker-loader',
+        options: {
+          filename: '[name].[contenthash].worker.js',
+        },
+      },
     ],
   },
 
@@ -36,7 +43,7 @@ export default {
    */
   resolve: {
     extensions: ['.js', '.jsx', '.json', '.ts', '.tsx'],
-    modules: [path.join(__dirname, '../src'), 'node_modules'],
+    modules: [path.join(__dirname, '..', '../src'), 'node_modules'],
   },
 
   plugins: [

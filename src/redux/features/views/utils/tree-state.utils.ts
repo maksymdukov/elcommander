@@ -48,10 +48,15 @@ export class TreeStateUtils {
     const removed = state.allIds.splice(start, deleteCount);
 
     // remove nodes from byId
-    removed.forEach((path) => {
-      delete state.byId[path];
+    removed.forEach((id) => {
+      const parentId = state.byId[id].parent;
+      if (parentId) {
+        const parent = state.byId[parentId];
+        if (parent) parent.children = [];
+      }
+      delete state.byId[id];
       // remove potential selected
-      state.selectedIds.delete(path);
+      state.selectedIds.delete(id);
     });
   }
 
