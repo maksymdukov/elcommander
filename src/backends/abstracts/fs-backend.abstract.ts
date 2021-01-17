@@ -58,6 +58,10 @@ export abstract class FSBackend<
     return {};
   }
 
+  getParentNode(node: TreeNode): TreeNode {
+    return node;
+  }
+
   public static get tabOptions() {
     return {
       tabSpinner: false,

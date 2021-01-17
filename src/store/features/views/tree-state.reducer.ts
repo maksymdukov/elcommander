@@ -240,7 +240,6 @@ export const treeStateReducer = createReducer<TreeState>(
           state.startNode = {
             ...startNode,
             children: [],
-            path: DirectoryStateUtils.getParentPath(startNode.path),
           };
           // TODO handle case where we enter path manually
         }

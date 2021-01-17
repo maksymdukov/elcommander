@@ -14,21 +14,14 @@ import {
 } from '../../abstracts/fs-worker.abstract';
 
 export class LocalFSWorker extends FSWorker<FSWatcher> {
-  private static getReadDirStartNode({ node, up }: ReadWatchDirProps) {
-    const startNode: IFSRawNode = {
+  private static getReadDirStartNode({ node }: ReadWatchDirProps): IFSRawNode {
+    return {
+      ...node,
       id: node.path,
       type: FsItemTypeEnum.Directory,
       name: node.name,
-      path: node.path,
       meta: {},
     };
-    if (up) {
-      // user wants to read parent of the node
-      const parentPath = extractParentPath(node.path);
-      startNode.id = parentPath;
-      startNode.path = parentPath;
-    }
-    return startNode;
   }
 
   private static getRawNodes(

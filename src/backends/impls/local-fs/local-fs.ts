@@ -1,4 +1,5 @@
 import * as Comlink from 'comlink';
+// @ts-ignore
 import LocalWorker from 'backends/impls/local-fs/local-fs.worker';
 import type { FSWatcher } from 'chokidar';
 import { IFSConstructorProps } from '../../abstracts/fs-backend.abstract';

@@ -16,6 +16,8 @@ import { setCursoredAction } from './tree-cursor.action';
 import { ViewIndexPayload, ViewStatePayload } from '../tree-state.interface';
 import { IFSRawNode } from '../../../../backends/interfaces/fs-raw-node.interface';
 import { TreeNode } from '../../../../interfaces/node.interface';
+import { DirectoryStateUtils } from '../utils/directory-state.utils';
+import { splitByDelimiter } from '../../../../utils/path';
 
 type OpenDirectoryStart = ViewStatePayload<{
   index: number;
@@ -288,23 +290,45 @@ export const enterDirByCursorThunk = (
   dispatch(enterDirThunk(cursor.id, viewIndex, fsManager));
 };
 
-export const exitDirThunk = (
+export const exitToParentThunk = (
   viewIndex: number,
-  fsManager: FSBackend
-): AppThunk => async (dispatch, getState) => {
+  fsManager: FSBackend,
+  pathToExit?: string
+): AppThunk => (dispatch, getState) => {
   const state = getState();
   const startNode = getStartNode(state, viewIndex);
-  if (startNode.path === '/') {
+  if (startNode.path === '/' || startNode.path === pathToExit) {
     // can't go higher
     return;
   }
   fsManager.unwatchAllDir();
-  dispatch(exitDirectoryAction({ viewIndex }));
-  // TODO reach out to fsManager and ask it to return one-level-up node
-  dispatch(enterDirectoryStartAction({ viewIndex, startNode }));
+  let levels = 1; // exit to direct parent by default
+  if (pathToExit) {
+    // figure out number of levels to exit
+    // compared to our current startNode
+    const pathToExitArr = splitByDelimiter(pathToExit);
+    const currentPathArr = splitByDelimiter(startNode.path);
+    levels = currentPathArr.length - pathToExitArr.length;
+  }
+
+  let parentNode: TreeNode = startNode;
+  let prevParentNode = startNode;
+
+  for (let i = 0; i < levels; i++) {
+    prevParentNode = parentNode;
+    dispatch(exitDirectoryAction({ viewIndex }));
+    // reach out to fsManager and ask it to return one-level-up node
+    parentNode = {
+      ...parentNode,
+      path: DirectoryStateUtils.getParentPath(parentNode.path),
+    };
+    parentNode = fsManager.getParentNode(parentNode);
+  }
+
+  dispatch(enterDirectoryStartAction({ viewIndex, startNode: parentNode }));
   dispatch(
     readWatchDirThunk({
-      node: startNode,
+      node: parentNode,
       up: true,
       fsManager,
       onDirRead: (nodes) => {
@@ -312,7 +336,7 @@ export const exitDirThunk = (
           enterDirectorySuccessAction({
             nodes,
             viewIndex,
-            cursorPath: startNode.path,
+            cursorPath: prevParentNode.path,
           })
         );
       },

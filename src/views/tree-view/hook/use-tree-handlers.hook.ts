@@ -1,27 +1,27 @@
 import { useDispatch } from 'react-redux';
-import { ScrollRef } from '../types/scroll-ref';
-import { TreeEventType } from '../../../enums/tree-event-type.enum';
-import { LassoContextState } from '../context/lasso.context';
-import { OPENABLE_NODE_TYPES } from '../tree-view.constants';
-import { useFsManagerCtx } from './use-fs-manager-ctx.hook';
+import { TreeEventType } from 'enums/tree-event-type.enum';
 import {
   closeDirThunk,
   enterDirByCursorThunk,
   enterDirByNodeIndex,
-  exitDirThunk,
+  exitToParentThunk,
   openDirThunk,
   toggleDirByCursorThunk,
-} from '../../../store/features/views/actions/tree-dir.actions';
+} from 'store/features/views/actions/tree-dir.actions';
 import {
   moveCursorThunk,
   setCursoredAction,
   setItemCursoredByClick,
-} from '../../../store/features/views/actions/tree-cursor.action';
+} from 'store/features/views/actions/tree-cursor.action';
 import {
   selectAndMoveCursorThunk,
   selectFromToThunk,
   toggleSelectionAction,
-} from '../../../store/features/views/actions/tree-selection.actions';
+} from 'store/features/views/actions/tree-selection.actions';
+import { ScrollRef } from '../types/scroll-ref';
+import { LassoContextState } from '../context/lasso.context';
+import { OPENABLE_NODE_TYPES } from '../tree-view.constants';
+import { useFsManagerCtx } from './use-fs-manager-ctx.hook';
 
 interface UseContainerProps {
   scrollRef: ScrollRef;
@@ -74,7 +74,7 @@ export const useTreeHandlers = ({
     // backspace
     if (e.key === 'Backspace') {
       e.preventDefault();
-      dispatch(exitDirThunk(viewIndex, fsManager));
+      dispatch(exitToParentThunk(viewIndex, fsManager));
     }
     // left
     if (e.key === 'ArrowLeft') {

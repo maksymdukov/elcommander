@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { getStartPath } from 'store/features/views/views.selectors';
 import { RootState } from 'store/root-types';
 import Button, { ButtonProps } from 'components/buttons/button';
@@ -8,9 +8,13 @@ import Menu from 'components/menu/menu';
 import { useTreeViewCtx } from '../hook/use-tree-view-ctx.hook';
 import { useStyles } from './view-path.styles';
 import { usePathHider } from '../hook/use-path-hider.hook';
+import { exitToParentThunk } from '../../../store/features/views/actions/tree-dir.actions';
+import { useFsManagerCtx } from '../hook/use-fs-manager-ctx.hook';
 
 const ViewPath: React.FC<{ width: number }> = ({ width }) => {
   const classes = useStyles();
+  const dispatch = useDispatch();
+  const { fsManager } = useFsManagerCtx();
   const viewIndex = useTreeViewCtx();
   const currentPath = useSelector((state: RootState) =>
     getStartPath(state, viewIndex)
@@ -34,18 +38,17 @@ const ViewPath: React.FC<{ width: number }> = ({ width }) => {
 
   const onHiddenPathClick = (idx: number) => () => {
     closeMenu();
-    // go from end of the array and collect
     const reversedIdx = hiddenPath.length - 1 - idx;
     const targetPath =
       hiddenPath.filter((_, index) => index <= reversedIdx).join('/') || '/';
-    console.log(targetPath);
+    dispatch(exitToParentThunk(viewIndex, fsManager, targetPath));
   };
   const onVisiblePathClick = (idx: number) => () => {
     const targetPath =
       [...hiddenPath, ...visiblePath]
         .filter((_, index) => index <= idx + hiddenPath.length)
         .join('/') || '/';
-    console.log(targetPath);
+    dispatch(exitToParentThunk(viewIndex, fsManager, targetPath));
   };
 
   const hiddenItems = !!hiddenPath.length && (

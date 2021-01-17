@@ -1,12 +1,14 @@
 import * as Comlink from 'comlink';
-import GDWorker from 'backends/impls/google-drive/google-drive.worker';
 import { shell } from 'electron';
 import { Remote } from 'comlink';
+// @ts-ignore
+import GDWorker from './google-drive.worker';
 import type { GoogleDriveWorker } from './google-drive.worker';
 import { FSBackendThreaded } from '../../abstracts/fs-backend-threaded.abstract';
 import { IFSConstructorProps } from '../../abstracts/fs-backend.abstract';
 import { GoogleDrivePersistence } from './google-drive-persistence';
 import { WorkerWatcher } from '../../abstracts/fs-worker.abstract';
+import { TreeNode } from '../../../interfaces/node.interface';
 
 export class GoogleDriveFs extends FSBackendThreaded<
   GoogleDriveWorker,
@@ -44,6 +46,16 @@ export class GoogleDriveFs extends FSBackendThreaded<
       path: '/',
       meta: {
         parents: ['root'],
+      },
+    };
+  }
+
+  getParentNode(node: TreeNode): TreeNode {
+    return {
+      ...node,
+      meta: {
+        ...node.meta,
+        parents: node.meta.parents.slice(0, node.meta.parents.length - 1),
       },
     };
   }

@@ -30,7 +30,6 @@ export class GoogleDriveWorker extends FSWorker {
   }
 
   async readDir({
-    up,
     node,
     abortSignal,
   }: ReadWatchDirProps): Promise<IFSRawNode[]> {
@@ -43,19 +42,9 @@ export class GoogleDriveWorker extends FSWorker {
         ...node.meta,
       },
     };
-    let { path } = node;
-    let parentId = node.meta.parents[node.meta.parents.length - 1];
-    let parents = [...node.meta.parents];
-    // user wants to read the parent of this node
-    if (up) {
-      path = extractParentPath(path);
-      // last element is id of current node itself
-      // we want to take the last but one
-      parentId = node.meta.parents[node.meta.parents.length - 2];
-      parents = node.meta.parents.slice(0, node.meta.parents.length - 1);
-      startNode.meta.parents = parents;
-      startNode.path = path;
-    }
+    const { path } = node;
+    const parentId = node.meta.parents[node.meta.parents.length - 1];
+    const parents = [...node.meta.parents];
 
     const list = await this.driveClient.files.list(
       {
