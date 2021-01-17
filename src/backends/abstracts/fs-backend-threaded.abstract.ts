@@ -9,29 +9,40 @@ import { IFSRawNode } from '../interfaces/fs-raw-node.interface';
 import { extractParentPath } from '../../utils/path';
 import { FSEventEmitter } from '../classes/fs-event-emitter';
 import { FSWorker, WorkerWatcher } from './fs-worker.abstract';
+import { FSPersistence } from '../classes/fs-persistence';
 
-export interface CtorProps<Worker> {
-  viewId: string;
+export type CtorProps<
+  Worker extends FSWorker<W>,
+  P extends FSPersistence,
+  W extends WorkerWatcher = WorkerWatcher
+> = {
   workerInstance: Remote<Worker>;
-}
+} & IFSConstructorProps<P>;
 
 export abstract class FSBackendThreaded<
   Worker extends FSWorker<Watcher>,
-  Watcher extends WorkerWatcher = WorkerWatcher
-> extends FSBackend {
+  Watcher extends WorkerWatcher = WorkerWatcher,
+  Persistence extends FSPersistence = FSPersistence
+> extends FSBackend<Persistence> {
   static async createInstance<
     WorkerT extends FSWorker<WatcherT>,
-    WatcherT extends WorkerWatcher = WorkerWatcher
+    WatcherT extends WorkerWatcher = WorkerWatcher,
+    PersistT extends FSPersistence = FSPersistence
   >(
     _: IFSConstructorProps
-  ): Promise<ThisType<FSBackendThreaded<WorkerT, WatcherT>>> {
+  ): Promise<FSBackendThreaded<WorkerT, WatcherT, PersistT>> {
     throw new Error('Must be implemented in the derived class');
   }
 
-  readonly worker: Remote<Worker>;
+  worker: Remote<Worker>;
 
-  protected constructor({ viewId, workerInstance }: CtorProps<Worker>) {
-    super({ viewId });
+  protected constructor({
+    viewId,
+    workerInstance,
+    configName,
+    persistence,
+  }: CtorProps<Worker, Persistence>) {
+    super({ viewId, configName, persistence });
     this.worker = workerInstance;
   }
 

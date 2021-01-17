@@ -15,6 +15,7 @@ import { app, BrowserWindow, shell } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import MenuBuilder from './menu';
+import { init } from './init';
 
 export default class AppUpdater {
   constructor() {
@@ -25,6 +26,13 @@ export default class AppUpdater {
 }
 
 let mainWindow: BrowserWindow | null = null;
+
+// hack for changing default Electron name of the userData dir under dev
+if (process.env.NODE_ENV === 'development') {
+  const APP_NAME = 'ElCommander';
+  app.setName(APP_NAME);
+  app.setPath('userData', path.join(app.getPath('appData'), APP_NAME));
+}
 
 if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support');
@@ -58,7 +66,7 @@ const createWindow = async () => {
   ) {
     await installExtensions();
   }
-
+  await init();
   const RESOURCES_PATH = app.isPackaged
     ? path.join(process.resourcesPath, 'resources')
     : path.join(__dirname, '../resources');
@@ -75,6 +83,7 @@ const createWindow = async () => {
     webPreferences: {
       nodeIntegration: true,
       nodeIntegrationInWorker: true,
+      enableRemoteModule: true,
     },
   });
 
@@ -109,7 +118,7 @@ const createWindow = async () => {
 
   // Remove this if your app does not use auto updates
   // eslint-disable-next-line
-  new AppUpdater();
+  // new AppUpdater();
 };
 
 /**

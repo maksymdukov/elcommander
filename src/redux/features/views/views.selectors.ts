@@ -9,18 +9,20 @@ export const getViewsSelector = createSelector(
 export const getViewIds = createSelector(getRootViewsSelector, (state) =>
   state.views.map((v) => v.viewId)
 );
-export const getViewNames = createSelector(getRootViewsSelector, (state) =>
-  state.views.map((v) => v.viewName)
-);
 export const getViewByIndex = createSelector(
   getViewsSelector,
   (_: RootState, index: number) => index,
   (state, index) => state[index]
 );
 
-export const getViewName = createSelector(
+export const getViewClassId = createSelector(
   getViewByIndex,
-  (state) => state.viewName
+  (state) => state.classId
+);
+
+export const getViewConfigName = createSelector(
+  getViewByIndex,
+  (state) => state.configName
 );
 
 export const getViewId = createSelector(

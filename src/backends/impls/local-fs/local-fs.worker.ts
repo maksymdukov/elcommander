@@ -2,16 +2,16 @@ import fs, { Dirent } from 'fs';
 import * as Comlink from 'comlink';
 import path from 'path';
 import chokidar, { FSWatcher } from 'chokidar';
-import { ReadWatchDirProps } from '../abstracts/fs-backend.abstract';
-import { IFSRawNode } from '../interfaces/fs-raw-node.interface';
-import { FsItemTypeEnum } from '../../enums/fs-item-type.enum';
-import { extractParentPath } from '../../utils/path';
+import { ReadWatchDirProps } from '../../abstracts/fs-backend.abstract';
+import { IFSRawNode } from '../../interfaces/fs-raw-node.interface';
+import { FsItemTypeEnum } from '../../../enums/fs-item-type.enum';
+import { extractParentPath } from '../../../utils/path';
 import {
   FSWorker,
   OnChangeCb,
   OnErrorCb,
   OnReadDirCb,
-} from '../abstracts/fs-worker.abstract';
+} from '../../abstracts/fs-worker.abstract';
 
 export class LocalFSWorker extends FSWorker<FSWatcher> {
   private static getReadDirStartNode({ node, up }: ReadWatchDirProps) {

@@ -5,8 +5,9 @@ export interface ByIdState {
 }
 
 export interface TreeState {
-  viewName: string;
+  classId: string;
   viewId: string;
+  configName: string;
   byId: ByIdState;
   allIds: string[];
   cursor: null | number;

@@ -2,6 +2,7 @@ import { AbortSignal } from 'abort-controller';
 import { FSEventEmitter, FSEventNames } from '../classes/fs-event-emitter';
 import { IFSRawNode } from '../interfaces/fs-raw-node.interface';
 import { TreeNode } from '../../interfaces/node.interface';
+import { FSPersistence } from '../classes/fs-persistence';
 
 declare global {
   interface Error {
@@ -12,8 +13,10 @@ declare global {
   }
 }
 
-export interface IFSConstructorProps {
+export interface IFSConstructorProps<P extends FSPersistence = FSPersistence> {
   viewId: string;
+  configName: string;
+  persistence: P;
 }
 
 export interface ReadWatchDirProps {
@@ -32,16 +35,28 @@ export interface FSSubscription {
   emitter: FSEventEmitter;
 }
 
-export abstract class FSBackend {
+// export interface FSCreateInstanceStatic<
+//   T extends FSBackend<P>,
+//   P extends FSPersistence = FSPersistence
+// > {
+//   new (props: IFSConstructorProps<P>): T;
+//   Persistence: typeof FSPersistence
+//   createInstance
+// }
+
+export abstract class FSBackend<
+  Persistence extends FSPersistence = FSPersistence
+> {
+  static Persistence: typeof FSPersistence = FSPersistence;
+
   // async instantiation
-  static async createInstance(prop: IFSConstructorProps) {
-    // @ts-ignore
-    return new this(prop);
+  static async createInstance(_: IFSConstructorProps): Promise<FSBackend> {
+    throw new Error('must be implemented in the derived class');
   }
 
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  private viewId: string;
+  static getStartNode(): Partial<TreeNode> {
+    return {};
+  }
 
   public static get tabOptions() {
     return {
@@ -49,10 +64,22 @@ export abstract class FSBackend {
     };
   }
 
+  protected viewId: string;
+
+  protected configName: string;
+
   private subscriptions: FSSubscription[] = [];
 
-  protected constructor({ viewId }: IFSConstructorProps) {
+  protected persistence: Persistence;
+
+  protected constructor({
+    viewId,
+    configName,
+    persistence,
+  }: IFSConstructorProps<Persistence>) {
     this.viewId = viewId;
+    this.configName = configName;
+    this.persistence = persistence;
   }
 
   abstract get options(): {
@@ -103,5 +130,5 @@ export abstract class FSBackend {
     this.unwatchAllDir();
   }
 
-  public async onInit() {}
+  public async onInit(): Promise<void> {}
 }

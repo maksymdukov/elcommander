@@ -300,6 +300,7 @@ export const exitDirThunk = (
   }
   fsManager.unwatchAllDir();
   dispatch(exitDirectoryAction({ viewIndex }));
+  // TODO reach out to fsManager and ask it to return one-level-up node
   dispatch(enterDirectoryStartAction({ viewIndex, startNode }));
   dispatch(
     readWatchDirThunk({

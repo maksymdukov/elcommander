@@ -4,6 +4,7 @@ import { FixedSizeList } from 'react-window';
 import { RootState } from '../../../redux/root-types';
 import {
   getCursorIdx,
+  getIsLoadingStartPath,
   getStartPath,
 } from '../../../redux/features/views/views.selectors';
 import { usePreviousValue } from '../../../utils/use-previous-value.hook';
@@ -17,19 +18,31 @@ const AutoCursorScroll: React.FC<AutoScrollProps> = ({ scrollRef, index }) => {
   const startPath = useSelector((state: RootState) =>
     getStartPath(state, index)
   );
+  const startPathLoading = useSelector((state: RootState) =>
+    getIsLoadingStartPath(state, index)
+  );
   const prevStartPath = usePreviousValue(startPath);
+  const prevStartPathLoading = usePreviousValue(startPathLoading);
   const cursorIndex = useSelector((state: RootState) =>
     getCursorIdx(state, index)
   );
   useEffect(() => {
     if (
-      scrollRef.current &&
-      prevStartPath !== startPath &&
-      cursorIndex !== null
+      (prevStartPath !== startPath ||
+        startPathLoading !== prevStartPathLoading) &&
+      cursorIndex !== null &&
+      scrollRef.current
     ) {
       scrollRef.current.scrollToItem(cursorIndex, 'smart');
     }
-  }, [startPath, scrollRef, cursorIndex, prevStartPath]);
+  }, [
+    startPath,
+    scrollRef,
+    cursorIndex,
+    prevStartPath,
+    startPathLoading,
+    prevStartPathLoading,
+  ]);
   return null;
 };
 

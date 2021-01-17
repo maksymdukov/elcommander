@@ -1,0 +1,11 @@
+.hr-container {
+  width: 100%;
+}
+
+.hr {
+  border: none;
+  height: 1px;
+  background-color: var(--hr-bg-color);
+  width: 100%;
+  margin: auto;
+}

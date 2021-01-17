@@ -2,6 +2,9 @@ import { AnyAction, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { treeStateReducer } from './tree-state.reducer';
 import { initialState } from './views-init-state';
 import { ViewIndexPayload } from './tree-state.interface';
+import { FsItemTypeEnum } from '../../../enums/fs-item-type.enum';
+import { ViewsStateUtils } from './utils/views-state.utils';
+import { AddViewAction, RemoveViewAction } from './actions/views.actions';
 
 function isTreeStateAction(
   action: AnyAction
@@ -13,19 +16,38 @@ export const viewsSlice = createSlice({
   name: 'views',
   initialState,
   reducers: {
-    addView(state) {
+    addView(state, { payload: { backend, config } }: AddViewAction) {
       state.views.push({
-        viewName: 'boo',
-        viewId: state.views.length ? state.views.length.toString() : '0',
+        classId: backend.id,
+        viewId: ViewsStateUtils.generateUUID(state),
+        configName: config?.name || '',
         byId: {},
         allIds: [],
         cursor: null,
-        selectedPaths: new Set(),
-        startPath: '/',
+        selectedIds: new Set(),
+        startNode: {
+          id: '/',
+          name: 'root',
+          type: FsItemTypeEnum.Directory,
+          children: [],
+          isLoading: false,
+          isOpened: false,
+          isCursored: false,
+          isHighlighted: false,
+          isSelected: false,
+          error: null,
+          path: '/',
+          nestLevel: -1,
+          meta: {},
+          ...backend.klass.getStartNode(),
+        },
         startPathLoading: false,
         startPathError: null,
         enterStack: [],
       });
+    },
+    removeView(state, { payload: { viewIndex } }: RemoveViewAction) {
+      state.views.splice(viewIndex, 1);
     },
   },
   extraReducers: (builder) => {
@@ -34,3 +56,8 @@ export const viewsSlice = createSlice({
     });
   },
 });
+
+export const {
+  addView: addViewAction,
+  removeView: removeViewAction,
+} = viewsSlice.actions;

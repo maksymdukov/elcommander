@@ -7,11 +7,19 @@ import TreeViewProvider from './context/treeViewProvider';
 import FsManagerCtxProvider from './context/fs-manager-ctx.provider';
 import { initializeViewThunk } from '../../redux/features/views/actions/tree-dir.actions';
 import ViewPath from './components/view-path';
-import { getViewName } from '../../redux/features/views/views.selectors';
+import {
+  getViewClassId,
+  getViewConfigName,
+} from '../../redux/features/views/views.selectors';
 import { RootState } from '../../redux/root-types';
-import { FSBackendsMap } from '../../backends/backends-map';
+import {
+  getFSBackendsMap,
+  IFSBackendDescriptor,
+} from '../../backends/backends-map';
 import DashSpinner from '../../components/animated/dash-spinner';
+import { removeViewAction } from '../../redux/features/views/views.slice';
 import './tree-view.global.scss';
+import { PluginPersistence } from '../../plugins/plugin-persistence';
 
 interface TreeViewProps {
   index: number;
@@ -19,10 +27,19 @@ interface TreeViewProps {
 }
 
 function TreeViewRaw({ index, viewId }: TreeViewProps) {
+  const [
+    fsBackendDescriptor,
+    setFsBackendDescriptor,
+  ] = useState<IFSBackendDescriptor | null>(null);
   const [fsManager, setFsManager] = useState<FSBackend | null>(null);
   const [instantiating, setInstantiating] = useState(false);
   const dispatch = useDispatch();
-  const viewName = useSelector((state: RootState) => getViewName(state, index));
+  const classId = useSelector((state: RootState) =>
+    getViewClassId(state, index)
+  );
+  const configName = useSelector((state: RootState) =>
+    getViewConfigName(state, index)
+  );
 
   // DI
   useEffect(() => {
@@ -30,15 +47,47 @@ function TreeViewRaw({ index, viewId }: TreeViewProps) {
     if (!fsManager && !instantiating) {
       setInstantiating(true);
       (async () => {
-        const instance = await FSBackendsMap[viewName].createInstance({
+        const FSBackendsMap = await getFSBackendsMap();
+        setFsBackendDescriptor(FSBackendsMap[classId]);
+        const FsBackendClass = FSBackendsMap[classId].klass;
+        // our app's global class to allow plugins access to fs
+        const pluginPersistence = new PluginPersistence(
+          FsBackendClass.Persistence.category,
+          FsBackendClass.Persistence.dirName
+        );
+        // implementation of plugin's specific persistence class
+        const persistence = new FsBackendClass.Persistence(pluginPersistence);
+        const instance = await FsBackendClass.createInstance({
           viewId,
+          persistence,
+          configName,
         });
         setFsManager(instance);
-        await instance.onInit();
+        try {
+          await instance.onInit();
+          // TODO
+          // dispatch this.configName save
+        } catch (e) {
+          // dispatch removeView action
+          dispatch(removeViewAction({ viewIndex: index }));
+          // TODO
+          // dispatch error notification
+          return;
+        }
+        setFsManager(instance);
         setInstantiating(false);
       })();
     }
-  }, [fsManager, viewName, instantiating, viewId]);
+  }, [
+    dispatch,
+    fsManager,
+    classId,
+    configName,
+    instantiating,
+    viewId,
+    setFsBackendDescriptor,
+    index,
+  ]);
 
   // cleanup
   useEffect(() => {
@@ -56,7 +105,11 @@ function TreeViewRaw({ index, viewId }: TreeViewProps) {
     }
   }, [dispatch, fsManager, index, instantiating]);
 
-  if (instantiating && FSBackendsMap[viewName].tabOptions.tabSpinner)
+  if (
+    instantiating &&
+    fsBackendDescriptor &&
+    fsBackendDescriptor.klass.tabOptions.tabSpinner
+  )
     return (
       <div className="spinner-container">
         <DashSpinner />
