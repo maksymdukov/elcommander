@@ -1,8 +1,8 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
-import { getIsLoadingStartPath } from '../../../redux/features/views/views.selectors';
+import { getIsLoadingStartPath } from '../../../store/features/views/views.selectors';
 import { useTreeViewCtx } from '../hook/use-tree-view-ctx.hook';
-import { RootState } from '../../../redux/root-types';
+import { RootState } from '../../../store/root-types';
 import DashSpinner from '../../../components/animated/dash-spinner';
 import { useFsManagerCtx } from '../hook/use-fs-manager-ctx.hook';
 import './path-spinner.global.scss';

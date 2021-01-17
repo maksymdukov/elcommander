@@ -1,5 +1,5 @@
 import React, { SVGProps } from 'react';
-import { FSBackend } from './abstracts/fs-backend.abstract';
+import { IFSBackend } from './abstracts/fs-backend.abstract';
 import { LocalFs } from './impls/local-fs/local-fs';
 import { GoogleDriveFs } from './impls/google-drive/google-drive-fs';
 import HardDriveIcon from '../components/icons/hard-drive-icon';
@@ -8,7 +8,7 @@ import GoogleDriveIcon from '../components/icons/google-drive-icon';
 export interface IFSBackendDescriptor {
   id: string;
   name: string;
-  klass: typeof FSBackend;
+  klass: IFSBackend;
   enabled: boolean;
   order: number;
   icon: React.FC<SVGProps<SVGSVGElement>>;
@@ -23,7 +23,6 @@ export const FSBackendsMap: IFSManagers = {
     id: 'LocalFS',
     name: 'Local',
     // https://github.com/microsoft/TypeScript/issues/4628
-    // @ts-ignore
     klass: LocalFs,
     enabled: true,
     order: 1,
@@ -33,7 +32,6 @@ export const FSBackendsMap: IFSManagers = {
     id: 'GoogleDriveFS',
     name: 'Google',
     // https://github.com/microsoft/TypeScript/issues/4628
-    // @ts-ignore
     klass: GoogleDriveFs,
     enabled: true,
     order: 2,

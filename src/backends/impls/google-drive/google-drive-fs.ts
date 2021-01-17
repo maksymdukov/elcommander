@@ -8,8 +8,6 @@ import { IFSConstructorProps } from '../../abstracts/fs-backend.abstract';
 import { GoogleDrivePersistence } from './google-drive-persistence';
 import { WorkerWatcher } from '../../abstracts/fs-worker.abstract';
 
-// https://github.com/microsoft/TypeScript/issues/4628
-// @ts-ignore
 export class GoogleDriveFs extends FSBackendThreaded<
   GoogleDriveWorker,
   WorkerWatcher,

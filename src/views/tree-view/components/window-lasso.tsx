@@ -6,7 +6,7 @@ import { useTreeViewCtx } from '../hook/use-tree-view-ctx.hook';
 import {
   lassoSelectionAction,
   resetSelectionAction,
-} from '../../../redux/features/views/actions/tree-selection.actions';
+} from '../../../store/features/views/actions/tree-selection.actions';
 
 const WindowLassoRaw: React.FC = () => {
   const viewIndex = useTreeViewCtx();

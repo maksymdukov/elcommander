@@ -1,21 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import AddTabIcon from '../../../components/icons/add-tab-icon';
-import IconButton from '../../../components/buttons/icon-button';
-import {
-  getFSBackendsMap,
-  IFSBackendDescriptor,
-} from '../../../backends/backends-map';
-import Menu from '../../../components/menu/menu';
-import MenuItem from '../../../components/menu/menu-item';
-import MenuIconedItem from '../../../components/menu/menu-iconed-item';
-import { addViewAction } from '../../../redux/features/views/views.slice';
-
-import './add-tab.global.scss';
+import AddTabIcon from 'components/icons/add-tab-icon';
+import IconButton from 'components/buttons/icon-button';
+import { getFSBackendsMap, IFSBackendDescriptor } from 'backends/backends-map';
+import Menu from 'components/menu/menu';
+import MenuItem from 'components/menu/menu-item';
+import MenuIconedItem from 'components/menu/menu-iconed-item';
+import { addViewAction } from 'store/features/views/views.slice';
 import {
   IUserPluginConfig,
   PluginPersistence,
-} from '../../../plugins/plugin-persistence';
+} from 'plugins/plugin-persistence';
+import ToolbarIcon from './toolbar-icon';
 
 interface BackendItem {
   be: IFSBackendDescriptor;
@@ -76,7 +72,7 @@ const AddTab = () => {
       onClose={openMenu}
       trigger={
         <IconButton onButtonClick={toggleMenu}>
-          <AddTabIcon className="add-tab-icon" />
+          <ToolbarIcon Icon={AddTabIcon} />
         </IconButton>
       }
       disabled={!backends}

@@ -1,7 +1,7 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
-import { getStartPath } from '../../../redux/features/views/views.selectors';
-import { RootState } from '../../../redux/root-types';
+import { getStartPath } from '../../../store/features/views/views.selectors';
+import { RootState } from '../../../store/root-types';
 import './view-path.global.scss';
 
 interface ViewPathProps {

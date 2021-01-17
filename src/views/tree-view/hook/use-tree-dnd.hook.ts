@@ -4,8 +4,8 @@ import { useDnd } from './use-dnd.hook';
 import { UNDROPPABLE_NODE_TYPES } from '../tree-view.constants';
 import { useDndContext } from './use-dnd-context.hook';
 import { TreeNode } from '../../../interfaces/node.interface';
-import { setCursoredAction } from '../../../redux/features/views/actions/tree-cursor.action';
-import { toggleNodeHighlightAction } from '../../../redux/features/views/actions/tree-selection.actions';
+import { setCursoredAction } from '../../../store/features/views/actions/tree-cursor.action';
+import { toggleNodeHighlightAction } from '../../../store/features/views/actions/tree-selection.actions';
 
 interface UseTreeDndProps {
   viewIndex: number;

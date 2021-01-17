@@ -11,17 +11,17 @@ import {
   exitDirThunk,
   openDirThunk,
   toggleDirByCursorThunk,
-} from '../../../redux/features/views/actions/tree-dir.actions';
+} from '../../../store/features/views/actions/tree-dir.actions';
 import {
   moveCursorThunk,
   setCursoredAction,
   setItemCursoredByClick,
-} from '../../../redux/features/views/actions/tree-cursor.action';
+} from '../../../store/features/views/actions/tree-cursor.action';
 import {
   selectAndMoveCursorThunk,
   selectFromToThunk,
   toggleSelectionAction,
-} from '../../../redux/features/views/actions/tree-selection.actions';
+} from '../../../store/features/views/actions/tree-selection.actions';
 
 interface UseContainerProps {
   scrollRef: ScrollRef;

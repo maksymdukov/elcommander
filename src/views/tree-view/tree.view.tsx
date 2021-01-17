@@ -1,25 +1,22 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import AutoSizer from 'react-virtualized-auto-sizer';
-import { FSBackend } from '../../backends/abstracts/fs-backend.abstract';
-import TreeList from './tree-list';
-import TreeViewProvider from './context/treeViewProvider';
-import FsManagerCtxProvider from './context/fs-manager-ctx.provider';
-import { initializeViewThunk } from '../../redux/features/views/actions/tree-dir.actions';
-import ViewPath from './components/view-path';
+import { removeViewAction } from 'store/features/views/views.slice';
+import { FSBackend } from 'backends/abstracts/fs-backend.abstract';
+import { initializeViewThunk } from 'store/features/views/actions/tree-dir.actions';
 import {
   getViewClassId,
   getViewConfigName,
-} from '../../redux/features/views/views.selectors';
-import { RootState } from '../../redux/root-types';
-import {
-  getFSBackendsMap,
-  IFSBackendDescriptor,
-} from '../../backends/backends-map';
-import DashSpinner from '../../components/animated/dash-spinner';
-import { removeViewAction } from '../../redux/features/views/views.slice';
-import './tree-view.global.scss';
-import { PluginPersistence } from '../../plugins/plugin-persistence';
+} from 'store/features/views/views.selectors';
+import { RootState } from 'store/root-types';
+import { getFSBackendsMap, IFSBackendDescriptor } from 'backends/backends-map';
+import { PluginPersistence } from 'plugins/plugin-persistence';
+import DashSpinner from 'components/animated/dash-spinner';
+import FsManagerCtxProvider from './context/fs-manager-ctx.provider';
+import TreeViewProvider from './context/treeViewProvider';
+import TreeList from './tree-list';
+import ViewPath from './components/view-path';
+import { useStyles } from './tree-view.styles';
 
 interface TreeViewProps {
   index: number;
@@ -27,6 +24,7 @@ interface TreeViewProps {
 }
 
 function TreeViewRaw({ index, viewId }: TreeViewProps) {
+  const classes = useStyles();
   const [
     fsBackendDescriptor,
     setFsBackendDescriptor,
@@ -111,7 +109,7 @@ function TreeViewRaw({ index, viewId }: TreeViewProps) {
     fsBackendDescriptor.klass.tabOptions.tabSpinner
   )
     return (
-      <div className="spinner-container">
+      <div className={classes.spinnerContainer}>
         <DashSpinner />
         <span>Loading tab...</span>
       </div>
@@ -125,7 +123,7 @@ function TreeViewRaw({ index, viewId }: TreeViewProps) {
     <FsManagerCtxProvider fsManager={fsManager}>
       <TreeViewProvider viewIndex={index}>
         <ViewPath index={index} />
-        <div className="tree-view-container">
+        <div className={classes.treeViewContainer}>
           <AutoSizer disableWidth>
             {({ height }) => (
               <TreeList index={index} height={height} fsManager={fsManager} />

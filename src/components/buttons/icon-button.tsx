@@ -1,6 +1,6 @@
 import React, { MouseEventHandler, PropsWithChildren } from 'react';
 import clsx from 'clsx';
-import './icon-button.global.scss';
+import { useStyles } from './icon-button.styles';
 
 interface IconButtonProps {
   className?: string;
@@ -11,10 +11,11 @@ const IconButtonRaw: React.ForwardRefRenderFunction<
   HTMLButtonElement,
   PropsWithChildren<IconButtonProps>
 > = ({ children, onButtonClick, className, ...props }, ref) => {
+  const classes = useStyles();
   return (
     <button
       type="button"
-      className={clsx('icon-button', className)}
+      className={clsx(classes.iconButton, className)}
       ref={ref}
       {...props}
       onClick={onButtonClick}

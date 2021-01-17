@@ -5,7 +5,6 @@ import { IFSConstructorProps } from '../../abstracts/fs-backend.abstract';
 import type { LocalFSWorker } from './local-fs.worker';
 import { FSBackendThreaded } from '../../abstracts/fs-backend-threaded.abstract';
 
-// @ts-ignore
 export class LocalFs extends FSBackendThreaded<LocalFSWorker, FSWatcher> {
   static get tabOptions() {
     return {
@@ -24,7 +23,7 @@ export class LocalFs extends FSBackendThreaded<LocalFSWorker, FSWatcher> {
     viewId,
     configName,
     persistence,
-  }: IFSConstructorProps) {
+  }: IFSConstructorProps): Promise<LocalFs> {
     const LocalFSWorkerClass = Comlink.wrap(
       new LocalWorker()
     ) as Comlink.Remote<typeof LocalFSWorker>;

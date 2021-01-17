@@ -1,5 +1,5 @@
 import React from 'react';
-import './dash-spinner.global.scss';
+import './dash-spinner.global.css';
 
 const DashSpinner = () => {
   return (

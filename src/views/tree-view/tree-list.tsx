@@ -1,19 +1,19 @@
 import React, { RefObject, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { FixedSizeList } from 'react-window';
-import { RootState } from '../../redux/root-types';
-import { getAllPathByIndex } from '../../redux/features/views/views.selectors';
+import { RootState } from 'store/root-types';
+import { getAllPathByIndex } from 'store/features/views/views.selectors';
+import { FSBackend } from 'backends/abstracts/fs-backend.abstract';
 import TreeListItem from './components/tree-list-item';
 import { useTreeHandlers } from './hook/use-tree-handlers.hook';
 import CustomInnerWindow from './components/custom-inner-window';
 import { LassoContextRef, LassoContextState } from './context/lasso.context';
 import LassoContextProvider from './context/lasso-context.provider';
-import { FSBackend } from '../../backends/abstracts/fs-backend.abstract';
 import Droppable from './context/droppable';
 import { useTreeDnd } from './hook/use-tree-dnd.hook';
-import './tree-list.global.scss';
 import AutoCursorScroll from './components/auto-cursor-scroll';
 import PathSpinner from './components/path-spinner';
+import { useStyles } from './tree-list.styles';
 
 interface TreeListProps {
   index: number;
@@ -27,6 +27,7 @@ const TreeList: React.FC<TreeListProps> = ({
   height,
   itemSize = 40,
 }) => {
+  const classes = useStyles();
   const allIds = useSelector((state: RootState) =>
     getAllPathByIndex(state, index)
   );
@@ -72,7 +73,7 @@ const TreeList: React.FC<TreeListProps> = ({
         setState={setLassoState}
       >
         <div
-          className="tree-list"
+          className={classes.treeList}
           tabIndex={0}
           {...getContainerProps()}
           {...getDndHandlers()}

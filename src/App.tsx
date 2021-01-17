@@ -1,10 +1,21 @@
 import React from 'react';
+import { createUseStyles } from 'react-jss';
 import Main from './sections/main/main';
 import Toolbar from './sections/toolbar/toolbar';
+import './App.global.css';
+
+const useStyles = createUseStyles({
+  appContainer: {
+    display: 'flex',
+    flexDirection: 'column',
+    height: '100vh',
+  },
+});
 
 export default function App() {
+  const classes = useStyles();
   return (
-    <div className="app-container">
+    <div className={classes.appContainer}>
       <Toolbar />
       <Main />
     </div>

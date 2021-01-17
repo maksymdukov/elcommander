@@ -24,13 +24,7 @@ export abstract class FSBackendThreaded<
   Watcher extends WorkerWatcher = WorkerWatcher,
   Persistence extends FSPersistence = FSPersistence
 > extends FSBackend<Persistence> {
-  static async createInstance<
-    WorkerT extends FSWorker<WatcherT>,
-    WatcherT extends WorkerWatcher = WorkerWatcher,
-    PersistT extends FSPersistence = FSPersistence
-  >(
-    _: IFSConstructorProps
-  ): Promise<FSBackendThreaded<WorkerT, WatcherT, PersistT>> {
+  static async createInstance(..._: any[]): Promise<any> {
     throw new Error('Must be implemented in the derived class');
   }
 

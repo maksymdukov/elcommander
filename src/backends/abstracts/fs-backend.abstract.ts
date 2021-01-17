@@ -35,14 +35,14 @@ export interface FSSubscription {
   emitter: FSEventEmitter;
 }
 
-// export interface FSCreateInstanceStatic<
-//   T extends FSBackend<P>,
-//   P extends FSPersistence = FSPersistence
-// > {
-//   new (props: IFSConstructorProps<P>): T;
-//   Persistence: typeof FSPersistence
-//   createInstance
-// }
+export interface IFSBackend {
+  createInstance(prop: IFSConstructorProps): Promise<FSBackend>;
+  Persistence: typeof FSPersistence;
+  tabOptions: {
+    tabSpinner: boolean;
+  };
+  getStartNode(): Partial<TreeNode>;
+}
 
 export abstract class FSBackend<
   Persistence extends FSPersistence = FSPersistence
@@ -50,7 +50,7 @@ export abstract class FSBackend<
   static Persistence: typeof FSPersistence = FSPersistence;
 
   // async instantiation
-  static async createInstance(_: IFSConstructorProps): Promise<FSBackend> {
+  static async createInstance(..._: any[]): Promise<any> {
     throw new Error('must be implemented in the derived class');
   }
 

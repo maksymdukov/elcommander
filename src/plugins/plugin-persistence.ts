@@ -1,14 +1,14 @@
 import fs from 'fs';
 import path from 'path';
 import { remote } from 'electron';
-import { FSBackend } from '../backends/abstracts/fs-backend.abstract';
+import { IFSBackend } from '../backends/abstracts/fs-backend.abstract';
 import { CONFIG } from '../config/config';
 import { readAllFilesInDir } from '../utils/fs/read-all-dir';
 import { ExtractPromiseArray } from '../utils/types/extract';
 
 export type PluginCategories = 'fs';
 
-export type PluginClass = typeof FSBackend;
+export type PluginClass = IFSBackend;
 
 export interface IUserPluginConfig {
   name: string;
