@@ -12,11 +12,13 @@ import { RootState } from 'store/root-types';
 import { getFSBackendsMap, IFSBackendDescriptor } from 'backends/backends-map';
 import { PluginPersistence } from 'plugins/plugin-persistence';
 import DashSpinner from 'components/animated/dash-spinner';
+import { unstable_batchedUpdates } from 'react-dom';
 import FsManagerCtxProvider from './context/fs-manager-ctx.provider';
 import TreeViewProvider from './context/treeViewProvider';
 import TreeList from './tree-list';
-import ViewPath from './components/view-path';
 import { useStyles } from './tree-view.styles';
+import StatusBar from './components/status-bar';
+import { usePreviousValue } from '../../utils/use-previous-value.hook';
 
 interface TreeViewProps {
   index: number;
@@ -30,6 +32,7 @@ function TreeViewRaw({ index, viewId }: TreeViewProps) {
     setFsBackendDescriptor,
   ] = useState<IFSBackendDescriptor | null>(null);
   const [fsManager, setFsManager] = useState<FSBackend | null>(null);
+  const prevFsManager = usePreviousValue(fsManager);
   const [instantiating, setInstantiating] = useState(false);
   const dispatch = useDispatch();
   const classId = useSelector((state: RootState) =>
@@ -43,6 +46,7 @@ function TreeViewRaw({ index, viewId }: TreeViewProps) {
   useEffect(() => {
     // instantiate fsManager
     if (!fsManager && !instantiating) {
+      console.log('instantiate fsManager');
       setInstantiating(true);
       (async () => {
         const FSBackendsMap = await getFSBackendsMap();
@@ -60,9 +64,12 @@ function TreeViewRaw({ index, viewId }: TreeViewProps) {
           persistence,
           configName,
         });
-        setFsManager(instance);
         try {
           await instance.onInit();
+          unstable_batchedUpdates(() => {
+            setFsManager(instance);
+            setInstantiating(false);
+          });
           // TODO
           // dispatch this.configName save
         } catch (e) {
@@ -70,10 +77,7 @@ function TreeViewRaw({ index, viewId }: TreeViewProps) {
           dispatch(removeViewAction({ viewIndex: index }));
           // TODO
           // dispatch error notification
-          return;
         }
-        setFsManager(instance);
-        setInstantiating(false);
       })();
     }
   }, [
@@ -98,10 +102,10 @@ function TreeViewRaw({ index, viewId }: TreeViewProps) {
 
   // initialize first dir
   useEffect(() => {
-    if (fsManager && !instantiating) {
+    if (fsManager && fsManager !== prevFsManager && !instantiating) {
       dispatch(initializeViewThunk(index, fsManager));
     }
-  }, [dispatch, fsManager, index, instantiating]);
+  }, [dispatch, fsManager, index, instantiating, prevFsManager]);
 
   if (
     instantiating &&
@@ -122,7 +126,7 @@ function TreeViewRaw({ index, viewId }: TreeViewProps) {
   return (
     <FsManagerCtxProvider fsManager={fsManager}>
       <TreeViewProvider viewIndex={index}>
-        <ViewPath index={index} />
+        <StatusBar />
         <div className={classes.treeViewContainer}>
           <AutoSizer disableWidth>
             {({ height }) => (

@@ -8,18 +8,25 @@ const theme = {
   },
   colors: {
     primary: '#011627',
+    primaryLight: '#093755',
     secondary: '#2EC4B6',
+    secondaryLight: '#c6fff5',
     tertiary: '#0570C7',
+    tertiaryLight: '#8fa2d4',
     error: '#E71D36',
+    errorLight: '#ffb3c0',
     warning: '#FF9F1C',
+    warningLight: '#f9e1d4',
   },
   background: {
     primary: '#FDFFFC',
+    secondary: '#bababa',
   },
   text: {
     colors: {
       primary: '#000',
       primaryInverse: '#fff',
+      secondary: '#222222',
       background: '#FDFFFC',
       backgroundInverse: '#FDFFFC',
     },

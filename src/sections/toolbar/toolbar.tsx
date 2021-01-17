@@ -1,7 +1,6 @@
 import React from 'react';
 import { createUseStyles } from 'react-jss';
 import AddTab from './components/add-tab';
-import 'reactjs-popup/dist/index.css';
 
 const useStyles = createUseStyles({
   toolbar: {

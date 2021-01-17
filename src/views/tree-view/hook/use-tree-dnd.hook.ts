@@ -1,11 +1,12 @@
 import { MutableRefObject } from 'react';
 import { useDispatch } from 'react-redux';
-import { useDnd } from './use-dnd.hook';
+import { TreeNode } from 'interfaces/node.interface';
+import { setCursoredAction } from 'store/features/views/actions/tree-cursor.action';
+import { toggleNodeHighlightAction } from 'store/features/views/actions/tree-selection.actions';
+import { useCurrentValue } from 'utils/use-current-value.hook';
 import { UNDROPPABLE_NODE_TYPES } from '../tree-view.constants';
+import { useDnd } from './use-dnd.hook';
 import { useDndContext } from './use-dnd-context.hook';
-import { TreeNode } from '../../../interfaces/node.interface';
-import { setCursoredAction } from '../../../store/features/views/actions/tree-cursor.action';
-import { toggleNodeHighlightAction } from '../../../store/features/views/actions/tree-selection.actions';
 
 interface UseTreeDndProps {
   viewIndex: number;
@@ -26,21 +27,42 @@ export const droppableFilter = ({
 
 export const useTreeDnd = ({ viewIndex, scrollableRef }: UseTreeDndProps) => {
   const dispatch = useDispatch();
+  const viewIndexCurrent = useCurrentValue(viewIndex);
   const { setContainerElement } = useDndContext();
   const { getDndHandlers, getNodeHandlers } = useDnd({
     onInitialMouseDown: (nodeIdx) => {
-      dispatch(setCursoredAction({ viewIndex, index: nodeIdx }));
+      dispatch(
+        setCursoredAction({
+          viewIndex: viewIndexCurrent.current,
+          index: nodeIdx,
+        })
+      );
       // save current active container ref
       if (scrollableRef.current) {
         setContainerElement(scrollableRef.current);
       }
     },
     onNodeDragEnter: (nodeIndex) =>
-      dispatch(toggleNodeHighlightAction({ viewIndex, index: nodeIndex })),
+      dispatch(
+        toggleNodeHighlightAction({
+          viewIndex: viewIndexCurrent.current,
+          index: nodeIndex,
+        })
+      ),
     onNodeDragLeave: (nodeIndex) =>
-      dispatch(toggleNodeHighlightAction({ viewIndex, index: nodeIndex })),
+      dispatch(
+        toggleNodeHighlightAction({
+          viewIndex: viewIndexCurrent.current,
+          index: nodeIndex,
+        })
+      ),
     onNodeDrop: (nodeIndex) => {
-      dispatch(toggleNodeHighlightAction({ viewIndex, index: nodeIndex }));
+      dispatch(
+        toggleNodeHighlightAction({
+          viewIndex: viewIndexCurrent.current,
+          index: nodeIndex,
+        })
+      );
       console.log('drop on node index:', nodeIndex);
     },
     droppableFilter,
@@ -53,22 +75,44 @@ export const useTreeDnd = ({ viewIndex, scrollableRef }: UseTreeDndProps) => {
       setContainerElement(null);
     },
     onContainerDrop: () => {
-      console.log('drop on container index:', viewIndex);
+      console.log('drop on container index:', viewIndexCurrent.current);
     },
     onDndFinish: () => {
       setContainerElement(null);
     },
     onNodeExternalDragEnter: (index) => {
-      dispatch(toggleNodeHighlightAction({ viewIndex, index }));
+      dispatch(
+        toggleNodeHighlightAction({
+          viewIndex: viewIndexCurrent.current,
+          index,
+        })
+      );
     },
     onNodeExternalDragLeave: (index) => {
-      dispatch(toggleNodeHighlightAction({ viewIndex, index }));
+      dispatch(
+        toggleNodeHighlightAction({
+          viewIndex: viewIndexCurrent.current,
+          index,
+        })
+      );
     },
     onContainerExternalDrop: () =>
-      console.log('external container drop viewIndex:', viewIndex),
+      console.log(
+        'external container drop viewIndex:',
+        viewIndexCurrent.current
+      ),
     onNodeExternalDrop: (index) => {
-      dispatch(toggleNodeHighlightAction({ viewIndex, index }));
-      console.log('external node drop index, viewIndex:', index, viewIndex);
+      dispatch(
+        toggleNodeHighlightAction({
+          viewIndex: viewIndexCurrent.current,
+          index,
+        })
+      );
+      console.log(
+        'external node drop index, viewIndex:',
+        index,
+        viewIndexCurrent.current
+      );
     },
   });
   return { getDndHandlers, getNodeHandlers };

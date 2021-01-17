@@ -5,3 +5,6 @@ export const extractParentPath = (currentPath: string) => {
     .join('/');
   return parentPath || '/';
 };
+
+export const splitByDelimiter = (path: string, delimiter = '/') =>
+  path === delimiter ? [''] : path.split(delimiter);
