@@ -65,11 +65,13 @@ const TreeMenu: React.FC<TreeMenuProps> = (props) => {
               on="hover"
               trigger={
                 Icon ? (
-                  <MenuIconedItem key={idx} icon={Icon}>
+                  <MenuIconedItem arrowed key={idx} icon={Icon}>
                     {item.label}
                   </MenuIconedItem>
                 ) : (
-                  <MenuItem key={idx}>{item.label}</MenuItem>
+                  <MenuItem arrowed key={idx}>
+                    {item.label}
+                  </MenuItem>
                 )
               }
             />

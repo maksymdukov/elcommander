@@ -3,6 +3,7 @@ import MenuItem from './menu-item';
 import './menu-iconed-item.global.scss';
 
 interface MenuIconedItemProps {
+  arrowed?: boolean;
   icon: React.FC<{ className?: string }>;
   onClick?: MouseEventHandler<HTMLButtonElement>;
 }
