@@ -17,8 +17,8 @@ const IconButtonRaw: React.ForwardRefRenderFunction<
       type="button"
       className={clsx(classes.iconButton, className)}
       ref={ref}
-      {...props}
       onClick={onButtonClick}
+      {...props}
     >
       {children}
     </button>

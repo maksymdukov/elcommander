@@ -11,7 +11,7 @@ export interface IFSBackendDescriptor {
   klass: IFSBackend;
   enabled: boolean;
   order: number;
-  icon: React.FC<SVGProps<SVGSVGElement>>;
+  icon?: React.FC<SVGProps<SVGSVGElement>>;
 }
 
 export interface IFSManagers {
@@ -22,7 +22,6 @@ export const FSBackendsMap: IFSManagers = {
   LocalFS: {
     id: 'LocalFS',
     name: 'Local',
-    // https://github.com/microsoft/TypeScript/issues/4628
     klass: LocalFs,
     enabled: true,
     order: 1,
@@ -31,7 +30,6 @@ export const FSBackendsMap: IFSManagers = {
   GoogleDriveFS: {
     id: 'GoogleDriveFS',
     name: 'Google',
-    // https://github.com/microsoft/TypeScript/issues/4628
     klass: GoogleDriveFs,
     enabled: true,
     order: 2,

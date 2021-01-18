@@ -1,6 +1,6 @@
 import React from 'react';
 import { createUseStyles } from 'react-jss';
-import AddTab from './components/add-tab';
+import AddTab from './components/add-tab/add-tab';
 
 const useStyles = createUseStyles({
   toolbar: {

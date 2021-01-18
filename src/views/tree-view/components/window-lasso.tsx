@@ -7,28 +7,39 @@ import {
   lassoSelectionAction,
   resetSelectionAction,
 } from '../../../store/features/views/actions/tree-selection.actions';
+import { useCurrentValue } from '../../../utils/use-current-value.hook';
 
 const WindowLassoRaw: React.FC = () => {
   const viewIndex = useTreeViewCtx();
+  // avoid closure in onLassoSelect*
+  const currentViewIndex = useCurrentValue(viewIndex);
   const dispatch = useDispatch();
+
   const onLassoSelect = useCallback(
     (start: number | null, end: number | null, direction: boolean) => {
       // either both are set
       // or
       // null null - means no selection
       if (start !== null && end !== null) {
-        dispatch(lassoSelectionAction({ viewIndex, start, end, direction }));
+        dispatch(
+          lassoSelectionAction({
+            viewIndex: currentViewIndex.current,
+            start,
+            end,
+            direction,
+          })
+        );
       } else {
         // reset selection
-        dispatch(resetSelectionAction({ viewIndex }));
+        dispatch(resetSelectionAction({ viewIndex: currentViewIndex.current }));
       }
     },
-    [dispatch, viewIndex]
+    [dispatch, currentViewIndex]
   );
 
   const onLassoSelectStart = useCallback(() => {
-    dispatch(resetSelectionAction({ viewIndex }));
-  }, [dispatch, viewIndex]);
+    dispatch(resetSelectionAction({ viewIndex: currentViewIndex.current }));
+  }, [dispatch, currentViewIndex]);
 
   const { current, start } = useLassoSelection({
     onLassoSelect,

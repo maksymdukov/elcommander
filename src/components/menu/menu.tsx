@@ -6,7 +6,7 @@ import { createUseStyles } from 'react-jss';
 import { Theme } from 'theme/jss-theme.provider';
 import 'reactjs-popup/dist/index.css';
 
-interface MenuProps {
+export interface MenuProps {
   trigger: JSX.Element;
   on?: PopupProps['on'];
   disabled?: PopupProps['disabled'];
