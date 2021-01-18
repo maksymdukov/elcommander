@@ -24,11 +24,18 @@ export class LocalFs extends FSBackendThreaded<LocalFSWorker, FSWatcher> {
     viewId,
     configName,
     persistence,
+    domContainer,
   }: IFSConstructorProps): Promise<LocalFs> {
     const LocalFSWorkerClass = Comlink.wrap(
       new LocalWorker()
     ) as Comlink.Remote<typeof LocalFSWorker>;
     const workerInstance = await new LocalFSWorkerClass();
-    return new LocalFs({ viewId, workerInstance, configName, persistence });
+    return new LocalFs({
+      viewId,
+      workerInstance,
+      configName,
+      persistence,
+      domContainer,
+    });
   }
 }

@@ -314,7 +314,7 @@ export const exitToParentThunk = (
   let parentNode: TreeNode = startNode;
   let prevParentNode = startNode;
 
-  for (let i = 0; i < levels; i++) {
+  for (let i = 0; i < levels; i += 1) {
     prevParentNode = parentNode;
     dispatch(exitDirectoryAction({ viewIndex }));
     // reach out to fsManager and ask it to return one-level-up node

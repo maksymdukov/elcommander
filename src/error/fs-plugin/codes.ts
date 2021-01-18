@@ -1,0 +1,3 @@
+export const PLUGIN_ERROR_CODES = {
+  USER_CANCEL: 'USER_CANCEL',
+};

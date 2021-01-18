@@ -2,8 +2,8 @@ import http, { Server } from 'http';
 import { Auth } from 'googleapis';
 import url from 'url';
 import { AddressInfo } from 'net';
-import { timeout } from '../../../utils/timeout';
-import { createPromise } from '../../../utils/leaked-promise';
+import { timeout } from 'utils/timeout';
+import { createPromise } from 'utils/leaked-promise';
 
 export class GoogleAuth {
   server: Server | null = null;
@@ -16,7 +16,7 @@ export class GoogleAuth {
 
   constructor(public authClient: Auth.OAuth2Client) {}
 
-  async authenticateByCode(code: string) {
+  public async authenticateByCode(code: string) {
     try {
       const { tokens } = await this.authClient.getToken({
         code,
@@ -29,7 +29,7 @@ export class GoogleAuth {
     }
   }
 
-  parseCode(input: string): null | string {
+  private parseCode(input: string): null | string {
     const myUrl = url.parse(input);
     if (!myUrl.search) {
       return null;
@@ -38,7 +38,7 @@ export class GoogleAuth {
     return search.get('code');
   }
 
-  startServer() {
+  private startServer() {
     this.server = http.createServer((req, res) => {
       this.codeListen.resolve(this.parseCode(req.url!));
       res.end('You can now close this tab');
@@ -65,7 +65,7 @@ export class GoogleAuth {
     });
   }
 
-  async getAuthUrl() {
+  public async getAuthUrl() {
     try {
       this.startServer();
       const port = await this.serverListen.promise;
@@ -76,7 +76,7 @@ export class GoogleAuth {
     }
   }
 
-  async setCredentialsAndVerify(refreshToken: string) {
+  public async setCredentialsAndVerify(refreshToken: string) {
     this.authClient.setCredentials({
       refresh_token: refreshToken,
     });
@@ -84,11 +84,11 @@ export class GoogleAuth {
     return token;
   }
 
-  async verifyIdToken(idToken: string) {
+  private async verifyIdToken(idToken: string) {
     return this.authClient.verifyIdToken({ idToken });
   }
 
-  async authenticate() {
+  public async authenticate() {
     const code = await Promise.race([this.codeListen.promise, timeout(60)]);
     if (!code) {
       throw new Error('auth code is invalid');
@@ -112,5 +112,11 @@ export class GoogleAuth {
       access_token: tokens.access_token,
       refresh_token: tokens.refresh_token,
     };
+  }
+
+  public async cancel() {
+    this.server?.close();
+    this.serverListen.reject(new Error());
+    this.codeListen.reject();
   }
 }

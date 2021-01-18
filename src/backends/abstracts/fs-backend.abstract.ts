@@ -17,6 +17,7 @@ export interface IFSConstructorProps<P extends FSPersistence = FSPersistence> {
   viewId: string;
   configName: string;
   persistence: P;
+  domContainer: Element;
 }
 
 export interface ReadWatchDirProps {
@@ -72,18 +73,22 @@ export abstract class FSBackend<
 
   protected configName: string;
 
-  private subscriptions: FSSubscription[] = [];
-
   protected persistence: Persistence;
+
+  protected domContainer: Element;
+
+  private subscriptions: FSSubscription[] = [];
 
   protected constructor({
     viewId,
     configName,
     persistence,
+    domContainer,
   }: IFSConstructorProps<Persistence>) {
     this.viewId = viewId;
     this.configName = configName;
     this.persistence = persistence;
+    this.domContainer = domContainer;
   }
 
   abstract get options(): {

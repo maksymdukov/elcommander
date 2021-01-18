@@ -78,6 +78,7 @@ export class LocalFSWorker extends FSWorker<FSWatcher> {
               onChange();
             });
           } catch (e) {
+            console.dir(e);
             await onError(e);
           }
         })();

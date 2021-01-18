@@ -35,8 +35,9 @@ export abstract class FSBackendThreaded<
     workerInstance,
     configName,
     persistence,
+    domContainer,
   }: CtorProps<Worker, Persistence>) {
-    super({ viewId, configName, persistence });
+    super({ viewId, configName, persistence, domContainer });
     this.worker = workerInstance;
   }
 

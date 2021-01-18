@@ -1,6 +1,7 @@
 import * as Comlink from 'comlink';
 import { drive_v3, google } from 'googleapis';
 import AbortController from 'abort-controller';
+import { proxy } from 'comlink';
 import { IFSRawNode } from '../../interfaces/fs-raw-node.interface';
 import { FsItemTypeEnum } from '../../../enums/fs-item-type.enum';
 import { CONFIG } from '../../../config/config';
@@ -15,7 +16,7 @@ import {
 import { GoogleAuth } from './google-auth';
 
 export class GoogleDriveWorker extends FSWorker {
-  private readonly auth: GoogleAuth;
+  public readonly auth: GoogleAuth;
 
   private readonly driveClient: drive_v3.Drive;
 
@@ -26,7 +27,7 @@ export class GoogleDriveWorker extends FSWorker {
       clientSecret: CONFIG.gClientSecret,
     });
     this.driveClient = google.drive({ version: 'v3', auth: authClient });
-    this.auth = new GoogleAuth(authClient);
+    this.auth = proxy(new GoogleAuth(authClient));
   }
 
   async readDir({
@@ -106,18 +107,6 @@ export class GoogleDriveWorker extends FSWorker {
       }
       await onError(e);
     }
-  }
-
-  async setCredentialsAndVerify(token: string) {
-    return this.auth.setCredentialsAndVerify(token);
-  }
-
-  async getAuthUrl() {
-    return this.auth.getAuthUrl();
-  }
-
-  async authenticate() {
-    return this.auth.authenticate();
   }
 }
 Comlink.expose(GoogleDriveWorker);

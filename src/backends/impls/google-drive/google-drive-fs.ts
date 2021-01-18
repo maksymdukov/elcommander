@@ -1,5 +1,5 @@
 import * as Comlink from 'comlink';
-import { shell } from 'electron';
+import { shell, remote } from 'electron';
 import { Remote } from 'comlink';
 // @ts-ignore
 import GDWorker from './google-drive.worker';
@@ -9,6 +9,9 @@ import { IFSConstructorProps } from '../../abstracts/fs-backend.abstract';
 import { GoogleDrivePersistence } from './google-drive-persistence';
 import { WorkerWatcher } from '../../abstracts/fs-worker.abstract';
 import { TreeNode } from '../../../interfaces/node.interface';
+import { UserCancelError } from '../../../error/fs-plugin/user-cancel.error';
+import { createPromise } from '../../../utils/leaked-promise';
+import { GoogleAuth } from './google-auth';
 
 export class GoogleDriveFs extends FSBackendThreaded<
   GoogleDriveWorker,
@@ -25,6 +28,7 @@ export class GoogleDriveFs extends FSBackendThreaded<
     viewId,
     configName,
     persistence,
+    domContainer,
   }: IFSConstructorProps<GoogleDrivePersistence>) {
     const GDWorkerClass = Comlink.wrap(new GDWorker()) as Remote<
       typeof GoogleDriveWorker
@@ -32,12 +36,15 @@ export class GoogleDriveFs extends FSBackendThreaded<
 
     const workerInstance = await new GDWorkerClass();
     return new GoogleDriveFs({
+      domContainer,
       viewId,
       workerInstance,
       configName,
       persistence,
     });
   }
+
+  cancelInit = createPromise<void, UserCancelError>();
 
   static getStartNode() {
     return {
@@ -67,6 +74,10 @@ export class GoogleDriveFs extends FSBackendThreaded<
     };
   }
 
+  cancelInitialization() {
+    this.cancelInit.reject(new UserCancelError());
+  }
+
   async onInit(): Promise<void> {
     // if there's a config this.configName
     // read it.
@@ -78,11 +89,14 @@ export class GoogleDriveFs extends FSBackendThreaded<
     // start auth process
     // write creds to the fs
     // let react change config name;
+    const workerAuth = ((await this.worker.auth) as unknown) as Remote<
+      GoogleAuth
+    >;
 
     if (this.configName) {
       const userConfig = await this.persistence.readConfig(this.configName);
       try {
-        await this.worker.setCredentialsAndVerify(
+        await workerAuth.setCredentialsAndVerify(
           userConfig.config.refresh_token
         );
       } catch (e) {
@@ -94,12 +108,22 @@ export class GoogleDriveFs extends FSBackendThreaded<
       }
     } else {
       // full auth flow
-      const url = await this.worker.getAuthUrl();
+      // Promise.race();
+      const { response } = await remote.dialog.showMessageBox({
+        type: 'question',
+        buttons: ['Ok', 'Cancel'],
+        message: 'Now you will be redirected to the Google Login page',
+      });
+      // Cancel button
+      if (response === 1) {
+        throw new UserCancelError();
+      }
+      const url = await workerAuth.getAuthUrl();
       if (!url) {
         throw new Error('Google auth url is empty');
       }
       await shell.openExternal(url);
-      const authData = await this.worker.authenticate();
+      const authData = await workerAuth.authenticate();
       await this.persistence.writeConfig(authData.email, authData);
       this.configName = authData.email;
     }
