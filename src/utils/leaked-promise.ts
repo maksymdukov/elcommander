@@ -1,6 +1,6 @@
-export const createPromise = <S = void, F = void>() => {
+export const createPromise = <S = void, E = void>() => {
   let resolve: (value: S) => void;
-  let reject: (value: F) => void;
+  let reject: (value: E) => void;
   // eslint-disable-next-line promise/param-names
   const promise = new Promise((res, rej) => {
     resolve = res;

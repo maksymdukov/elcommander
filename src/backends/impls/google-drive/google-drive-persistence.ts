@@ -4,7 +4,7 @@ import {
   SavedConfigFile,
 } from '../../../plugins/plugin-persistence';
 
-interface GoogleDriveConfigShape {
+export interface GoogleDriveConfigShape {
   email: string;
   refresh_token: string;
   access_token: string;

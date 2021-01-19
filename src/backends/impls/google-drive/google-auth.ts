@@ -4,13 +4,14 @@ import url from 'url';
 import { AddressInfo } from 'net';
 import { timeout } from 'utils/timeout';
 import { createPromise } from 'utils/leaked-promise';
+import { UserCancelError } from '../../../error/fs-plugin/user-cancel.error';
 
 export class GoogleAuth {
   server: Server | null = null;
 
   serverListen = createPromise<number, Error>();
 
-  codeListen = createPromise<string | null>();
+  codeListen = createPromise<string | null, Error>();
 
   redirectUri: string | null = null;
 
@@ -116,7 +117,7 @@ export class GoogleAuth {
 
   public async cancel() {
     this.server?.close();
-    this.serverListen.reject(new Error());
-    this.codeListen.reject();
+    this.serverListen.reject(new UserCancelError());
+    this.codeListen.reject(new UserCancelError());
   }
 }

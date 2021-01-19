@@ -94,6 +94,7 @@ export abstract class FSBackend<
   abstract get options(): {
     pathSpinner?: boolean;
     treeSpinner?: boolean;
+    initCancellable?: boolean;
   };
 
   public abstract readDir(props: ReadWatchDirProps): Promise<IFSRawNode[]>;
@@ -140,4 +141,6 @@ export abstract class FSBackend<
   }
 
   public async onInit(): Promise<void> {}
+
+  public async cancelInitialization(): Promise<void> {}
 }

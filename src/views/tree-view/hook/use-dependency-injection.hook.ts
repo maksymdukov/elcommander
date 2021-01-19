@@ -3,7 +3,6 @@ import { unstable_batchedUpdates } from 'react-dom';
 import { useSelector } from 'react-redux';
 import { getFSBackendsMap, IFSBackendDescriptor } from 'backends/backends-map';
 import { FSBackend } from 'backends/abstracts/fs-backend.abstract';
-import { usePreviousValue } from 'utils/use-previous-value.hook';
 import { RootState } from 'store/root-types';
 import {
   getViewClassId,
@@ -11,7 +10,7 @@ import {
 } from 'store/features/views/views.selectors';
 import { PluginPersistence } from 'plugins/plugin-persistence';
 import { createAppendedElement, removeElement } from 'utils/dom/element';
-import { UserCancelError } from '../../../error/fs-plugin/user-cancel.error';
+import { UserCancelError } from 'error/fs-plugin/user-cancel.error';
 
 interface UseDependencyInjectionHookProps {
   viewId: string;
@@ -31,10 +30,10 @@ export const useDependencyInjection = ({
     setFsBackendDescriptor,
   ] = useState<IFSBackendDescriptor | null>(null);
   const [fsManager, setFsManager] = useState<FSBackend | null>(null);
-  const prevFsManager = usePreviousValue(fsManager);
   const domContainerRef = useRef<Element>();
 
   const [instantiating, setInstantiating] = useState(false);
+  const [initializing, setInitializing] = useState(false);
 
   const classId = useSelector((state: RootState) =>
     getViewClassId(state, index)
@@ -75,18 +74,23 @@ export const useDependencyInjection = ({
           configName,
           domContainer,
         });
+        unstable_batchedUpdates(() => {
+          setInstantiating(false);
+          setInitializing(true);
+          setFsManager(instance);
+        });
         try {
           await instance.onInit();
-          unstable_batchedUpdates(() => {
-            setFsManager(instance);
-            setInstantiating(false);
-          });
+          setInitializing(false);
+          onSuccessfulInit(instance, index);
           // TODO
           // dispatch this.configName save
         } catch (e) {
           // dispatch removeView action
           onFailInit(e, index);
+          console.log('error was caught', e);
           if (e instanceof UserCancelError) {
+            // do nothing
             return;
           }
           // TODO
@@ -95,14 +99,17 @@ export const useDependencyInjection = ({
       })();
     }
   }, [
+    setInitializing,
     onFailInit,
     fsManager,
     classId,
     configName,
     instantiating,
+    initializing,
     viewId,
     setFsBackendDescriptor,
     index,
+    onSuccessfulInit,
   ]);
 
   // cleanup
@@ -120,7 +127,7 @@ export const useDependencyInjection = ({
     };
   }, [fsManager]);
 
-  // remove domContainer in case of fsManager.onInit fail
+  // remove domContainer in case fsManager.onInit fails
   useEffect(
     () => () => {
       if (domContainerRef.current) {
@@ -131,16 +138,10 @@ export const useDependencyInjection = ({
     []
   );
 
-  // initialize first dir
-  useEffect(() => {
-    if (fsManager && fsManager !== prevFsManager && !instantiating) {
-      onSuccessfulInit(fsManager, index);
-    }
-  }, [fsManager, index, instantiating, prevFsManager, onSuccessfulInit]);
-
   return {
     fsBackendDescriptor,
     fsManager,
     instantiating,
+    initializing,
   };
 };

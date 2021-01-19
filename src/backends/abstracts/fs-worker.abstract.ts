@@ -1,5 +1,12 @@
 import { FSBackend, ReadWatchDirProps } from './fs-backend.abstract';
 import { IFSRawNode } from '../interfaces/fs-raw-node.interface';
+import 'error/comlink/error-transfer-handler';
+
+// HMR in worker error hack
+// @ts-ignore
+self.$RefreshReg$ = () => {};
+// @ts-ignore
+self.$RefreshSig$$ = () => () => {};
 
 export interface WorkerWatcher {
   close(): void;

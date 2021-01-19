@@ -12,6 +12,7 @@ import { TreeNode } from '../../../interfaces/node.interface';
 import { UserCancelError } from '../../../error/fs-plugin/user-cancel.error';
 import { createPromise } from '../../../utils/leaked-promise';
 import { GoogleAuth } from './google-auth';
+import { runCancelableGenerator } from '../../../utils/generators';
 
 export class GoogleDriveFs extends FSBackendThreaded<
   GoogleDriveWorker,
@@ -71,14 +72,17 @@ export class GoogleDriveFs extends FSBackendThreaded<
     return {
       pathSpinner: true,
       treeSpinner: true,
+      initCancellable: true,
     };
   }
 
-  cancelInitialization() {
-    this.cancelInit.reject(new UserCancelError());
+  async cancelInitialization() {
+    this.cancelInit.resolve();
+    const auth = await this.worker.auth;
+    await auth.cancel();
   }
 
-  async onInit(): Promise<void> {
+  *authFlow() {
     // if there's a config this.configName
     // read it.
     // verify it
@@ -89,19 +93,18 @@ export class GoogleDriveFs extends FSBackendThreaded<
     // start auth process
     // write creds to the fs
     // let react change config name;
-    const workerAuth = ((await this.worker.auth) as unknown) as Remote<
+    const workerAuth = ((yield this.worker.auth) as unknown) as Remote<
       GoogleAuth
     >;
-
     if (this.configName) {
-      const userConfig = await this.persistence.readConfig(this.configName);
+      const userConfig = yield this.persistence.readConfig(this.configName);
       try {
-        await workerAuth.setCredentialsAndVerify(
+        yield workerAuth.setCredentialsAndVerify(
           userConfig.config.refresh_token
         );
       } catch (e) {
         // delete config file
-        await this.persistence.deleteConfig(userConfig.name);
+        yield this.persistence.deleteConfig(userConfig.name);
         this.configName = '';
         // rethrow
         throw e;
@@ -109,7 +112,7 @@ export class GoogleDriveFs extends FSBackendThreaded<
     } else {
       // full auth flow
       // Promise.race();
-      const { response } = await remote.dialog.showMessageBox({
+      const { response } = yield remote.dialog.showMessageBox({
         type: 'question',
         buttons: ['Ok', 'Cancel'],
         message: 'Now you will be redirected to the Google Login page',
@@ -118,14 +121,21 @@ export class GoogleDriveFs extends FSBackendThreaded<
       if (response === 1) {
         throw new UserCancelError();
       }
-      const url = await workerAuth.getAuthUrl();
+      const url = yield workerAuth.getAuthUrl();
       if (!url) {
         throw new Error('Google auth url is empty');
       }
-      await shell.openExternal(url);
-      const authData = await workerAuth.authenticate();
-      await this.persistence.writeConfig(authData.email, authData);
+      yield shell.openExternal(url);
+      const authData = yield workerAuth.authenticate();
+      yield this.persistence.writeConfig(authData.email, authData);
       this.configName = authData.email;
     }
+  }
+
+  async onInit(): Promise<void> {
+    return runCancelableGenerator(
+      this.authFlow.bind(this),
+      this.cancelInit.promise
+    );
   }
 }

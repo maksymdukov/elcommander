@@ -10,6 +10,7 @@ import { extractParentPath } from '../../utils/path';
 import { FSEventEmitter } from '../classes/fs-event-emitter';
 import { FSWorker, WorkerWatcher } from './fs-worker.abstract';
 import { FSPersistence } from '../classes/fs-persistence';
+import 'error/comlink/error-transfer-handler';
 
 export type CtorProps<
   Worker extends FSWorker<W>,
@@ -53,6 +54,7 @@ export abstract class FSBackendThreaded<
     const sub = this.tryGetSubscription(path);
     // already subscribed
     if (sub) {
+      // TODO setImmediate?
       sub.emitter.emit('error', new Error('Already subscribed'));
       return sub.emitter;
     }

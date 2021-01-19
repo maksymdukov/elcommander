@@ -5,6 +5,7 @@ import { removeViewAction } from 'store/features/views/views.slice';
 import { FSBackend } from 'backends/abstracts/fs-backend.abstract';
 import { initializeViewThunk } from 'store/features/views/actions/tree-dir.actions';
 import DashSpinner from 'components/animated/dash-spinner';
+import Button from 'components/buttons/button';
 import FsManagerCtxProvider from './context/fs-manager-ctx.provider';
 import TreeViewProvider from './context/treeViewProvider';
 import TreeList from './tree-list';
@@ -24,6 +25,7 @@ function TreeViewRaw({ index, viewId }: TreeViewProps) {
   const {
     fsManager,
     instantiating,
+    initializing,
     fsBackendDescriptor,
   } = useDependencyInjection({
     index,
@@ -41,9 +43,23 @@ function TreeViewRaw({ index, viewId }: TreeViewProps) {
       [dispatch]
     ),
   });
-
   if (
     instantiating &&
+    !fsManager &&
+    fsBackendDescriptor &&
+    fsBackendDescriptor.klass.tabOptions.tabSpinner
+  )
+    return (
+      <div className={classes.spinnerContainer}>
+        <DashSpinner />
+        <span>Initializing tab...</span>
+      </div>
+    );
+
+  if (
+    initializing &&
+    fsManager &&
+    fsManager.options.initCancellable &&
     fsBackendDescriptor &&
     fsBackendDescriptor.klass.tabOptions.tabSpinner
   )
@@ -51,13 +67,15 @@ function TreeViewRaw({ index, viewId }: TreeViewProps) {
       <div className={classes.spinnerContainer}>
         <DashSpinner />
         <span>Loading tab...</span>
+        <Button color="error" onClick={() => fsManager.cancelInitialization()}>
+          Cancel
+        </Button>
       </div>
     );
 
-  if (instantiating || !fsManager) {
+  if (instantiating || initializing || !fsManager) {
     return null;
   }
-
   return (
     <FsManagerCtxProvider fsManager={fsManager}>
       <TreeViewProvider viewIndex={index}>
