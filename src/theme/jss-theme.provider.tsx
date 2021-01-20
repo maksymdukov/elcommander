@@ -1,5 +1,6 @@
 import React from 'react';
 import { ThemeProvider } from 'react-jss';
+import tinycolor from 'tinycolor2';
 
 const theme = {
   size: {
@@ -30,6 +31,10 @@ const theme = {
       background: '#FDFFFC',
       backgroundInverse: '#FDFFFC',
     },
+  },
+  tools: {
+    darken: (color: string, amount: number) =>
+      tinycolor(color).darken(amount).toString(),
   },
 };
 

@@ -22,7 +22,7 @@ export const useStyles = createUseStyles<Theme>((theme) => ({
     paddingRight: 2,
     paddingLeft: 2,
     '&:hover': {
-      background: theme.colors.tertiary,
+      background: theme.colors.secondary,
     },
   },
 }));

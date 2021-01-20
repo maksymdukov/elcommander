@@ -115,7 +115,7 @@ export abstract class FSBackend<
     );
   }
 
-  // Recursively unwatch directories
+  // unwatch directories including nested
   unwatchDir(node: TreeNode) {
     const { path } = node;
     this.subscriptions = this.subscriptions.filter((sub) => {

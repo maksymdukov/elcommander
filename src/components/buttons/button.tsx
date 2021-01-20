@@ -1,7 +1,7 @@
 import React, { MouseEventHandler, PropsWithChildren } from 'react';
 import { createUseStyles } from 'react-jss';
 import clsx from 'clsx';
-import { Theme } from '../../theme/jss-theme.provider';
+import { Theme } from 'theme/jss-theme.provider';
 
 const useStyles = createUseStyles<Theme>((theme) => ({
   button: {
@@ -12,7 +12,9 @@ const useStyles = createUseStyles<Theme>((theme) => ({
     font: 'inherit',
     lineHeight: 'normal',
     cursor: 'pointer',
-    borderRadius: '2px',
+    boxShadow:
+      '0px 3px 1px -2px rgba(0,0,0,0.2), 0px 2px 2px 0px rgba(0,0,0,0.14), 0px 1px 5px 0px rgba(0,0,0,0.12);',
+    borderRadius: 4,
     background: (props: ButtonProps) =>
       props.transparent ? 'transparent' : theme.colors[props.color!],
     color: theme.text.colors.primaryInverse,
@@ -23,7 +25,11 @@ const useStyles = createUseStyles<Theme>((theme) => ({
     },
     '&:hover': {
       // @ts-ignore
-      background: (props: ButtonProps) => theme.colors[`${props.color}Light`],
+      background: (props: ButtonProps) =>
+        theme.tools.darken(theme.colors[props.color!], 10),
+    },
+    '&:active': {
+      boxShadow: 'none',
     },
   },
 }));
@@ -44,9 +50,9 @@ const ButtonRaw: React.ForwardRefRenderFunction<
     children,
     onClick,
     className,
-    transparent,
-    outlined,
-    color,
+    transparent = false,
+    outlined = false,
+    color = 'primary',
     ...rest
   } = props;
   const classes = useStyles(props);
@@ -67,11 +73,5 @@ const Button = React.forwardRef<
   HTMLButtonElement,
   PropsWithChildren<ButtonProps>
 >(ButtonRaw);
-
-Button.defaultProps = {
-  color: 'primary',
-  outlined: false,
-  transparent: false,
-};
 
 export default Button;

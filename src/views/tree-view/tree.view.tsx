@@ -59,7 +59,6 @@ function TreeViewRaw({ index, viewId }: TreeViewProps) {
   if (
     initializing &&
     fsManager &&
-    fsManager.options.initCancellable &&
     fsBackendDescriptor &&
     fsBackendDescriptor.klass.tabOptions.tabSpinner
   )
@@ -67,9 +66,14 @@ function TreeViewRaw({ index, viewId }: TreeViewProps) {
       <div className={classes.spinnerContainer}>
         <DashSpinner />
         <span>Loading tab...</span>
-        <Button color="error" onClick={() => fsManager.cancelInitialization()}>
-          Cancel
-        </Button>
+        {fsManager.options.initCancellable && (
+          <Button
+            color="error"
+            onClick={() => fsManager.cancelInitialization()}
+          >
+            Cancel
+          </Button>
+        )}
       </div>
     );
 
