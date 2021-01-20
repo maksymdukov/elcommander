@@ -1,44 +1,21 @@
 import { Remote, proxy, releaseProxy } from 'comlink';
-import {
-  FSBackend,
-  FSSubscription,
-  IFSConstructorProps,
-  ReadWatchDirProps,
-} from './fs-backend.abstract';
+import { FSBackend, ReadWatchDirProps } from './fs-backend.abstract';
 import { IFSRawNode } from '../interfaces/fs-raw-node.interface';
 import { extractParentPath } from '../../utils/path';
 import { FSEventEmitter } from '../classes/fs-event-emitter';
-import { FSWorker, WorkerWatcher } from './fs-worker.abstract';
-import { FSPersistence } from '../classes/fs-persistence';
+import { FSWorker } from './fs-worker.abstract';
+import { FSSubscription } from '../classes/fs-subscription-manager';
 import 'error/comlink/error-transfer-handler';
 
-export type CtorProps<
-  Worker extends FSWorker<W>,
-  P extends FSPersistence,
-  W extends WorkerWatcher = WorkerWatcher
-> = {
+export type CtorProps<Worker extends FSWorker> = {
   workerInstance: Remote<Worker>;
-} & IFSConstructorProps<P>;
+};
 
-export abstract class FSBackendThreaded<
-  Worker extends FSWorker<Watcher>,
-  Watcher extends WorkerWatcher = WorkerWatcher,
-  Persistence extends FSPersistence = FSPersistence
-> extends FSBackend<Persistence> {
-  static async createInstance(..._: any[]): Promise<any> {
-    throw new Error('Must be implemented in the derived class');
-  }
-
+export class FSBackendThreaded<Worker extends FSWorker> extends FSBackend {
   worker: Remote<Worker>;
 
-  protected constructor({
-    viewId,
-    workerInstance,
-    configName,
-    persistence,
-    domContainer,
-  }: CtorProps<Worker, Persistence>) {
-    super({ viewId, configName, persistence, domContainer });
+  constructor({ workerInstance }: CtorProps<Worker>) {
+    super();
     this.worker = workerInstance;
   }
 
@@ -46,25 +23,25 @@ export abstract class FSBackendThreaded<
     return this.worker.readDir(props);
   }
 
-  readWatchDir({ node, up }: ReadWatchDirProps) {
+  readWatchDir({ node, up }: ReadWatchDirProps): FSEventEmitter {
     let { path } = node;
     if (up) {
       path = extractParentPath(path);
     }
-    const sub = this.tryGetSubscription(path);
+    const sub = this.subscriptions.get(path);
     // already subscribed
     if (sub) {
       // TODO setImmediate?
-      sub.emitter.emit('error', new Error('Already subscribed'));
-      return sub.emitter;
+      sub.ctx.emit('error', new Error('Already subscribed'));
+      return sub.ctx;
     }
 
     const eventEmitter = new FSEventEmitter();
-    const fsSubscription: FSSubscription = {
+    const fsSubscription: FSSubscription<FSEventEmitter> = {
       path,
-      emitter: eventEmitter,
+      ctx: eventEmitter,
     };
-    this.addSubscription(fsSubscription);
+    this.subscriptions.add(fsSubscription);
 
     const onRead = proxy(async (nodes: IFSRawNode[]) => {
       eventEmitter.emit('dirRead', nodes);
@@ -87,7 +64,7 @@ export abstract class FSBackendThreaded<
     );
 
     eventEmitter.on('close', () => {
-      this.worker.removeWatcher(path);
+      this.worker.unwatchDir(path);
     });
 
     return eventEmitter;
@@ -95,7 +72,7 @@ export abstract class FSBackendThreaded<
 
   async onDestroy() {
     await this.unwatchAllDir();
-    await this.worker.removeAllWatchers();
+    await this.worker.unwatchAllDir();
     this.worker[releaseProxy]();
   }
 }

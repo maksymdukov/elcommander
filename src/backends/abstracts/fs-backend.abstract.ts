@@ -3,6 +3,7 @@ import { FSEventEmitter, FSEventNames } from '../classes/fs-event-emitter';
 import { IFSRawNode } from '../interfaces/fs-raw-node.interface';
 import { TreeNode } from '../../interfaces/node.interface';
 import { FSPersistence } from '../classes/fs-persistence';
+import { FsSubscriptionManager } from '../classes/fs-subscription-manager';
 
 declare global {
   interface Error {
@@ -26,121 +27,41 @@ export interface ReadWatchDirProps {
   abortSignal?: AbortSignal;
 }
 
-/*
-  Subscriptions array look:
-    [{path: "/home", emitter: FSEventEmitter}]
- */
-
-export interface FSSubscription {
-  path: string;
-  emitter: FSEventEmitter;
-}
-
-export interface IFSBackend {
-  createInstance(prop: IFSConstructorProps): Promise<FSBackend>;
-  Persistence: typeof FSPersistence;
-  tabOptions: {
-    tabSpinner: boolean;
-  };
-  getStartNode(): Partial<TreeNode>;
-}
-
-export abstract class FSBackend<
-  Persistence extends FSPersistence = FSPersistence
-> {
-  static Persistence: typeof FSPersistence = FSPersistence;
-
-  // async instantiation
-  static async createInstance(..._: any[]): Promise<any> {
-    throw new Error('must be implemented in the derived class');
-  }
-
+export abstract class FSBackend {
   static getStartNode(): Partial<TreeNode> {
     return {};
   }
+
+  protected constructor(..._: any[]) {}
 
   getParentNode(node: TreeNode): TreeNode {
     return node;
   }
 
-  public static get tabOptions() {
-    return {
-      tabSpinner: false,
-    };
-  }
-
-  protected viewId: string;
-
-  protected configName: string;
-
-  protected persistence: Persistence;
-
-  protected domContainer: Element;
-
-  private subscriptions: FSSubscription[] = [];
-
-  protected constructor({
-    viewId,
-    configName,
-    persistence,
-    domContainer,
-  }: IFSConstructorProps<Persistence>) {
-    this.viewId = viewId;
-    this.configName = configName;
-    this.persistence = persistence;
-    this.domContainer = domContainer;
-  }
-
-  abstract get options(): {
-    pathSpinner?: boolean;
-    treeSpinner?: boolean;
-    initCancellable?: boolean;
-  };
+  public subscriptions: FsSubscriptionManager<any> = new FsSubscriptionManager<
+    FSEventEmitter
+  >({
+    onSubRemove: (sub) => {
+      sub.ctx.emit('close');
+      ([
+        'change',
+        'error',
+        'dirRead',
+        'close',
+      ] as FSEventNames[]).forEach((ev) => sub.ctx.removeAllListeners(ev));
+    },
+  });
 
   public abstract readDir(props: ReadWatchDirProps): Promise<IFSRawNode[]>;
 
   public abstract readWatchDir(arg: ReadWatchDirProps): FSEventEmitter;
 
-  protected addSubscription(sub: FSSubscription) {
-    this.subscriptions.push(sub);
-  }
-
-  protected tryGetSubscription(path: string) {
-    return this.subscriptions.find((sub) => sub.path === path);
-  }
-
-  protected removeSubListeners(sub: FSSubscription) {
-    (['change', 'error', 'dirRead', 'close'] as FSEventNames[]).forEach((ev) =>
-      sub.emitter.removeAllListeners(ev)
-    );
-  }
-
   // unwatch directories including nested
-  unwatchDir(node: TreeNode) {
-    const { path } = node;
-    this.subscriptions = this.subscriptions.filter((sub) => {
-      if (sub.path.substr(0, path.length) === path) {
-        sub.emitter.emit('close');
-        this.removeSubListeners(sub);
-        return false;
-      }
-      return true;
-    });
+  public unwatchDir(path: string) {
+    this.subscriptions.removeNested(path);
   }
 
-  unwatchAllDir() {
-    this.subscriptions.forEach((sub) => {
-      sub.emitter.emit('close');
-      this.removeSubListeners(sub);
-    });
-    this.subscriptions = [];
+  public unwatchAllDir() {
+    this.subscriptions.removeAll();
   }
-
-  public async onDestroy() {
-    this.unwatchAllDir();
-  }
-
-  public async onInit(): Promise<void> {}
-
-  public async cancelInitialization(): Promise<void> {}
 }

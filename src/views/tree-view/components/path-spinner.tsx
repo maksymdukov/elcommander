@@ -4,16 +4,16 @@ import { getIsLoadingStartPath } from '../../../store/features/views/views.selec
 import { useTreeViewCtx } from '../hook/use-tree-view-ctx.hook';
 import { RootState } from '../../../store/root-types';
 import DashSpinner from '../../../components/animated/dash-spinner';
-import { useFsManagerCtx } from '../hook/use-fs-manager-ctx.hook';
+import { useFsPluginCtx } from '../hook/use-fs-manager-ctx.hook';
 import './path-spinner.global.scss';
 
 const PathSpinnerRaw = () => {
-  const { fsManager } = useFsManagerCtx();
+  const { fsPlugin } = useFsPluginCtx();
   const viewIndex = useTreeViewCtx();
   const isLoadingPath = useSelector((state: RootState) =>
     getIsLoadingStartPath(state, viewIndex)
   );
-  return isLoadingPath && fsManager.options.pathSpinner ? (
+  return isLoadingPath && fsPlugin.options.pathSpinner ? (
     <div className="path-spinner-container">
       <DashSpinner />
       <span>Loading directory...</span>

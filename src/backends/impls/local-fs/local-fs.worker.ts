@@ -1,11 +1,10 @@
 import fs, { Dirent } from 'fs';
 import * as Comlink from 'comlink';
 import path from 'path';
-import chokidar, { FSWatcher } from 'chokidar';
+import chokidar from 'chokidar';
 import { ReadWatchDirProps } from '../../abstracts/fs-backend.abstract';
 import { IFSRawNode } from '../../interfaces/fs-raw-node.interface';
 import { FsItemTypeEnum } from '../../../enums/fs-item-type.enum';
-import { extractParentPath } from '../../../utils/path';
 import {
   FSWorker,
   OnChangeCb,
@@ -13,7 +12,7 @@ import {
   OnReadDirCb,
 } from '../../abstracts/fs-worker.abstract';
 
-export class LocalFSWorker extends FSWorker<FSWatcher> {
+export class LocalFSWorker extends FSWorker {
   private static getReadDirStartNode({ node }: ReadWatchDirProps): IFSRawNode {
     return {
       ...node,
@@ -55,10 +54,7 @@ export class LocalFSWorker extends FSWorker<FSWatcher> {
     onChange: OnChangeCb,
     onError: OnErrorCb
   ) {
-    let { path: targetPath } = node;
-    if (up) {
-      targetPath = extractParentPath(targetPath);
-    }
+    const { path: targetPath } = node;
 
     const watcher = chokidar
       .watch(targetPath, {
@@ -83,7 +79,11 @@ export class LocalFSWorker extends FSWorker<FSWatcher> {
           }
         })();
       });
-    this.addWatcher(targetPath, watcher);
+
+    this.subscriptions.add({
+      path: targetPath,
+      ctx: watcher,
+    });
   }
 
   async readDir({ node, up }: ReadWatchDirProps): Promise<IFSRawNode[]> {

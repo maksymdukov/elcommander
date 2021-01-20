@@ -39,7 +39,7 @@ export const viewsSlice = createSlice({
           path: '/',
           nestLevel: -1,
           meta: {},
-          ...backend.klass.getStartNode(),
+          ...backend.klass.FS.getStartNode(),
         },
         startPathLoading: false,
         startPathError: null,

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import AddTabIcon from 'components/icons/add-tab-icon';
 import IconButton from 'components/buttons/icon-button';
-import { getFSBackendsMap, IFSBackendDescriptor } from 'backends/backends-map';
+import { getFSBackendsMap, IFSPluginDescriptor } from 'backends/backends-map';
 import { addViewAction } from 'store/features/views/views.slice';
 import {
   IUserPluginConfig,
@@ -11,25 +11,35 @@ import {
 import TreeMenu, { TreeMenuNode } from 'components/menu/tree-menu';
 import ToolbarIcon from '../toolbar-icon';
 
-interface BackendItem {
-  be: IFSBackendDescriptor;
+interface IFSPluginItem {
+  pluginDescriptor: IFSPluginDescriptor;
   configs: IUserPluginConfig[];
   config?: IUserPluginConfig;
 }
 
-const generateTree = (beItems: BackendItem[]): TreeMenuNode<BackendItem>[] => {
-  return beItems.map((beItem) => ({
-    icon: beItem.be.icon,
-    label: beItem.be.name,
+const generateTree = (
+  pluginItems: IFSPluginItem[]
+): TreeMenuNode<IFSPluginItem>[] => {
+  return pluginItems.map((beItem) => ({
+    icon: beItem.pluginDescriptor.icon,
+    label: beItem.pluginDescriptor.name,
     children: generateTree(
       beItem.configs.length
         ? [
             {
-              be: { ...beItem.be, name: '[NEW]', icon: undefined },
+              pluginDescriptor: {
+                ...beItem.pluginDescriptor,
+                name: '[NEW]',
+                icon: undefined,
+              },
               configs: [],
             },
             ...beItem.configs.map((cnf) => ({
-              be: { ...beItem.be, name: cnf.name, icon: undefined },
+              pluginDescriptor: {
+                ...beItem.pluginDescriptor,
+                name: cnf.name,
+                icon: undefined,
+              },
               configs: [],
               config: cnf,
             })),
@@ -58,13 +68,13 @@ const AddTab = () => {
       const savedConfigs = await Promise.all(savedConfigPromises);
 
       // merge backends with configs
-      const beItems: BackendItem[] = backendKeys
+      const pluginItems: IFSPluginItem[] = backendKeys
         .map((key, idx) => ({
-          be: backendsMap[key],
+          pluginDescriptor: backendsMap[key],
           configs: savedConfigs[idx],
         }))
-        .sort((a, b) => a.be.order - b.be.order);
-      const tree = generateTree(beItems);
+        .sort((a, b) => a.pluginDescriptor.order - b.pluginDescriptor.order);
+      const tree = generateTree(pluginItems);
       setBackends(tree);
     })();
     // rerun whenever view[].configName changes
@@ -80,10 +90,10 @@ const AddTab = () => {
 
   // TODO delete config
 
-  const onNewTabClick = ({ be, config }: BackendItem) => () => {
+  const onNewTabClick = ({ pluginDescriptor, config }: IFSPluginItem) => () => {
     closeMenu();
     // create new tab
-    dispatch(addViewAction({ backend: be, config }));
+    dispatch(addViewAction({ backend: pluginDescriptor, config }));
   };
 
   if (!backends) return null;

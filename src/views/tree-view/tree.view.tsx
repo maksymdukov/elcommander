@@ -2,16 +2,16 @@ import React, { useCallback } from 'react';
 import { useDispatch } from 'react-redux';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { removeViewAction } from 'store/features/views/views.slice';
-import { FSBackend } from 'backends/abstracts/fs-backend.abstract';
 import { initializeViewThunk } from 'store/features/views/actions/tree-dir.actions';
 import DashSpinner from 'components/animated/dash-spinner';
 import Button from 'components/buttons/button';
-import FsManagerCtxProvider from './context/fs-manager-ctx.provider';
+import FsPluginCtxProvider from './context/fs-plugin-ctx.provider';
 import TreeViewProvider from './context/treeViewProvider';
 import TreeList from './tree-list';
 import { useStyles } from './tree-view.styles';
 import StatusBar from './components/status-bar';
 import { useDependencyInjection } from './hook/use-dependency-injection.hook';
+import { FsPlugin } from '../../backends/abstracts/fs-plugin.abstract';
 
 interface TreeViewProps {
   index: number;
@@ -23,16 +23,16 @@ function TreeViewRaw({ index, viewId }: TreeViewProps) {
   const dispatch = useDispatch();
 
   const {
-    fsManager,
+    fsPlugin,
     instantiating,
     initializing,
-    fsBackendDescriptor,
+    fsPluginDescriptor,
   } = useDependencyInjection({
     index,
     viewId,
     onSuccessfulInit: useCallback(
-      (fsMgr: FSBackend, viewIndex: number) => {
-        dispatch(initializeViewThunk(viewIndex, fsMgr));
+      (fsPlug: FsPlugin, viewIndex: number) => {
+        dispatch(initializeViewThunk(viewIndex, fsPlug));
       },
       [dispatch]
     ),
@@ -45,9 +45,9 @@ function TreeViewRaw({ index, viewId }: TreeViewProps) {
   });
   if (
     instantiating &&
-    !fsManager &&
-    fsBackendDescriptor &&
-    fsBackendDescriptor.klass.tabOptions.tabSpinner
+    !fsPlugin &&
+    fsPluginDescriptor &&
+    fsPluginDescriptor.klass.pluginOptions.tabSpinner
   )
     return (
       <div className={classes.spinnerContainer}>
@@ -58,41 +58,38 @@ function TreeViewRaw({ index, viewId }: TreeViewProps) {
 
   if (
     initializing &&
-    fsManager &&
-    fsBackendDescriptor &&
-    fsBackendDescriptor.klass.tabOptions.tabSpinner
+    fsPlugin &&
+    fsPluginDescriptor &&
+    fsPluginDescriptor.klass.pluginOptions.tabSpinner
   )
     return (
       <div className={classes.spinnerContainer}>
         <DashSpinner />
         <span>Loading tab...</span>
-        {fsManager.options.initCancellable && (
-          <Button
-            color="error"
-            onClick={() => fsManager.cancelInitialization()}
-          >
+        {fsPluginDescriptor.klass.pluginOptions.initCancellable && (
+          <Button color="error" onClick={() => fsPlugin.cancelInitialization()}>
             Cancel
           </Button>
         )}
       </div>
     );
 
-  if (instantiating || initializing || !fsManager) {
+  if (instantiating || initializing || !fsPlugin) {
     return null;
   }
   return (
-    <FsManagerCtxProvider fsManager={fsManager}>
+    <FsPluginCtxProvider fsPlugin={fsPlugin}>
       <TreeViewProvider viewIndex={index}>
         <StatusBar />
         <div className={classes.treeViewContainer}>
           <AutoSizer disableWidth>
             {({ height }) => (
-              <TreeList index={index} height={height} fsManager={fsManager} />
+              <TreeList index={index} height={height} fsPlugin={fsPlugin} />
             )}
           </AutoSizer>
         </div>
       </TreeViewProvider>
-    </FsManagerCtxProvider>
+    </FsPluginCtxProvider>
   );
 }
 const TreeView = React.memo(TreeViewRaw);

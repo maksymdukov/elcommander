@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux';
 import { FixedSizeList } from 'react-window';
 import { RootState } from 'store/root-types';
 import { getAllPathByIndex } from 'store/features/views/views.selectors';
-import { FSBackend } from 'backends/abstracts/fs-backend.abstract';
+import { FsPlugin } from 'backends/abstracts/fs-plugin.abstract';
 import TreeListItem from './components/tree-list-item';
 import { useTreeHandlers } from './hook/use-tree-handlers.hook';
 import CustomInnerWindow from './components/custom-inner-window';
@@ -18,7 +18,7 @@ import { useStyles } from './tree-list.styles';
 interface TreeListProps {
   index: number;
   height: number;
-  fsManager: FSBackend;
+  fsPlugin: FsPlugin;
   itemSize?: number;
 }
 

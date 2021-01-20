@@ -2,11 +2,10 @@ import * as Comlink from 'comlink';
 import { drive_v3, google } from 'googleapis';
 import AbortController from 'abort-controller';
 import { proxy } from 'comlink';
+import { CONFIG } from 'config/config';
 import { IFSRawNode } from '../../interfaces/fs-raw-node.interface';
 import { FsItemTypeEnum } from '../../../enums/fs-item-type.enum';
-import { CONFIG } from '../../../config/config';
 import { ReadWatchDirProps } from '../../abstracts/fs-backend.abstract';
-import { extractParentPath } from '../../../utils/path';
 import {
   FSWorker,
   OnChangeCb,
@@ -20,7 +19,7 @@ export class GoogleDriveWorker extends FSWorker {
 
   private readonly driveClient: drive_v3.Drive;
 
-  public constructor() {
+  constructor() {
     super();
     const authClient = new google.auth.OAuth2({
       clientId: CONFIG.gClientId,
@@ -56,7 +55,6 @@ export class GoogleDriveWorker extends FSWorker {
       },
       { signal: abortSignal }
     );
-    console.log(list.data.files);
     if (!list.data.files) return [];
     return [
       startNode,
@@ -84,15 +82,15 @@ export class GoogleDriveWorker extends FSWorker {
     _: OnChangeCb,
     onError: OnErrorCb
   ): Promise<void> {
-    let { path: targetPath } = node;
-    if (up) {
-      targetPath = extractParentPath(targetPath);
-    }
+    const { path: targetPath } = node;
     const abortController = new AbortController();
     try {
-      await this.addWatcher(targetPath, {
-        close() {
-          abortController.abort();
+      this.subscriptions.add({
+        path: targetPath,
+        ctx: {
+          close() {
+            abortController.abort();
+          },
         },
       });
       const nodes = await this.readDir({

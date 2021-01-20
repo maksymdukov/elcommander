@@ -1,8 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { unstable_batchedUpdates } from 'react-dom';
 import { useSelector } from 'react-redux';
-import { getFSBackendsMap, IFSBackendDescriptor } from 'backends/backends-map';
-import { FSBackend } from 'backends/abstracts/fs-backend.abstract';
+import { getFSBackendsMap, IFSPluginDescriptor } from 'backends/backends-map';
 import { RootState } from 'store/root-types';
 import {
   getViewClassId,
@@ -11,11 +10,12 @@ import {
 import { PluginPersistence } from 'plugins/plugin-persistence';
 import { createAppendedElement, removeElement } from 'utils/dom/element';
 import { UserCancelError } from 'error/fs-plugin/user-cancel.error';
+import { FsPlugin } from 'backends/abstracts/fs-plugin.abstract';
 
 interface UseDependencyInjectionHookProps {
   viewId: string;
   index: number;
-  onSuccessfulInit: (fsManager: FSBackend, viewIndex: number) => void;
+  onSuccessfulInit: (fsPlugin: FsPlugin, viewIndex: number) => void;
   onFailInit: (e: any, viewIndex: number) => void;
 }
 
@@ -26,10 +26,10 @@ export const useDependencyInjection = ({
   onFailInit,
 }: UseDependencyInjectionHookProps) => {
   const [
-    fsBackendDescriptor,
-    setFsBackendDescriptor,
-  ] = useState<IFSBackendDescriptor | null>(null);
-  const [fsManager, setFsManager] = useState<FSBackend | null>(null);
+    fsPluginDescriptor,
+    setFsPluginDescriptor,
+  ] = useState<IFSPluginDescriptor | null>(null);
+  const [fsPlugin, setFsPlugin] = useState<FsPlugin | null>(null);
   const domContainerRef = useRef<Element>();
 
   const [instantiating, setInstantiating] = useState(false);
@@ -44,31 +44,31 @@ export const useDependencyInjection = ({
 
   // DI
   useEffect(() => {
-    // instantiate fsManager
-    if (!fsManager && !instantiating) {
+    // instantiate FsPlugin
+    if (!fsPlugin && !instantiating) {
       setInstantiating(true);
 
       // inject
       (async () => {
-        const FSBackendsMap = await getFSBackendsMap();
-        setFsBackendDescriptor(FSBackendsMap[classId]);
-        const FsBackendClass = FSBackendsMap[classId].klass;
+        const FSPluginMap = await getFSBackendsMap();
+        setFsPluginDescriptor(FSPluginMap[classId]);
+        const FsPluginKlass = FSPluginMap[classId].klass;
 
         // our app's global class to allow plugins access to fs
         const pluginPersistence = new PluginPersistence(
-          FsBackendClass.Persistence.category,
-          FsBackendClass.Persistence.dirName
+          FsPluginKlass.Persistence.category,
+          FsPluginKlass.Persistence.dirName
         );
 
         // implementation of plugin's specific persistence class
-        const persistence = new FsBackendClass.Persistence(pluginPersistence);
+        const persistence = new FsPluginKlass.Persistence(pluginPersistence);
 
         // give plugin dom container
         const domContainer = createAppendedElement();
         domContainerRef.current = domContainer;
 
         // create plugin instance
-        const instance = await FsBackendClass.createInstance({
+        const instance = await FsPluginKlass.createInstance({
           viewId,
           persistence,
           configName,
@@ -77,7 +77,7 @@ export const useDependencyInjection = ({
         unstable_batchedUpdates(() => {
           setInstantiating(false);
           setInitializing(true);
-          setFsManager(instance);
+          setFsPlugin(instance);
         });
         try {
           await instance.onInit();
@@ -101,13 +101,13 @@ export const useDependencyInjection = ({
   }, [
     setInitializing,
     onFailInit,
-    fsManager,
+    fsPlugin,
     classId,
     configName,
     instantiating,
     initializing,
     viewId,
-    setFsBackendDescriptor,
+    setFsPluginDescriptor,
     index,
     onSuccessfulInit,
   ]);
@@ -115,9 +115,9 @@ export const useDependencyInjection = ({
   // cleanup
   useEffect(() => {
     return () => {
-      if (fsManager) {
+      if (fsPlugin) {
         (async () => {
-          await fsManager.onDestroy();
+          await fsPlugin.onDestroy();
           if (domContainerRef.current) {
             removeElement(domContainerRef.current);
             domContainerRef.current = undefined;
@@ -125,9 +125,9 @@ export const useDependencyInjection = ({
         })();
       }
     };
-  }, [fsManager]);
+  }, [fsPlugin]);
 
-  // remove domContainer in case fsManager.onInit fails
+  // remove domContainer in case fsPlugin.onInit fails
   useEffect(
     () => () => {
       if (domContainerRef.current) {
@@ -139,8 +139,8 @@ export const useDependencyInjection = ({
   );
 
   return {
-    fsBackendDescriptor,
-    fsManager,
+    fsPluginDescriptor,
+    fsPlugin,
     instantiating,
     initializing,
   };

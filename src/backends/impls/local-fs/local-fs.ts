@@ -1,24 +1,16 @@
 import * as Comlink from 'comlink';
 // @ts-ignore
 import LocalWorker from 'backends/impls/local-fs/local-fs.worker';
-import type { FSWatcher } from 'chokidar';
 import { IFSConstructorProps } from '../../abstracts/fs-backend.abstract';
 import type { LocalFSWorker } from './local-fs.worker';
 import { FSBackendThreaded } from '../../abstracts/fs-backend-threaded.abstract';
+import { FsPlugin } from '../../abstracts/fs-plugin.abstract';
+import { FSPersistence } from '../../classes/fs-persistence';
 
-export class LocalFs extends FSBackendThreaded<LocalFSWorker, FSWatcher> {
-  static get tabOptions() {
-    return {
-      tabSpinner: false,
-    };
-  }
+export class LocalFs extends FsPlugin<FSBackendThreaded<LocalFSWorker>> {
+  static FS = FSBackendThreaded;
 
-  get options() {
-    return {
-      pathSpinner: false,
-      treeSpinner: false,
-    };
-  }
+  static Persistence = FSPersistence;
 
   static async createInstance({
     viewId,
@@ -30,9 +22,10 @@ export class LocalFs extends FSBackendThreaded<LocalFSWorker, FSWatcher> {
       new LocalWorker()
     ) as Comlink.Remote<typeof LocalFSWorker>;
     const workerInstance = await new LocalFSWorkerClass();
+    const fs = new FSBackendThreaded({ workerInstance });
     return new LocalFs({
       viewId,
-      workerInstance,
+      fs,
       configName,
       persistence,
       domContainer,

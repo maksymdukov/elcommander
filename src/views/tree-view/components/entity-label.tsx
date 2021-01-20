@@ -3,7 +3,7 @@ import clsx from 'clsx';
 import './entity-label.global.scss';
 import { TreeNode } from '../../../interfaces/node.interface';
 import TreeSpinner from './tree-spinner';
-import { useFsManagerCtx } from '../hook/use-fs-manager-ctx.hook';
+import { useFsPluginCtx } from '../hook/use-fs-manager-ctx.hook';
 
 interface EntityLabelProps {
   onClick?: React.DOMAttributes<HTMLDivElement>['onClick'];
@@ -40,7 +40,7 @@ const EntityLabelRaw: React.ForwardRefRenderFunction<
   },
   ref
 ) => {
-  const { fsManager } = useFsManagerCtx();
+  const { fsPlugin } = useFsPluginCtx();
   return (
     <div
       ref={ref}
@@ -64,7 +64,7 @@ const EntityLabelRaw: React.ForwardRefRenderFunction<
     >
       {children}
       <span className="entity-label__label">{node.name}</span>
-      {node.isLoading && fsManager.options.treeSpinner && <TreeSpinner />}
+      {node.isLoading && fsPlugin.options.treeSpinner && <TreeSpinner />}
     </div>
   );
 };

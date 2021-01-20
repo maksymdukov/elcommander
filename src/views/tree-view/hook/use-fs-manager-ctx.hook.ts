@@ -1,4 +1,4 @@
 import { useContext } from 'react';
-import { FsManagerCtx } from '../context/fs-manager-ctx';
+import { FsPluginCtx } from '../context/fs-plugin-ctx';
 
-export const useFsManagerCtx = () => useContext(FsManagerCtx);
+export const useFsPluginCtx = () => useContext(FsPluginCtx);

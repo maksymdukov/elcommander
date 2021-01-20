@@ -21,7 +21,7 @@ import {
 import { ScrollRef } from '../types/scroll-ref';
 import { LassoContextState } from '../context/lasso.context';
 import { OPENABLE_NODE_TYPES } from '../tree-view.constants';
-import { useFsManagerCtx } from './use-fs-manager-ctx.hook';
+import { useFsPluginCtx } from './use-fs-manager-ctx.hook';
 
 interface UseContainerProps {
   scrollRef: ScrollRef;
@@ -34,7 +34,7 @@ export const useTreeHandlers = ({
   viewIndex,
   lassoState,
 }: UseContainerProps) => {
-  const { fsManager } = useFsManagerCtx();
+  const { fsPlugin } = useFsPluginCtx();
   const dispatch = useDispatch();
   const onKeyDown = (e: React.KeyboardEvent) => {
     // Shift + Down
@@ -63,23 +63,23 @@ export const useTreeHandlers = ({
     // right
     if (e.key === 'ArrowRight') {
       e.preventDefault();
-      dispatch(toggleDirByCursorThunk(viewIndex, true, fsManager));
+      dispatch(toggleDirByCursorThunk(viewIndex, true, fsPlugin));
       return;
     }
     // enter
     if (e.key === 'Enter') {
       e.preventDefault();
-      dispatch(enterDirByCursorThunk(viewIndex, fsManager));
+      dispatch(enterDirByCursorThunk(viewIndex, fsPlugin));
     }
     // backspace
     if (e.key === 'Backspace') {
       e.preventDefault();
-      dispatch(exitToParentThunk(viewIndex, fsManager));
+      dispatch(exitToParentThunk(viewIndex, fsPlugin));
     }
     // left
     if (e.key === 'ArrowLeft') {
       e.preventDefault();
-      dispatch(toggleDirByCursorThunk(viewIndex, false, fsManager));
+      dispatch(toggleDirByCursorThunk(viewIndex, false, fsPlugin));
       return;
     }
 
@@ -128,12 +128,12 @@ export const useTreeHandlers = ({
     }
 
     if (e.treeEventType === TreeEventType.OpenNode) {
-      dispatch(openDirThunk(treeIndex, viewIndex, fsManager));
+      dispatch(openDirThunk(treeIndex, viewIndex, fsPlugin));
       return;
     }
 
     if (e.treeEventType === TreeEventType.CloseNode) {
-      dispatch(closeDirThunk(treeIndex, viewIndex, fsManager));
+      dispatch(closeDirThunk(treeIndex, viewIndex, fsPlugin));
       return;
     }
 
@@ -151,7 +151,7 @@ export const useTreeHandlers = ({
       e.treeEventType === TreeEventType.EnterNode &&
       OPENABLE_NODE_TYPES.includes(treeNode.type)
     ) {
-      dispatch(enterDirByNodeIndex(treeIndex, viewIndex, fsManager));
+      dispatch(enterDirByNodeIndex(treeIndex, viewIndex, fsPlugin));
     }
   };
 

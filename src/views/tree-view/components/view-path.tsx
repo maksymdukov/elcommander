@@ -9,12 +9,12 @@ import { useTreeViewCtx } from '../hook/use-tree-view-ctx.hook';
 import { useStyles } from './view-path.styles';
 import { usePathHider } from '../hook/use-path-hider.hook';
 import { exitToParentThunk } from '../../../store/features/views/actions/tree-dir.actions';
-import { useFsManagerCtx } from '../hook/use-fs-manager-ctx.hook';
+import { useFsPluginCtx } from '../hook/use-fs-manager-ctx.hook';
 
 const ViewPath: React.FC<{ width: number }> = ({ width }) => {
   const classes = useStyles();
   const dispatch = useDispatch();
-  const { fsManager } = useFsManagerCtx();
+  const { fsPlugin } = useFsPluginCtx();
   const viewIndex = useTreeViewCtx();
   const currentPath = useSelector((state: RootState) =>
     getStartPath(state, viewIndex)
@@ -41,14 +41,14 @@ const ViewPath: React.FC<{ width: number }> = ({ width }) => {
     const reversedIdx = hiddenPath.length - 1 - idx;
     const targetPath =
       hiddenPath.filter((_, index) => index <= reversedIdx).join('/') || '/';
-    dispatch(exitToParentThunk(viewIndex, fsManager, targetPath));
+    dispatch(exitToParentThunk(viewIndex, fsPlugin, targetPath));
   };
   const onVisiblePathClick = (idx: number) => () => {
     const targetPath =
       [...hiddenPath, ...visiblePath]
         .filter((_, index) => index <= idx + hiddenPath.length)
         .join('/') || '/';
-    dispatch(exitToParentThunk(viewIndex, fsManager, targetPath));
+    dispatch(exitToParentThunk(viewIndex, fsPlugin, targetPath));
   };
 
   const hiddenItems = !!hiddenPath.length && (

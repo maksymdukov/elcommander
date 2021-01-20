@@ -1,8 +1,5 @@
+import { IUserPluginConfig, SavedConfigFile } from 'plugins/plugin-persistence';
 import { ConfigShape, FSPersistence } from '../../classes/fs-persistence';
-import {
-  IUserPluginConfig,
-  SavedConfigFile,
-} from '../../../plugins/plugin-persistence';
 
 export interface GoogleDriveConfigShape {
   email: string;

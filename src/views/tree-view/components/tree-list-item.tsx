@@ -7,7 +7,6 @@ import NodeIcon from './node-icon';
 import { getNodeById } from '../../../store/features/views/views.selectors';
 import { RootState } from '../../../store/root-types';
 import { TreeEventType } from '../../../enums/tree-event-type.enum';
-import { useNodeRef } from '../hook/use-node-ref';
 import { useDndNodeHandlers } from '../hook/use-dnd-node-handlers.hook';
 import './node.global.scss';
 import {
@@ -26,7 +25,7 @@ const TreeListItemRaw: React.FC<TreeListItemRawProps> = ({
   data,
   style,
 }) => {
-  const ref = useNodeRef(index);
+  // const ref = useNodeRef(index);
   const {
     onMouseUp: handleMouseUp,
     onMouseEnter: handleMouseEnter,
@@ -113,12 +112,7 @@ const TreeListItemRaw: React.FC<TreeListItemRawProps> = ({
   };
 
   return (
-    <div
-      ref={ref}
-      data-tree="node"
-      style={style}
-      onMouseDown={onContainerMouseDown}
-    >
+    <div data-tree="node" style={style} onMouseDown={onContainerMouseDown}>
       <div className="node__title" style={{ paddingLeft: offset }}>
         <NodeControlIcon node={node} onClick={onIconPicClick} offset={offset} />
         <EntityLabel
