@@ -1,14 +1,14 @@
 import fs from 'fs';
 import path from 'path';
 import { remote } from 'electron';
-import { IFSBackend } from '../backends/abstracts/fs-backend.abstract';
 import { CONFIG } from '../config/config';
 import { readAllFilesInDir } from '../utils/fs/read-all-dir';
 import { ExtractPromiseArray } from '../utils/types/extract';
+import { IFSPlugin } from '../backends/abstracts/fs-plugin.abstract';
 
 export type PluginCategories = 'fs';
 
-export type PluginClass = IFSBackend;
+export type PluginClass = IFSPlugin;
 
 export interface IUserPluginConfig {
   name: string;
@@ -77,17 +77,9 @@ export class PluginPersistence {
   }
 
   async writeConfig(name: string, content: string) {
-    console.log('write config name', name);
-    console.log('write config content', content);
-    console.log('path', path.join(this.pluginDir, name));
-    const result = await fs.promises.writeFile(
-      path.join(this.pluginDir, name),
-      content,
-      {
-        encoding: 'utf8',
-      }
-    );
-    return result;
+    return fs.promises.writeFile(path.join(this.pluginDir, name), content, {
+      encoding: 'utf8',
+    });
   }
 
   async deleteConfig(name: string) {

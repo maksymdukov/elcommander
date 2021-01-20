@@ -7,7 +7,7 @@ import { FSBackendThreaded } from '../../abstracts/fs-backend-threaded.abstract'
 import { FsPlugin } from '../../abstracts/fs-plugin.abstract';
 import { FSPersistence } from '../../classes/fs-persistence';
 
-export class LocalFs extends FsPlugin<FSBackendThreaded<LocalFSWorker>> {
+export class LocalFsPlugin extends FsPlugin<FSBackendThreaded<LocalFSWorker>> {
   static FS = FSBackendThreaded;
 
   static Persistence = FSPersistence;
@@ -17,13 +17,13 @@ export class LocalFs extends FsPlugin<FSBackendThreaded<LocalFSWorker>> {
     configName,
     persistence,
     domContainer,
-  }: IFSConstructorProps): Promise<LocalFs> {
+  }: IFSConstructorProps): Promise<LocalFsPlugin> {
     const LocalFSWorkerClass = Comlink.wrap(
       new LocalWorker()
     ) as Comlink.Remote<typeof LocalFSWorker>;
     const workerInstance = await new LocalFSWorkerClass();
     const fs = new FSBackendThreaded({ workerInstance });
-    return new LocalFs({
+    return new LocalFsPlugin({
       viewId,
       fs,
       configName,

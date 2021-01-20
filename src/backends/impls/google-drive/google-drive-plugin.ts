@@ -93,13 +93,12 @@ export class GoogleDrivePlugin extends FsPlugin<
       }
     } else {
       // full auth flow
-      // Promise.race();
       const { response } = yield remote.dialog.showMessageBox({
         type: 'question',
         buttons: ['Ok', 'Cancel'],
         message: 'Now you will be redirected to the Google Login page',
       });
-      // Cancel button
+      // Cancel button index
       if (response === 1) {
         throw new UserCancelError();
       }

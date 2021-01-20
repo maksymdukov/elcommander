@@ -1,5 +1,5 @@
 import React, { SVGProps } from 'react';
-import { LocalFs } from './impls/local-fs/local-fs';
+import { LocalFsPlugin } from './impls/local-fs/local-fs-plugin';
 import { GoogleDrivePlugin } from './impls/google-drive/google-drive-plugin';
 import HardDriveIcon from '../components/icons/hard-drive-icon';
 import GoogleDriveIcon from '../components/icons/google-drive-icon';
@@ -22,7 +22,7 @@ export const FSBackendsMap: IFSPluginMap = {
   LocalFS: {
     id: 'LocalFS',
     name: 'Local',
-    klass: LocalFs,
+    klass: LocalFsPlugin,
     enabled: true,
     order: 1,
     icon: HardDriveIcon,
