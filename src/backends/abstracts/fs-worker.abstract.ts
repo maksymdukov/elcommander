@@ -36,7 +36,6 @@ export abstract class FSWorker {
   ): Promise<void>;
 
   async unwatchDir(path: string) {
-    console.log(this.subscriptions);
     return this.subscriptions.removeNested(path);
   }
 

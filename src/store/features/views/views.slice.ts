@@ -4,7 +4,11 @@ import { initialState } from './views-init-state';
 import { ViewIndexPayload } from './tree-state.interface';
 import { FsItemTypeEnum } from '../../../enums/fs-item-type.enum';
 import { ViewsStateUtils } from './utils/views-state.utils';
-import { AddViewAction, RemoveViewAction } from './actions/views.actions';
+import {
+  AddViewAction,
+  RemoveViewAction,
+  ResizeViewAction,
+} from './actions/views.actions';
 
 function isTreeStateAction(
   action: AnyAction
@@ -17,8 +21,17 @@ export const viewsSlice = createSlice({
   initialState,
   reducers: {
     addView(state, { payload: { backend, config } }: AddViewAction) {
+      const viewsLength = state.views.length;
+      const futureLength = viewsLength + 1;
+      const avgWidth = 100 / futureLength;
+      state.views.forEach((view) => {
+        view.width -= view.width / futureLength;
+      });
       state.views.push({
         classId: backend.id,
+        // calculate width when adding view
+        // split last tab in two
+        width: avgWidth,
         viewId: ViewsStateUtils.generateUUID(state),
         configName: config?.name || '',
         byId: {},
@@ -47,7 +60,20 @@ export const viewsSlice = createSlice({
       });
     },
     removeView(state, { payload: { viewIndex } }: RemoveViewAction) {
+      const removedWidth = state.views[viewIndex].width;
+      const newLength = state.views.length - 1;
       state.views.splice(viewIndex, 1);
+      state.views.forEach((view) => {
+        view.width += removedWidth / newLength;
+      });
+    },
+    resizeView(
+      state,
+      { payload: { viewIndex, prevViewWidth, viewWidth } }: ResizeViewAction
+    ) {
+      state.views[viewIndex].width = viewWidth;
+      // resize previous one
+      state.views[viewIndex - 1].width = prevViewWidth;
     },
   },
   extraReducers: (builder) => {
@@ -60,4 +86,5 @@ export const viewsSlice = createSlice({
 export const {
   addView: addViewAction,
   removeView: removeViewAction,
+  resizeView: resizeViewAction,
 } = viewsSlice.actions;

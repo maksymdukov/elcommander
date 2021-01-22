@@ -10,3 +10,9 @@ export type AddViewAction = PayloadAction<{
 export type RemoveViewAction = PayloadAction<{
   viewIndex: number;
 }>;
+
+export type ResizeViewAction = PayloadAction<{
+  viewIndex: number;
+  viewWidth: number;
+  prevViewWidth: number;
+}>;

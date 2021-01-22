@@ -19,7 +19,7 @@ interface UseDependencyInjectionHookProps {
   onFailInit: (e: any, viewIndex: number) => void;
 }
 
-export const useDependencyInjection = ({
+export const useFsPluginInjection = ({
   index,
   viewId,
   onSuccessfulInit,

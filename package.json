@@ -285,6 +285,7 @@
     "regenerator-runtime": "^0.13.5",
     "source-map-support": "^0.5.19",
     "tinycolor2": "^1.4.2",
+    "use-resize-observer": "^7.0.0",
     "uuid": "^8.3.2"
   },
   "devEngines": {

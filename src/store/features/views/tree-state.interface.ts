@@ -7,6 +7,7 @@ export interface ByIdState {
 export interface TreeState {
   classId: string;
   viewId: string;
+  width: number;
   configName: string;
   byId: ByIdState;
   allIds: string[];

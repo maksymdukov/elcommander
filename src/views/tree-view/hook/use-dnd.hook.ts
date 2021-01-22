@@ -151,12 +151,14 @@ export const useDnd = ({
     if (!ctxRef.current.isActive) {
       return;
     }
+    setIsDroppable(true);
     onContainerEnter();
   };
   const onContainerMouseLeave = () => {
     if (!ctxRef.current.isActive) {
       return;
     }
+    setIsDroppable(false);
     onContainerLeave();
   };
 

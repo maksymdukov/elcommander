@@ -12,4 +12,5 @@ export enum TreeEventType {
   MoveSelectionLeave,
   MoveSelectionFinish,
   DNDNodeDrop,
+  ResizeStart,
 }

@@ -15,6 +15,16 @@ export const getViewByIndex = createSelector(
   (state, index) => state[index]
 );
 
+export const getViewsLength = createSelector(
+  getViewsSelector,
+  (state) => state.length
+);
+
+export const getViewWidth = createSelector(
+  getViewByIndex,
+  (state) => state.width
+);
+
 export const getViewClassId = createSelector(
   getViewByIndex,
   (state) => state.classId

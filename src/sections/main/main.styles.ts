@@ -8,10 +8,4 @@ export const useStyles = createUseStyles<Theme>(() => ({
     padding: '0 0 10px',
     flexWrap: 'nowrap',
   },
-  tabView: {
-    flexGrow: 0,
-    flexShrink: 0,
-    display: 'flex',
-    flexDirection: 'column',
-  },
 }));

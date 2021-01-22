@@ -13,7 +13,8 @@ import Droppable from './context/droppable';
 import { useTreeDnd } from './hook/use-tree-dnd.hook';
 import AutoCursorScroll from './components/auto-cursor-scroll';
 import PathSpinner from './components/path-spinner';
-import { useStyles } from './tree-list.styles';
+import { TABVIEW_BORDER_WIDTH, useStyles } from './tree-list.styles';
+import ResizeHandle from './components/resize-handle';
 
 interface TreeListProps {
   index: number;
@@ -79,14 +80,16 @@ const TreeList: React.FC<TreeListProps> = ({
           {...getDndHandlers()}
           style={{ height }}
         >
+          <ResizeHandle />
           <PathSpinner />
           <FixedSizeList
             ref={scrollRef}
+            className={classes.scrollContainer}
             outerRef={outerRef}
             innerElementType={CustomInnerWindow}
             itemCount={allIds.length}
             onScroll={lassoState.onScroll}
-            height={height}
+            height={height - TABVIEW_BORDER_WIDTH * 2}
             itemData={itemData}
             itemSize={itemSize}
             overscanCount={5}
