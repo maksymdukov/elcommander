@@ -24,7 +24,7 @@ export const usePathHider = (currentPath: string, width: number) => {
       // check to see if overflowing
       const containerWidth = viewPathContainer.current.clientWidth;
       const containerScrollWidth = viewPathContainer.current.scrollWidth;
-      if (containerScrollWidth > containerWidth) {
+      if (containerScrollWidth > containerWidth && visiblePath.length !== 1) {
         // unstable_batchedUpdates(() => {
         // take one from visible (beginning)
         let shifted = '';

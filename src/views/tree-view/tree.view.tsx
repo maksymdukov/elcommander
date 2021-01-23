@@ -10,7 +10,7 @@ import TreeViewProvider from './context/treeViewProvider';
 import TreeList from './tree-list';
 import { useStyles } from './tree-view.styles';
 import StatusBar from './components/status-bar';
-import { useFsPluginInjection } from './hook/use-dependency-injection.hook';
+import { useFsPluginInjection } from './hook/use-fsplugin-injection.hook';
 import { FsPlugin } from '../../backends/abstracts/fs-plugin.abstract';
 import { RootState } from '../../store/root-types';
 import { getViewWidth } from '../../store/features/views/views.selectors';

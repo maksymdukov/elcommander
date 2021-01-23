@@ -18,6 +18,36 @@ import { TABVIEW_GAP } from '../tree-view.styles';
 export const RESIZE_HANDLE_WIDTH =
   (TABVIEW_BORDER_WIDTH + TABVIEW_GAP) * 2 + TABVIEW_BORDER_WIDTH;
 
+export const MIN_TABVIEW_WIDTH = 10;
+
+export const getConfinedWidth = (
+  currentViewWidth: number,
+  prevViewWidth: number,
+  diff: number
+) => {
+  const pairWidth = currentViewWidth + prevViewWidth;
+  const newViewWidth = currentViewWidth + diff;
+  const newPrevViewWidth = prevViewWidth - diff;
+  if (newViewWidth > pairWidth - MIN_TABVIEW_WIDTH) {
+    return {
+      newCurrentViewWidth: pairWidth - MIN_TABVIEW_WIDTH,
+      newPrevViewWidth: pairWidth - (pairWidth - MIN_TABVIEW_WIDTH),
+    };
+  }
+
+  if (newPrevViewWidth > pairWidth - MIN_TABVIEW_WIDTH) {
+    return {
+      newCurrentViewWidth: pairWidth - (pairWidth - MIN_TABVIEW_WIDTH),
+      newPrevViewWidth: pairWidth - MIN_TABVIEW_WIDTH,
+    };
+  }
+
+  return {
+    newCurrentViewWidth: newViewWidth,
+    newPrevViewWidth,
+  };
+};
+
 const useStyles = createUseStyles({
   resize: {
     position: 'absolute',
@@ -94,11 +124,16 @@ const ResizeHandle = () => {
   useEffect(() => {
     if (currentPageX !== null && startPageX !== null && pxInPercent !== null) {
       const percentDiff = (startPageX - currentPageX) * pxInPercent;
+      const { newCurrentViewWidth, newPrevViewWidth } = getConfinedWidth(
+        viewWidthRef.current.initialCurrent,
+        viewWidthRef.current.initialPrevious,
+        percentDiff
+      );
       dispatch(
         resizeViewAction({
           viewIndex,
-          viewWidth: viewWidthRef.current.initialCurrent + percentDiff,
-          prevViewWidth: viewWidthRef.current.initialPrevious - percentDiff,
+          viewWidth: newCurrentViewWidth,
+          prevViewWidth: newPrevViewWidth,
         })
       );
     }
