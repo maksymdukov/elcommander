@@ -1,10 +1,11 @@
 import { PayloadAction } from '@reduxjs/toolkit';
 import { IFSPluginDescriptor } from 'backends/backends-map';
-import { IUserPluginConfig } from 'plugins/plugin-persistence';
+import { TreeNode } from 'interfaces/node.interface';
 
 export type AddViewAction = PayloadAction<{
   backend: IFSPluginDescriptor;
-  config?: IUserPluginConfig;
+  config?: string;
+  startNode?: TreeNode;
 }>;
 
 export type RemoveViewAction = PayloadAction<{

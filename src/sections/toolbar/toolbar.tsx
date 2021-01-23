@@ -2,6 +2,7 @@ import React from 'react';
 import { createUseStyles } from 'react-jss';
 import AddTab from './components/add-tab/add-tab';
 import { Theme } from '../../theme/jss-theme.provider';
+import Bookmarks from './components/bookmarks/bookmarks';
 
 const useStyles = createUseStyles<Theme>((theme) => ({
   toolbar: {
@@ -16,7 +17,9 @@ const useStyles = createUseStyles<Theme>((theme) => ({
   },
   bookmarks: {
     flexGrow: 1,
-    paddingLeft: 10,
+    display: 'flex',
+    height: '100%',
+    // paddingLeft: 10,
     borderLeft: `2px solid ${theme.colors.tertiary}`,
   },
 }));
@@ -28,7 +31,9 @@ const Toolbar = () => {
       <div className={classes.toolbarFuncs}>
         <AddTab />
       </div>
-      <div className={classes.bookmarks}>123</div>
+      <div className={classes.bookmarks}>
+        <Bookmarks />
+      </div>
     </div>
   );
 };

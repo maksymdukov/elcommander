@@ -93,7 +93,9 @@ const AddTab = () => {
   const onNewTabClick = ({ pluginDescriptor, config }: IFSPluginItem) => () => {
     closeMenu();
     // create new tab
-    dispatch(addViewAction({ backend: pluginDescriptor, config }));
+    dispatch(
+      addViewAction({ backend: pluginDescriptor, config: config?.name })
+    );
   };
 
   if (!backends) return null;

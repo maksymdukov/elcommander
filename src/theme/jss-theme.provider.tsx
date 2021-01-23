@@ -32,6 +32,12 @@ const theme = {
       backgroundInverse: '#FDFFFC',
     },
   },
+  bookmarks: {
+    colors: {
+      folderBg: '#d19310',
+      folder: '#fff',
+    },
+  },
   tools: {
     darken: (color: string, amount: number) =>
       tinycolor(color).darken(amount).toString(),

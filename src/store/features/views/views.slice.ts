@@ -20,7 +20,7 @@ export const viewsSlice = createSlice({
   name: 'views',
   initialState,
   reducers: {
-    addView(state, { payload: { backend, config } }: AddViewAction) {
+    addView(state, { payload: { backend, config, startNode } }: AddViewAction) {
       const viewsLength = state.views.length;
       const futureLength = viewsLength + 1;
       const avgWidth = 100 / futureLength;
@@ -33,7 +33,7 @@ export const viewsSlice = createSlice({
         // split last tab in two
         width: avgWidth,
         viewId: ViewsStateUtils.generateUUID(state),
-        configName: config?.name || '',
+        configName: config || '',
         byId: {},
         allIds: [],
         cursor: null,
@@ -53,6 +53,7 @@ export const viewsSlice = createSlice({
           nestLevel: -1,
           meta: {},
           ...backend.klass.FS.getStartNode(),
+          ...startNode,
         },
         startPathLoading: false,
         startPathError: null,
