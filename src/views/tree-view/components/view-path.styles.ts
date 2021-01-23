@@ -4,7 +4,7 @@ import { Theme } from 'theme/jss-theme.provider';
 export const useStyles = createUseStyles<Theme>((theme) => ({
   viewPathContainer: {
     flexGrow: 1,
-    overflow: 'auto',
+    overflowX: 'scroll',
     '&::-webkit-scrollbar': {
       height: 0,
     },

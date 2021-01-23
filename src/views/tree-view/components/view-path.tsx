@@ -5,10 +5,10 @@ import { RootState } from 'store/root-types';
 import Button, { ButtonProps } from 'components/buttons/button';
 import MenuItem from 'components/menu/menu-item';
 import Menu from 'components/menu/menu';
+import { exitToParentThunk } from 'store/features/views/actions/tree-dir.actions';
 import { useTreeViewCtx } from '../hook/use-tree-view-ctx.hook';
 import { useStyles } from './view-path.styles';
 import { usePathHider } from '../hook/use-path-hider.hook';
-import { exitToParentThunk } from '../../../store/features/views/actions/tree-dir.actions';
 import { useFsPluginCtx } from '../hook/use-fs-manager-ctx.hook';
 
 const ViewPath: React.FC<{ width: number }> = ({ width }) => {

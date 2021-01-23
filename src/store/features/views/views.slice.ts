@@ -33,6 +33,7 @@ export const viewsSlice = createSlice({
         // split last tab in two
         width: avgWidth,
         viewId: ViewsStateUtils.generateUUID(state),
+        viewName: backend.name,
         configName: config || '',
         byId: {},
         allIds: [],

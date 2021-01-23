@@ -1,13 +1,14 @@
 import { useLayoutEffect, useRef, useState } from 'react';
 import { unstable_batchedUpdates } from 'react-dom';
-import { splitByDelimiter } from '../../../utils/path';
+import { splitByDelimiter } from 'utils/path';
 
 export const usePathHider = (currentPath: string, width: number) => {
   const viewPathContainer = useRef<HTMLDivElement>(null);
   const [isVisible, setIsVisible] = useState(false);
-  const [visiblePath, setVisiblePath] = useState<string[]>([]);
+  const [visiblePath, setVisiblePath] = useState<string[]>(
+    splitByDelimiter(currentPath)
+  );
   const [hiddenPath, setHiddenPath] = useState<string[]>([]);
-
   useLayoutEffect(() => {
     // once currentPath or width has changed - make container invisible
     unstable_batchedUpdates(() => {

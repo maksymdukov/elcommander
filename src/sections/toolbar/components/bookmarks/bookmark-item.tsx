@@ -4,19 +4,38 @@ import { createUseStyles } from 'react-jss';
 import { Theme } from 'theme/jss-theme.provider';
 import Button from 'components/buttons/button';
 import { useDispatch } from 'react-redux';
-import { openBookmarkThunk } from '../../../../store/features/bookmarks/bookmarks.actions';
+import { openBookmarkThunk } from 'store/features/bookmarks/bookmarks.actions';
+import FolderIcon from 'components/icons/folder-icon';
+import { useDndContext } from 'views/tree-view/hook/use-dnd-context.hook';
 
 const useStyles = createUseStyles<Theme>((theme) => ({
-  bookmarkBtn: {
-    fontWeight: 'bold',
-    background: theme.bookmarks.colors.folderBg,
-    color: theme.bookmarks.colors.folder,
+  btnWrapper: {
     '&:not(:last-child)': {
       marginRight: 5,
     },
+  },
+  bookmarkBtn: {
+    background: 'transparent',
+    color: theme.text.colors.primary,
+    border: `1px solid ${theme.colors.primaryLight}`,
     '&:hover': {
-      background: theme.tools.darken(theme.bookmarks.colors.folderBg, 20),
+      background: theme.colors.tertiaryLight,
+      color: theme.text.colors.primaryInverse,
     },
+    '&:hover $folderIcon': {
+      fill: theme.text.colors.primaryInverse,
+    },
+    cursor: 'default',
+  },
+  btnLabel: {
+    display: 'flex',
+    alignItems: 'center',
+  },
+  folderIcon: {
+    width: theme.size.iconButtonScale * 15,
+    height: theme.size.iconButtonScale * 15,
+    marginRight: 5,
+    fill: theme.bookmarks.colors.folderBg,
   },
 }));
 
@@ -30,10 +49,26 @@ const BookmarkItem: React.FC<BookmarkItemProps> = ({ bookmark }) => {
   const onClick = () => {
     dispatch(openBookmarkThunk(bookmark));
   };
+  const { setIsDroppable } = useDndContext();
+  const onMouseEnter = () => {
+    setIsDroppable(false);
+  };
+  const onMouseLeave = () => {
+    setIsDroppable(true);
+  };
   return (
-    <Button onClick={onClick} className={classes.bookmarkBtn}>
-      {bookmark.startNode.name}
-    </Button>
+    <div
+      className={classes.btnWrapper}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
+    >
+      <Button onClick={onClick} className={classes.bookmarkBtn}>
+        <div className={classes.btnLabel}>
+          <FolderIcon className={classes.folderIcon} />
+          {bookmark.startNode.name}
+        </div>
+      </Button>
+    </div>
   );
 };
 

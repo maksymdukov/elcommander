@@ -6,6 +6,7 @@ import clsx from 'clsx';
 import { useDispatch, useSelector } from 'react-redux';
 import { addBookmarkThunk } from 'store/features/bookmarks/bookmarks.actions';
 import { getBookmarks } from 'store/features/bookmarks/bookmarks.selectors';
+import { FsItemTypeEnum } from 'enums/fs-item-type.enum';
 import BookmarkItem from './bookmark-item';
 
 const useStyles = createUseStyles<Theme>((theme) => ({
@@ -18,7 +19,7 @@ const useStyles = createUseStyles<Theme>((theme) => ({
     border: `2px solid transparent`,
   },
   bookmarksDraggedOver: {
-    border: `2px solid ${theme.colors.tertiary}`,
+    outline: `2px solid ${theme.colors.tertiary}`,
   },
 }));
 
@@ -27,10 +28,13 @@ const Bookmarks = () => {
   const bookmarks = useSelector(getBookmarks);
   const classes = useStyles();
   const [isDraggedOver, setIsDraggedOver] = useState(false);
-  const { ctxRef, setIsDroppable } = useDndContext();
+  const { ctxRef, setIsDroppable, state } = useDndContext();
 
   const onMouseEnter = () => {
-    if (ctxRef.current.isActive) {
+    if (
+      ctxRef.current.isActive &&
+      ctxRef.current.startNode?.type === FsItemTypeEnum.Directory
+    ) {
       setIsDroppable(true);
       setIsDraggedOver(true);
     }
@@ -44,7 +48,11 @@ const Bookmarks = () => {
   };
 
   const onMouseUp = () => {
-    if (!ctxRef.current.isActive) {
+    if (
+      !ctxRef.current.isActive ||
+      ctxRef.current.startNode?.type !== FsItemTypeEnum.Directory ||
+      !state.isDroppable
+    ) {
       return;
     }
     setIsDroppable(false);

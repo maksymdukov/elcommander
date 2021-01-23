@@ -6,6 +6,7 @@ export const initialState: ViewsState = {
     {
       classId: 'LocalFS',
       viewId: '1',
+      viewName: 'LocalFS',
       width: 100,
       configName: '',
       byId: {},

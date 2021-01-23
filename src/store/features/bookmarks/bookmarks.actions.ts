@@ -17,6 +17,7 @@ export const addBookmarkThunk = (
 ): AppThunk => async (dispatch, getState) => {
   const startView = getViewByIndex(getState(), viewIndex);
   const bookmark: IBookmark = {
+    viewName: startView.viewName,
     classId: startView.classId,
     configName: startView.configName,
     startNode,

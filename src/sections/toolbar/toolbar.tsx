@@ -18,6 +18,7 @@ const useStyles = createUseStyles<Theme>((theme) => ({
   bookmarks: {
     flexGrow: 1,
     display: 'flex',
+    alignItems: 'center',
     height: '100%',
     // paddingLeft: 10,
     borderLeft: `2px solid ${theme.colors.tertiary}`,
