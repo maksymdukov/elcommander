@@ -1,7 +1,6 @@
 import { createUseStyles } from 'react-jss';
 import { Theme } from 'theme/jss-theme.provider';
-
-export const TABVIEW_GAP = 4;
+import { TABVIEW_GAP } from './tree-view.constants';
 
 export const useStyles = createUseStyles<Theme>(() => ({
   treeViewContainer: {

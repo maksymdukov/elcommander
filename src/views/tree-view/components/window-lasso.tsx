@@ -1,13 +1,13 @@
 import React, { useCallback } from 'react';
 import { useDispatch } from 'react-redux';
-import classes from './window-lasso.scss';
-import { useLassoSelection } from '../hook/use-lasso-selection.hook';
-import { useTreeViewCtx } from '../hook/use-tree-view-ctx.hook';
+import { useCurrentValue } from 'utils/use-current-value.hook';
 import {
   lassoSelectionAction,
   resetSelectionAction,
-} from '../../../store/features/views/actions/tree-selection.actions';
-import { useCurrentValue } from '../../../utils/use-current-value.hook';
+} from 'store/features/views/actions/tree-selection.actions';
+import classes from './window-lasso.scss';
+import { useLassoSelection } from '../hook/use-lasso-selection.hook';
+import { useTreeViewCtx } from '../hook/use-tree-view-ctx.hook';
 
 const WindowLassoRaw: React.FC = () => {
   const viewIndex = useTreeViewCtx();

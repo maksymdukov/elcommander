@@ -1,13 +1,13 @@
 import React, { RefObject, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { FixedSizeList } from 'react-window';
-import { RootState } from '../../../store/root-types';
+import { RootState } from 'store/root-types';
 import {
   getCursorIdx,
   getIsLoadingStartPath,
   getStartPath,
-} from '../../../store/features/views/views.selectors';
-import { usePreviousValue } from '../../../utils/use-previous-value.hook';
+} from 'store/features/views/views.selectors';
+import { usePreviousValue } from 'utils/use-previous-value.hook';
 
 interface AutoScrollProps {
   scrollRef: RefObject<FixedSizeList>;

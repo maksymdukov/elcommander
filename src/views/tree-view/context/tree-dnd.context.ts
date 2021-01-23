@@ -5,7 +5,9 @@ export const TreeDNDContext = createContext<TreeDndContextVal>({
   state: {
     isDroppable: false,
   },
-  ctxRef: { current: { isActive: false } },
+  ctxRef: {
+    current: { isActive: false, startViewIndex: null, startNode: null },
+  },
   setMouseCoords: () => {},
   setIsDroppable: () => {},
   setContainerElement: () => {},

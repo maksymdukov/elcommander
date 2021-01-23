@@ -30,6 +30,7 @@ export const useTreeDnd = ({ viewIndex, scrollableRef }: UseTreeDndProps) => {
   const viewIndexCurrent = useCurrentValue(viewIndex);
   const { setContainerElement } = useDndContext();
   const { getDndHandlers, getNodeHandlers } = useDnd({
+    viewIndex,
     onInitialMouseDown: (nodeIdx) => {
       dispatch(
         setCursoredAction({

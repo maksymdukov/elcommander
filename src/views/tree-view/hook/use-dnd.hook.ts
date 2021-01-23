@@ -5,6 +5,7 @@ import { TreeNode } from '../../../interfaces/node.interface';
 import { TreeEventType } from '../../../enums/tree-event-type.enum';
 
 interface UseDndHookProps {
+  viewIndex: number;
   onNodeDragEnter: (nodeIndex: number, node: TreeNode) => void;
   onNodeExternalDragEnter: (nodeIndex: number, node: TreeNode) => void;
   onNodeDragLeave: (nodeIndex: number, node: TreeNode) => void;
@@ -36,6 +37,7 @@ const defaultFilter: UseDndHookProps['droppableFilter'] = ({
 }) => startNodeIndex !== currentNodeIndex;
 
 export const useDnd = ({
+  viewIndex,
   onNodeDragEnter,
   onNodeDragLeave,
   onNodeDrop,
@@ -83,6 +85,8 @@ export const useDnd = ({
       onInitialMouseDown(treeIndex, treeNode);
     }
     // e.preventDefault();
+    ctxRef.current.startNode = treeNode;
+    ctxRef.current.startViewIndex = viewIndex;
     startNodeRef.current = treeNode;
     startNodeIndexRef.current = treeIndex;
     setIsDroppable(false);
@@ -95,6 +99,8 @@ export const useDnd = ({
       return;
     }
     e.treeEventType = TreeEventType.DNDNodeDrop;
+    ctxRef.current.startNode = null;
+    ctxRef.current.startViewIndex = null;
     const { treeIndex, treeNode } = e;
     e.preventDefault();
     if (

@@ -20,6 +20,8 @@ const TreeDndProvider: React.FC = ({ children }) => {
 
   const ctxRef = useRef<CtxRef>({
     isActive: false,
+    startNode: null,
+    startViewIndex: null,
   });
 
   const setMouseCoords = useCallback(

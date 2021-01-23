@@ -12,13 +12,7 @@ import { TreeEventType } from 'enums/tree-event-type.enum';
 import { usePreviousValue } from 'utils/use-previous-value.hook';
 import { useTreeCtx } from 'sections/main/hooks/use-tree-ctx.hook';
 import { useTreeViewCtx } from '../hook/use-tree-view-ctx.hook';
-import { TABVIEW_BORDER_WIDTH } from '../tree-list.styles';
-import { TABVIEW_GAP } from '../tree-view.styles';
-
-export const RESIZE_HANDLE_WIDTH =
-  (TABVIEW_BORDER_WIDTH + TABVIEW_GAP) * 2 + TABVIEW_BORDER_WIDTH;
-
-export const MIN_TABVIEW_WIDTH = 10;
+import { MIN_TABVIEW_WIDTH, RESIZE_HANDLE_WIDTH } from '../tree-view.constants';
 
 export const getConfinedWidth = (
   currentViewWidth: number,

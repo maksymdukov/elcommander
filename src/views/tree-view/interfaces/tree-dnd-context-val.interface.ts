@@ -1,8 +1,11 @@
 import { MutableRefObject } from 'react';
+import { TreeNode } from 'interfaces/node.interface';
 import { DNDPreviewState, DNDState } from './tree-dnd-state.interface';
 
 export interface CtxRef {
   isActive: boolean;
+  startViewIndex: number | null;
+  startNode: TreeNode | null;
 }
 
 export interface TreeDndContextVal {

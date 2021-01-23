@@ -4,8 +4,7 @@ import MinusIcon from '../../../components/icons/minus-icon';
 import classes from './dnd-preview-icon.scss';
 import { useDndPreviewContext } from '../hook/use-dnd-preview-context.hook';
 import { useDndContext } from '../hook/use-dnd-context.hook';
-
-const PREVIEW_OFFSET = 15;
+import { PREVIEW_PIC_OFFSET } from '../tree-view.constants';
 
 const DndPreviewIcon: React.FC = () => {
   const { mouseY, mouseX } = useDndPreviewContext();
@@ -16,8 +15,8 @@ const DndPreviewIcon: React.FC = () => {
   return (
     <div
       style={{
-        transform: `translate(${mouseX + PREVIEW_OFFSET}px, ${
-          mouseY + PREVIEW_OFFSET
+        transform: `translate(${mouseX + PREVIEW_PIC_OFFSET}px, ${
+          mouseY + PREVIEW_PIC_OFFSET
         }px)`,
       }}
       className={classes['preview-icon']}

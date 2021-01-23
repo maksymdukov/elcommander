@@ -13,8 +13,9 @@ import Droppable from './context/droppable';
 import { useTreeDnd } from './hook/use-tree-dnd.hook';
 import AutoCursorScroll from './components/auto-cursor-scroll';
 import PathSpinner from './components/path-spinner';
-import { TABVIEW_BORDER_WIDTH, useStyles } from './tree-list.styles';
+import { useStyles } from './tree-list.styles';
 import ResizeHandle from './components/resize-handle';
+import { TABVIEW_BORDER_WIDTH } from './tree-view.constants';
 
 interface TreeListProps {
   index: number;
