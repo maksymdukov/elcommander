@@ -13,11 +13,11 @@ import { OPENABLE_NODE_TYPES } from '../../../../views/tree-view/tree-view.const
 import { IndexPayload } from './tree-state.actions';
 import { setCursoredAction } from './tree-cursor.action';
 import { ViewIndexPayload, ViewStatePayload } from '../tree-state.interface';
-import { IFSRawNode } from '../../../../backends/interfaces/fs-raw-node.interface';
+import { IFSRawNode } from '../../../../plugins/fs/interfaces/fs-raw-node.interface';
 import { TreeNode } from '../../../../interfaces/node.interface';
 import { DirectoryStateUtils } from '../utils/directory-state.utils';
 import { splitByDelimiter } from '../../../../utils/path';
-import { FsPlugin } from '../../../../backends/abstracts/fs-plugin.abstract';
+import { FsPlugin } from '../../../../plugins/fs/abstracts/fs-plugin.abstract';
 
 type OpenDirectoryStart = ViewStatePayload<{
   index: number;

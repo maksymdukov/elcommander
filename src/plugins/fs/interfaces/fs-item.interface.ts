@@ -1,4 +1,4 @@
-import { FsItemTypeEnum } from '../../enums/fs-item-type.enum';
+import { FsItemTypeEnum } from '../../../enums/fs-item-type.enum';
 
 export interface IFSNode {
   id: string;

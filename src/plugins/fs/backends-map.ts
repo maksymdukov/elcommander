@@ -1,8 +1,8 @@
 import React, { SVGProps } from 'react';
 import { LocalFsPlugin } from './impls/local-fs/local-fs-plugin';
 import { GoogleDrivePlugin } from './impls/google-drive/google-drive-plugin';
-import HardDriveIcon from '../components/icons/hard-drive-icon';
-import GoogleDriveIcon from '../components/icons/google-drive-icon';
+import HardDriveIcon from '../../components/icons/hard-drive-icon';
+import GoogleDriveIcon from '../../components/icons/google-drive-icon';
 import { IFSPlugin } from './abstracts/fs-plugin.abstract';
 
 export interface IFSPluginDescriptor {

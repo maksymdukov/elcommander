@@ -1,7 +1,7 @@
 import { Remote, proxy, releaseProxy } from 'comlink';
 import { FSBackend, ReadWatchDirProps } from './fs-backend.abstract';
 import { IFSRawNode } from '../interfaces/fs-raw-node.interface';
-import { extractParentPath } from '../../utils/path';
+import { extractParentPath } from '../../../utils/path';
 import { FSEventEmitter } from '../classes/fs-event-emitter';
 import { FSWorker } from './fs-worker.abstract';
 import { FSSubscription } from '../classes/fs-subscription-manager';

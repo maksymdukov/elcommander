@@ -4,7 +4,7 @@ import AbortController from 'abort-controller';
 import { proxy } from 'comlink';
 import { CONFIG } from 'config/config';
 import { IFSRawNode } from '../../interfaces/fs-raw-node.interface';
-import { FsItemTypeEnum } from '../../../enums/fs-item-type.enum';
+import { FsItemTypeEnum } from '../../../../enums/fs-item-type.enum';
 import { ReadWatchDirProps } from '../../abstracts/fs-backend.abstract';
 import {
   FSWorker,

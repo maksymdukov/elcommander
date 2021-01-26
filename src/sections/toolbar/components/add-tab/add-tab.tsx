@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import AddTabIcon from 'components/icons/add-tab-icon';
 import IconButton from 'components/buttons/icon-button';
-import { getFSPluginsMap, IFSPluginDescriptor } from 'backends/backends-map';
+import { getFSPluginsMap, IFSPluginDescriptor } from 'plugins/fs/backends-map';
 import { addViewAction } from 'store/features/views/views.slice';
 import {
   IUserPluginConfig,

@@ -1,5 +1,5 @@
 import { createContext } from 'react';
-import { FsPlugin } from '../../../backends/abstracts/fs-plugin.abstract';
+import { FsPlugin } from '../../../plugins/fs/abstracts/fs-plugin.abstract';
 
 export interface IFsPluginCtxVal {
   fsPlugin: FsPlugin;

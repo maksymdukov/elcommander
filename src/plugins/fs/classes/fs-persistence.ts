@@ -3,7 +3,7 @@ import {
   PluginCategories,
   PluginPersistence,
   SavedConfigFile,
-} from '../../plugins/plugin-persistence';
+} from '../../plugin-persistence';
 
 export type ConfigShape<T = any> = {
   name: string;

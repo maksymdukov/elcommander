@@ -1,6 +1,6 @@
 import * as Comlink from 'comlink';
 // @ts-ignore
-import LocalWorker from 'backends/impls/local-fs/local-fs.worker';
+import LocalWorker from 'plugins/fs/impls/local-fs/local-fs.worker';
 import { IFSConstructorProps } from '../../abstracts/fs-backend.abstract';
 import type { LocalFSWorker } from './local-fs.worker';
 import { FSBackendThreaded } from '../../abstracts/fs-backend-threaded.abstract';

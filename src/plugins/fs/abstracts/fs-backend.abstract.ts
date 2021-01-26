@@ -1,7 +1,7 @@
 import { AbortSignal } from 'abort-controller';
 import { FSEventEmitter, FSEventNames } from '../classes/fs-event-emitter';
 import { IFSRawNode } from '../interfaces/fs-raw-node.interface';
-import { TreeNode } from '../../interfaces/node.interface';
+import { TreeNode } from '../../../interfaces/node.interface';
 import { FSPersistence } from '../classes/fs-persistence';
 import { FsSubscriptionManager } from '../classes/fs-subscription-manager';
 

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { unstable_batchedUpdates } from 'react-dom';
 import { useSelector } from 'react-redux';
-import { getFSPluginsMap, IFSPluginDescriptor } from 'backends/backends-map';
+import { getFSPluginsMap, IFSPluginDescriptor } from 'plugins/fs/backends-map';
 import { RootState } from 'store/root-types';
 import {
   getViewClassId,
@@ -10,7 +10,7 @@ import {
 import { PluginPersistence } from 'plugins/plugin-persistence';
 import { createAppendedElement, removeElement } from 'utils/dom/element';
 import { UserCancelError } from 'error/fs-plugin/user-cancel.error';
-import { FsPlugin } from 'backends/abstracts/fs-plugin.abstract';
+import { FsPlugin } from 'plugins/fs/abstracts/fs-plugin.abstract';
 
 interface UseDependencyInjectionHookProps {
   viewId: string;

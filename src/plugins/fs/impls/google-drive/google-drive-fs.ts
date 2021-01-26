@@ -1,6 +1,6 @@
 import { FSBackendThreaded } from '../../abstracts/fs-backend-threaded.abstract';
 import { GoogleDriveWorker } from './google-drive.worker';
-import { TreeNode } from '../../../interfaces/node.interface';
+import { TreeNode } from '../../../../interfaces/node.interface';
 
 export class GoogleDriveFs extends FSBackendThreaded<GoogleDriveWorker> {
   static getStartNode() {

@@ -4,7 +4,7 @@ import path from 'path';
 import chokidar from 'chokidar';
 import { ReadWatchDirProps } from '../../abstracts/fs-backend.abstract';
 import { IFSRawNode } from '../../interfaces/fs-raw-node.interface';
-import { FsItemTypeEnum } from '../../../enums/fs-item-type.enum';
+import { FsItemTypeEnum } from '../../../../enums/fs-item-type.enum';
 import {
   FSWorker,
   OnChangeCb,

@@ -4,7 +4,7 @@ import url from 'url';
 import { AddressInfo } from 'net';
 import { timeout } from 'utils/timeout';
 import { createPromise } from 'utils/leaked-promise';
-import { UserCancelError } from '../../../error/fs-plugin/user-cancel.error';
+import { UserCancelError } from '../../../../error/fs-plugin/user-cancel.error';
 
 export class GoogleAuth {
   server: Server | null = null;

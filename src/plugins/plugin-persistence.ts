@@ -4,7 +4,7 @@ import { remote } from 'electron';
 import { CONFIG } from '../config/config';
 import { readAllFilesInDir } from '../utils/fs/read-all-dir';
 import { ExtractPromiseArray } from '../utils/types/extract';
-import { IFSPlugin } from '../backends/abstracts/fs-plugin.abstract';
+import { IFSPlugin } from './fs/abstracts/fs-plugin.abstract';
 
 export type PluginCategories = 'fs';
 
