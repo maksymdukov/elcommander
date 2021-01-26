@@ -3,6 +3,7 @@ import { useDndContext } from './use-dnd-context.hook';
 import { TreeDndHandlersVal } from '../context/droppable.context';
 import { TreeNode } from '../../../interfaces/node.interface';
 import { TreeEventType } from '../../../enums/tree-event-type.enum';
+import { useCurrentValue } from '../../../utils/use-current-value.hook';
 
 interface UseDndHookProps {
   viewIndex: number;
@@ -52,6 +53,7 @@ export const useDnd = ({
   onNodeExternalDragEnter,
   onNodeExternalDragLeave,
 }: UseDndHookProps) => {
+  const currentViewIndex = useCurrentValue(viewIndex);
   const { setMouseCoords, setIsDroppable, ctxRef } = useDndContext();
   const startNodeRef = useRef<TreeNode | null>(null);
   const startNodeIndexRef = useRef<number | null>(null);
@@ -86,7 +88,7 @@ export const useDnd = ({
     }
     // e.preventDefault();
     ctxRef.current.startNode = treeNode;
-    ctxRef.current.startViewIndex = viewIndex;
+    ctxRef.current.startViewIndex = currentViewIndex.current;
     startNodeRef.current = treeNode;
     startNodeIndexRef.current = treeIndex;
     setIsDroppable(false);

@@ -14,6 +14,7 @@ const Main = () => {
     getViewIds,
     (left, right) => left.length === right.length
   );
+  console.log('viewIds', viewIds);
   return (
     <TreeContextProvider treeContainerRef={treeContainerRef}>
       <div ref={treeContainerRef} className={classes.treeContainer}>

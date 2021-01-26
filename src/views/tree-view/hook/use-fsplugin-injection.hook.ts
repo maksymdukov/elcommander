@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { unstable_batchedUpdates } from 'react-dom';
 import { useSelector } from 'react-redux';
-import { getFSBackendsMap, IFSPluginDescriptor } from 'backends/backends-map';
+import { getFSPluginsMap, IFSPluginDescriptor } from 'backends/backends-map';
 import { RootState } from 'store/root-types';
 import {
   getViewClassId,
@@ -50,7 +50,7 @@ export const useFsPluginInjection = ({
 
       // inject
       (async () => {
-        const FSPluginMap = await getFSBackendsMap();
+        const FSPluginMap = await getFSPluginsMap();
         setFsPluginDescriptor(FSPluginMap[classId]);
         const FsPluginKlass = FSPluginMap[classId].klass;
 

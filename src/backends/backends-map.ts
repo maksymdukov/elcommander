@@ -18,7 +18,7 @@ export interface IFSPluginMap {
   [k: string]: IFSPluginDescriptor;
 }
 
-export const FSBackendsMap: IFSPluginMap = {
+export const FSPluginsMap: IFSPluginMap = {
   LocalFS: {
     id: 'LocalFS',
     name: 'Local',
@@ -37,6 +37,6 @@ export const FSBackendsMap: IFSPluginMap = {
   },
 };
 
-export const getFSBackendsMap = async () => {
-  return FSBackendsMap;
+export const getFSPluginsMap = async () => {
+  return FSPluginsMap;
 };

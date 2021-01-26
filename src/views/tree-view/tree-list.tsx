@@ -33,7 +33,6 @@ const TreeList: React.FC<TreeListProps> = ({
   const allIds = useSelector((state: RootState) =>
     getAllPathByIndex(state, index)
   );
-
   // used in lasso
   const itemCfgRef = useRef({ count: 0, size: itemSize });
   itemCfgRef.current.count = allIds.length;

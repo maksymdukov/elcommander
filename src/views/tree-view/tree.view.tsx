@@ -26,7 +26,6 @@ function TreeViewRaw({ index, viewId }: TreeViewProps) {
   const viewWidth = useSelector((state: RootState) =>
     getViewWidth(state, index)
   );
-
   const {
     fsPlugin,
     instantiating,

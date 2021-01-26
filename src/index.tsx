@@ -6,6 +6,10 @@ import store from './store/store';
 import './scss/main.scss';
 import JssThemeProvider from './theme/jss-theme.provider';
 
+window.addEventListener('contextmenu', (e) => {
+  e.preventDefault();
+});
+
 render(
   <Provider store={store}>
     <JssThemeProvider>

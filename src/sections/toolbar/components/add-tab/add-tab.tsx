@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import AddTabIcon from 'components/icons/add-tab-icon';
 import IconButton from 'components/buttons/icon-button';
-import { getFSBackendsMap, IFSPluginDescriptor } from 'backends/backends-map';
+import { getFSPluginsMap, IFSPluginDescriptor } from 'backends/backends-map';
 import { addViewAction } from 'store/features/views/views.slice';
 import {
   IUserPluginConfig,
@@ -58,7 +58,7 @@ const AddTab = () => {
   useEffect(() => {
     (async () => {
       // get all possible fsBackends
-      const backendsMap = await getFSBackendsMap();
+      const backendsMap = await getFSPluginsMap();
 
       // ask each fsBackend what saved config it has
       const backendKeys = Object.keys(backendsMap);

@@ -41,9 +41,13 @@ const useStyles = createUseStyles<Theme>((theme) => ({
 
 interface BookmarkItemProps {
   bookmark: IBookmark;
+  onContextClick: () => void;
 }
 
-const BookmarkItem: React.FC<BookmarkItemProps> = ({ bookmark }) => {
+const BookmarkItem: React.FC<BookmarkItemProps> = ({
+  bookmark,
+  onContextClick,
+}) => {
   const classes = useStyles();
   const dispatch = useDispatch();
   const onClick = () => {
@@ -56,11 +60,19 @@ const BookmarkItem: React.FC<BookmarkItemProps> = ({ bookmark }) => {
   const onMouseLeave = () => {
     setIsDroppable(true);
   };
+  const onMouseDown = (e: React.MouseEvent) => {
+    // right click
+    if (e.button === 2) {
+      onContextClick();
+    }
+  };
   return (
     <div
       className={classes.btnWrapper}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
+      onMouseDown={onMouseDown}
+      title={bookmark.startNode.path}
     >
       <Button onClick={onClick} className={classes.bookmarkBtn}>
         <div className={classes.btnLabel}>
