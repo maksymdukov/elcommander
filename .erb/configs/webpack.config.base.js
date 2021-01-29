@@ -4,14 +4,24 @@
 
 import path from 'path';
 import webpack from 'webpack';
-import Dotenv from 'dotenv-webpack';
+import fs from 'fs';
+import dotenv from 'dotenv';
 import { dependencies as externals } from '../../src/package.json';
+
+const envVars = dotenv.parse(fs.readFileSync(path.join(process.cwd(), '.env')));
 
 export default {
   externals: [...Object.keys(externals || {})],
 
   module: {
     rules: [
+      {
+        test: /\.worker\.ts$/,
+        loader: 'worker-loader',
+        options: {
+          filename: '[name].[contenthash].js',
+        },
+      },
       {
         test: /\.tsx?$/,
         exclude: /node_modules/,
@@ -20,13 +30,6 @@ export default {
           options: {
             cacheDirectory: true,
           },
-        },
-      },
-      {
-        test: /\.worker\.ts$/,
-        loader: 'worker-loader',
-        options: {
-          filename: '[name].[contenthash].worker.js',
         },
       },
     ],
@@ -49,7 +52,7 @@ export default {
   plugins: [
     new webpack.EnvironmentPlugin({
       NODE_ENV: 'production',
+      ...envVars,
     }),
-    new Dotenv(),
   ],
 };

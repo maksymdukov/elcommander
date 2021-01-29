@@ -7,6 +7,7 @@ export const init = async () => {
   // create app-specific directories
   const userDataDir = app.getPath('userData');
 
+  // plugin config dirs
   const promises = [CONFIG.pluginConfigDirName].map((name) => {
     const pluginRootDir = path.join(userDataDir, CONFIG.appDirsPrefix + name);
     return [CONFIG.fsPluginDirName].map((pluginCategory) => {
@@ -14,7 +15,20 @@ export const init = async () => {
       return fs.promises.mkdir(dir, { recursive: true });
     });
   });
-  const concatenated = ([] as Promise<string>[]).concat(...promises);
+
+  // plugin source dir with user-installed plugins /ElPlugins
+  const pluginSourceDir = path.join(
+    userDataDir,
+    CONFIG.appDirsPrefix + CONFIG.pluginDirname
+  );
+  const pluginSourcePromise = fs.promises.mkdir(pluginSourceDir, {
+    recursive: true,
+  });
+  // plugin source code dir
+  const concatenated = ([] as Promise<string>[]).concat(
+    ...promises,
+    pluginSourcePromise
+  );
   try {
     await Promise.allSettled(concatenated);
   } catch (e) {

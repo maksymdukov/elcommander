@@ -1,5 +1,5 @@
 import { PayloadAction } from '@reduxjs/toolkit';
-import { IFSPluginDescriptor } from 'plugins/fs/backends-map';
+import { IFSPluginDescriptor } from 'plugins/plugin-map';
 import { TreeNode } from 'interfaces/node.interface';
 
 export type AddViewAction = PayloadAction<{

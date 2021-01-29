@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { unstable_batchedUpdates } from 'react-dom';
 import { useSelector } from 'react-redux';
-import { getFSPluginsMap, IFSPluginDescriptor } from 'plugins/fs/backends-map';
+import { getFSPluginsMap, IFSPluginDescriptor } from 'plugins/plugin-map';
 import { RootState } from 'store/root-types';
 import {
   getViewClassId,

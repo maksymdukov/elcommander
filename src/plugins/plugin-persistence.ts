@@ -5,8 +5,7 @@ import { CONFIG } from '../config/config';
 import { readAllFilesInDir } from '../utils/fs/read-all-dir';
 import { ExtractPromiseArray } from '../utils/types/extract';
 import { IFSPlugin } from './fs/abstracts/fs-plugin.abstract';
-
-export type PluginCategories = 'fs';
+import { PluginCategories } from './plugin-categories.type';
 
 export type PluginClass = IFSPlugin;
 

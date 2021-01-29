@@ -1,9 +1,9 @@
 import {
   IUserPluginConfig,
-  PluginCategories,
   PluginPersistence,
   SavedConfigFile,
 } from '../../plugin-persistence';
+import { PluginCategories } from '../../plugin-categories.type';
 
 export type ConfigShape<T = any> = {
   name: string;

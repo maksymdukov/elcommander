@@ -1,7 +1,7 @@
 import { PayloadAction } from '@reduxjs/toolkit';
 import { AppThunk } from 'store/store';
 import { TreeNode } from 'interfaces/node.interface';
-import { getFSPluginsMap } from 'plugins/fs/backends-map';
+import { getFSPluginsMap } from 'plugins/plugin-map';
 import { IBookmark } from './bookmarks.interface';
 import { getViewByIndex } from '../views/views.selectors';
 import { addBookmarkAction } from './bookmarks.slice';

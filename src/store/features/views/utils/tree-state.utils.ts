@@ -1,5 +1,5 @@
+import { TreeNode } from 'interfaces/node.interface';
 import { TreeState } from '../tree-state.interface';
-import { TreeNode } from '../../../../interfaces/node.interface';
 
 export class TreeStateUtils {
   static getNodeById(
@@ -21,10 +21,10 @@ export class TreeStateUtils {
       const objKey = key as keyof TreeState;
       switch (objKey) {
         case 'allIds':
-          state.allIds.splice(0, state.allIds.length);
+          state.allIds = [];
           break;
         case 'byId':
-          Object.keys(state.byId).forEach((k) => delete state.byId[k]);
+          state.byId = {};
           break;
         case 'cursor':
           state.cursor = null;
