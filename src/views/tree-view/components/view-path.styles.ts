@@ -21,6 +21,7 @@ export const useStyles = createUseStyles<Theme>((theme) => ({
   pathBtn: {
     paddingRight: 2,
     paddingLeft: 2,
+    color: theme.text.colors.primaryInverse,
     '&:hover': {
       background: theme.colors.secondary,
     },

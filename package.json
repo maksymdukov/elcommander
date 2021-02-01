@@ -36,6 +36,7 @@
       "dist/",
       "node_modules/",
       "index.html",
+      "preferences.html",
       "main.prod.js",
       "main.prod.js.map",
       "package.json"
@@ -279,6 +280,7 @@
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "react-jss": "^10.5.0",
+    "react-query": "^3.6.0",
     "react-redux": "^7.2.2",
     "react-router-dom": "^5.2.0",
     "react-virtualized-auto-sizer": "^1.0.3",

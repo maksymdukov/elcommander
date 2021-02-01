@@ -3,6 +3,7 @@ import { remote } from 'electron';
 import { Npm } from './npm';
 import { CONFIG } from '../../config/config';
 import { PluginCategories } from '../plugin-categories.type';
+import { InstalledPackages } from './npm.types';
 
 const PLUGINS_PATH = path.join(
   remote.app.getPath('userData'),
@@ -12,6 +13,8 @@ const PLUGINS_PATH = path.join(
 export class PluginManager {
   npm = new Npm(PLUGINS_PATH);
 
+  constructor(private category: PluginCategories) {}
+
   async add(name: string) {
     return this.npm.install(name);
   }
@@ -20,17 +23,21 @@ export class PluginManager {
     return this.npm.uninstall(name);
   }
 
-  async list(category: PluginCategories) {
+  async list() {
     const localPlugins = await this.npm.list();
-    if (category === 'fs') {
+    if (this.category === 'fs') {
       // filter plugins by category
     }
     return localPlugins;
   }
 
-  async search(category: PluginCategories) {
+  async searchAll() {
+    return this.npm.search('cra-template-*');
+  }
+
+  async search() {
     // get local plugins list
-    const localCategorizedPlugins = await this.list(category);
+    const localCategorizedPlugins = await this.list();
 
     // find plugins based on category
     // if (category === 'fs') {}
@@ -42,6 +49,27 @@ export class PluginManager {
 
   async update(name: string) {
     return this.npm.update(name);
+  }
+
+  async getOutdatedPackages() {
+    const localList = await this.list();
+    const allFound = await this.searchAll();
+    return Object.values(localList).reduce((acc, localPackage) => {
+      if (
+        allFound.find(
+          (found) =>
+            found.name === localPackage.name &&
+            found.version !== localPackage.version
+        )
+      ) {
+        acc[localPackage.name] = localPackage;
+      }
+      return acc;
+    }, {} as InstalledPackages);
+  }
+
+  abortAll() {
+    this.npm.abortAll();
   }
 }
 

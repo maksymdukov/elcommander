@@ -10,6 +10,9 @@ export const useStyles = createUseStyles<Theme>(() => ({
     transition: 'box-shadow 0.2s',
     lineHeight: 0,
     cursor: 'pointer',
+    '&:disabled > svg': {
+      fill: '#333',
+    },
     '&:hover': {
       boxShadow: '0px 0px 5px -2px #000000',
     },

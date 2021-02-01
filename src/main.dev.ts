@@ -105,6 +105,10 @@ const createWindow = async () => {
 
   mainWindow.on('closed', () => {
     mainWindow = null;
+    BrowserWindow.getAllWindows().forEach((win) => {
+      // Close all windows when mainWindow closes;
+      win.close();
+    });
   });
 
   const menuBuilder = new MenuBuilder(mainWindow);

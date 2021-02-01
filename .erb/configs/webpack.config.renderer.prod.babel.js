@@ -27,16 +27,31 @@ export default merge(baseConfig, {
 
   target: 'electron-renderer',
 
-  entry: [
-    // 'core-js',
-    // 'regenerator-runtime/runtime',
-    path.join(__dirname, '../../src/index.tsx'),
-  ],
+  entry: {
+    shared: ['react', 'react-dom', 'redux', 'react-redux'],
+    main: {
+      import: require.resolve('../../src/renderer.tsx'),
+      dependOn: 'shared',
+    },
+    preferences: {
+      import: require.resolve('../../src/windows/preferences/preferences.tsx'),
+      dependOn: 'shared',
+    },
+  },
 
   output: {
     path: path.join(__dirname, '../../src/dist'),
     publicPath: './dist/',
-    filename: 'renderer.prod.js',
+    filename: (pathData) => {
+      switch (pathData.chunk.name) {
+        case 'main':
+          return 'renderer.prod.js';
+        case 'preferences':
+          return 'preferences.prod.js';
+        default:
+          return 'shared.prod.js';
+      }
+    },
   },
 
   module: {

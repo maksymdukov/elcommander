@@ -19,9 +19,11 @@ export interface InstalledPackage {
   from: string;
   resolved: string;
   version: string;
+  name: string;
+  path: string;
 }
 
 export type SearchedPackages = SearchedPackage[];
-export type InstalledPackages = Partial<{
+export type InstalledPackages = {
   [i: string]: InstalledPackage;
-}>;
+};

@@ -17,7 +17,7 @@ const useStyles = createUseStyles<Theme>((theme) => ({
     borderRadius: 4,
     background: (props: ButtonProps) =>
       props.transparent ? 'transparent' : theme.colors[props.color!],
-    color: theme.text.colors.primaryInverse,
+    color: theme.text.colors.primary,
     border: (props: ButtonProps) => (props.outlined ? `1px solid` : 'none'),
     borderColor: (props: ButtonProps) => theme.colors[props.color!],
     '&:focus': {

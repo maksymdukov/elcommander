@@ -1,7 +1,7 @@
 import React, { CSSProperties } from 'react';
 import './rect-spinner.global.css';
 
-const RectSpinner = ({ style }: { style: CSSProperties }) => {
+const RectSpinner = ({ style }: { style?: CSSProperties }) => {
   return (
     <div className="lds-facebook" style={style}>
       <div />

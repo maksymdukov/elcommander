@@ -253,32 +253,43 @@ export default class MenuBuilder {
               ],
       },
       {
-        label: 'Help',
+        label: '&Settings',
         submenu: [
           {
-            label: 'Learn More',
-            click() {
-              shell.openExternal('https://electronjs.org');
-            },
-          },
-          {
-            label: 'Documentation',
-            click() {
-              shell.openExternal(
-                'https://github.com/electron/electron/tree/master/docs#readme'
-              );
-            },
-          },
-          {
-            label: 'Community Discussions',
-            click() {
-              shell.openExternal('https://www.electronjs.org/community');
-            },
-          },
-          {
-            label: 'Search Issues',
-            click() {
-              shell.openExternal('https://github.com/electron/electron/issues');
+            label: 'Preferences',
+            click: () => {
+              let prefWindow: BrowserWindow | null = null;
+              prefWindow = new BrowserWindow({
+                show: false,
+                width: 1024,
+                height: 728,
+                webPreferences: {
+                  nodeIntegration: true,
+                  nodeIntegrationInWorker: true,
+                  enableRemoteModule: true,
+                },
+              });
+              prefWindow.setMenu(null);
+              prefWindow.loadURL(`file://${__dirname}/preferences.html`);
+
+              this.mainWindow.setEnabled(false);
+              this.mainWindow.setOpacity(0.5);
+
+              prefWindow.webContents.on('did-finish-load', () => {
+                if (!prefWindow) {
+                  throw new Error('"prefWindow" is not defined');
+                }
+                prefWindow.show();
+                prefWindow.focus();
+              });
+
+              prefWindow.on('closed', () => {
+                prefWindow = null;
+                if (!this.mainWindow.isDestroyed()) {
+                  this.mainWindow.setEnabled(true);
+                  this.mainWindow.setOpacity(1);
+                }
+              });
             },
           },
         ],
