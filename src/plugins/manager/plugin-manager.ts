@@ -1,8 +1,7 @@
 import path from 'path';
 import { remote } from 'electron';
+import { CONFIG, PluginCategories } from 'elcommander-plugin-sdk';
 import { Npm } from './npm';
-import { CONFIG } from '../../config/config';
-import { PluginCategories } from '../plugin-categories.type';
 import { InstalledPackages } from './npm.types';
 
 const PLUGINS_PATH = path.join(
@@ -32,7 +31,7 @@ export class PluginManager {
   }
 
   async searchAll() {
-    return this.npm.search('cra-template-*');
+    return this.npm.search('elcommander-fs-plugin-*');
   }
 
   async search() {
@@ -41,7 +40,7 @@ export class PluginManager {
 
     // find plugins based on category
     // if (category === 'fs') {}
-    const foundPlugins = await this.npm.search('cra-template-*');
+    const foundPlugins = await this.npm.search('elcommander-fs-plugin-*');
 
     // filter out existing plugins
     return foundPlugins.filter((found) => !localCategorizedPlugins[found.name]);

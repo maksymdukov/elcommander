@@ -1,7 +1,7 @@
 import React, { ReactNode } from 'react';
 import clsx from 'clsx';
 import './entity-label.global.scss';
-import { TreeNode } from '../../../interfaces/node.interface';
+import { TreeNode } from 'elcommander-plugin-sdk';
 import TreeSpinner from './tree-spinner';
 import { useFsPluginCtx } from '../hook/use-fs-manager-ctx.hook';
 

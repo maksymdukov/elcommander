@@ -1,0 +1,28 @@
+{
+  "name": "elcommander-fs-plugin-google-drive",
+  "version": "0.0.12",
+  "description": "",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist/**/*"
+  ],
+  "scripts": {
+    "rm": "rm -rf ./dist",
+    "build:dev": "NODE_ENV=development webpack --config webpack.config.babel.js",
+    "build": "NODE_ENV=production webpack --config webpack.config.babel.js"
+  },
+  "dependencies": {
+    "comlink": "^4.3.0",
+    "googleapis": "^67.0.0",
+    "abort-controller": "^3.0.0"
+  },
+  "devDependencies": {
+    "elcommander-plugin-sdk": "1.0.0",
+    "electron": "^11.0.1",
+    "react": "^17.0.1",
+    "webpack": "^5.20.1"
+  },
+  "author": "",
+  "license": "ISC"
+}

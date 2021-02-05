@@ -1,5 +1,5 @@
 import { createContext } from 'react';
-import { FsPlugin } from '../../../plugins/fs/abstracts/fs-plugin.abstract';
+import { FsPlugin } from 'elcommander-plugin-sdk';
 
 export interface IFsPluginCtxVal {
   fsPlugin: FsPlugin;

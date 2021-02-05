@@ -1,6 +1,6 @@
 import { PayloadAction } from '@reduxjs/toolkit';
 import { IFSPluginDescriptor } from 'plugins/plugin-map';
-import { TreeNode } from 'interfaces/node.interface';
+import { TreeNode } from 'elcommander-plugin-sdk';
 
 export type AddViewAction = PayloadAction<{
   backend: IFSPluginDescriptor;

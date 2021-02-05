@@ -1,4 +1,4 @@
-import { TreeNode } from 'interfaces/node.interface';
+import { TreeNode } from 'elcommander-plugin-sdk';
 
 export interface IBookmark {
   viewName: string;

@@ -1,4 +1,4 @@
-import { FsItemTypeEnum } from '../../enums/fs-item-type.enum';
+import { FsItemTypeEnum } from 'elcommander-plugin-sdk';
 // UI
 export const INITIAL_NODE_OFFSET = 15; // px
 export const CHILDREN_OFFSET_PX = 26; // px

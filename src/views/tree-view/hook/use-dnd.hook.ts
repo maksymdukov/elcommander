@@ -1,9 +1,9 @@
 import React, { useCallback, useRef } from 'react';
+import { TreeNode } from 'elcommander-plugin-sdk';
+import { useCurrentValue } from 'utils/use-current-value.hook';
+import { TreeEventType } from 'enums/tree-event-type.enum';
 import { useDndContext } from './use-dnd-context.hook';
 import { TreeDndHandlersVal } from '../context/droppable.context';
-import { TreeNode } from '../../../interfaces/node.interface';
-import { TreeEventType } from '../../../enums/tree-event-type.enum';
-import { useCurrentValue } from '../../../utils/use-current-value.hook';
 
 interface UseDndHookProps {
   viewIndex: number;

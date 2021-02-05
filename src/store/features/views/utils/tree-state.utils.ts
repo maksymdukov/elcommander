@@ -1,4 +1,4 @@
-import { TreeNode } from 'interfaces/node.interface';
+import { TreeNode } from 'elcommander-plugin-sdk';
 import { TreeState } from '../tree-state.interface';
 
 export class TreeStateUtils {

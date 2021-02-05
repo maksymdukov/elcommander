@@ -2,9 +2,8 @@ import React from 'react';
 import { createUseStyles } from 'react-jss';
 import Main from './sections/main/main';
 import Toolbar from './sections/toolbar/toolbar';
-import './App.global.css';
 import DndPreviewIcon from './views/tree-view/components/dnd-preview-icon';
-import Preferences from './views/preferences/preferences';
+import './App.global.css';
 
 const useStyles = createUseStyles({
   appContainer: {
@@ -23,7 +22,6 @@ export default function App() {
         <Main />
       </div>
       <DndPreviewIcon />
-      <Preferences />
     </>
   );
 }

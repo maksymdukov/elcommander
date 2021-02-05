@@ -1,4 +1,5 @@
 import { createReducer } from '@reduxjs/toolkit';
+import { TreeNode } from 'elcommander-plugin-sdk';
 import { TreeState } from './tree-state.interface';
 import {
   closeDirectoryAction,
@@ -24,7 +25,6 @@ import { DirectoryStateUtils } from './utils/directory-state.utils';
 import { CursorStateUtils } from './utils/cursor-state.utils';
 import { TreeStateUtils } from './utils/tree-state.utils';
 import { SelectionStateUtils } from './utils/selection-state.utils';
-import { TreeNode } from '../../../interfaces/node.interface';
 
 export const treeStateReducer = createReducer<TreeState>(
   initialState.views[0],

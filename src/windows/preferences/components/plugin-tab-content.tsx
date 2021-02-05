@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { createUseStyles } from 'react-jss';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { useDispatch } from 'react-redux';
-import { PluginCategories } from 'plugins/plugin-categories.type';
+import { PluginCategories } from 'elcommander-plugin-sdk';
 import { Theme } from 'theme/jss-theme.provider';
 import SimpleTable from 'components/table/simple-table';
 import { PluginManager } from 'plugins/manager/plugin-manager';
@@ -73,6 +73,9 @@ const PluginTabContent: React.FC<PluginTabContentProps> = ({ category }) => {
       queryFn: () => pluginManager.current.list(),
       onSuccess: (pckgs) => {
         dispatch(setPluginsThunk(category, pckgs));
+      },
+      onError: (err) => {
+        console.log('err', err);
       },
       refetchOnWindowFocus: false,
     }

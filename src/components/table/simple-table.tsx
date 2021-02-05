@@ -1,7 +1,7 @@
 import React from 'react';
 import { createUseStyles } from 'react-jss';
-import { Theme } from '../../theme/jss-theme.provider';
 import clsx from 'clsx';
+import { Theme } from '../../theme/jss-theme.provider';
 
 const useStyles = createUseStyles<Theme>(() => ({
   simpleTable: {

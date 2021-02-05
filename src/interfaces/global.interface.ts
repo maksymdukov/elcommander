@@ -1,5 +1,5 @@
+import { TreeNode } from 'elcommander-plugin-sdk';
 import { TreeEventType } from '../enums/tree-event-type.enum';
-import { TreeNode } from './node.interface';
 
 declare global {
   namespace React {

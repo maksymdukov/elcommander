@@ -1,6 +1,6 @@
 import { useLayoutEffect, useRef, useState } from 'react';
 import { unstable_batchedUpdates } from 'react-dom';
-import { splitByDelimiter } from 'utils/path';
+import { splitByDelimiter } from 'elcommander-plugin-sdk';
 
 export const usePathHider = (currentPath: string, width: number) => {
   const viewPathContainer = useRef<HTMLDivElement>(null);

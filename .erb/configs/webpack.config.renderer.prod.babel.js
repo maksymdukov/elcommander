@@ -16,9 +16,12 @@ import DeleteSourceMaps from '../scripts/DeleteSourceMaps';
 CheckNodeEnv('production');
 DeleteSourceMaps();
 
-const devtoolsConfig = process.env.DEBUG_PROD === 'true' ? {
-  devtool: 'source-map'
-} : {};
+const devtoolsConfig =
+  process.env.DEBUG_PROD === 'true'
+    ? {
+        devtool: 'source-map',
+      }
+    : {};
 
 export default merge(baseConfig, {
   ...devtoolsConfig,
@@ -60,8 +63,11 @@ export default merge(baseConfig, {
       {
         test: /\.global\.css$/,
         use: [
+          // {
+          //   loader: MiniCssExtractPlugin.loader,
+          // },
           {
-            loader: MiniCssExtractPlugin.loader,
+            loader: 'style-loader',
           },
           {
             loader: 'css-loader',
@@ -75,8 +81,11 @@ export default merge(baseConfig, {
       {
         test: /^((?!\.global).)*\.css$/,
         use: [
+          // {
+          //   loader: MiniCssExtractPlugin.loader,
+          // },
           {
-            loader: MiniCssExtractPlugin.loader,
+            loader: 'style-loader',
           },
           {
             loader: 'css-loader',
@@ -94,8 +103,11 @@ export default merge(baseConfig, {
         test: /\.global\.(scss|sass)$/,
         use: [
           {
-            loader: MiniCssExtractPlugin.loader,
+            loader: 'style-loader',
           },
+          // {
+          //   loader: MiniCssExtractPlugin.loader,
+          // },
           {
             loader: 'css-loader',
             options: {
@@ -115,8 +127,11 @@ export default merge(baseConfig, {
       {
         test: /^((?!\.global).)*\.(scss|sass)$/,
         use: [
+          // {
+          //   loader: MiniCssExtractPlugin.loader,
+          // },
           {
-            loader: MiniCssExtractPlugin.loader,
+            loader: 'style-loader',
           },
           {
             loader: 'css-loader',
@@ -194,20 +209,19 @@ export default merge(baseConfig, {
   },
 
   optimization: {
-    minimizer:
-      [
-          new TerserPlugin({
-            parallel: true,
-          }),
-          new OptimizeCSSAssetsPlugin({
-            cssProcessorOptions: {
-              map: {
-                inline: false,
-                annotation: true,
-              },
-            },
-          }),
-        ],
+    minimizer: [
+      new TerserPlugin({
+        parallel: true,
+      }),
+      new OptimizeCSSAssetsPlugin({
+        cssProcessorOptions: {
+          map: {
+            inline: false,
+            annotation: true,
+          },
+        },
+      }),
+    ],
   },
 
   plugins: [
@@ -225,9 +239,9 @@ export default merge(baseConfig, {
       DEBUG_PROD: false,
     }),
 
-    new MiniCssExtractPlugin({
-      filename: 'style.css',
-    }),
+    // new MiniCssExtractPlugin({
+    //   filename: 'style.css',
+    // }),
 
     new BundleAnalyzerPlugin({
       analyzerMode:

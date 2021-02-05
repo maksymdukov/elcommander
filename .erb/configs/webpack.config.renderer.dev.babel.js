@@ -45,7 +45,7 @@ export default merge(baseConfig, {
   target: 'electron-renderer',
 
   entry: {
-    shared: ['react', 'react-dom', 'redux', 'react-redux'],
+    shared: ['redux', 'react-redux'],
     main: {
       import: require.resolve('../../src/renderer.tsx'),
       dependOn: 'shared',
@@ -257,6 +257,7 @@ export default merge(baseConfig, {
   devServer: {
     port,
     publicPath,
+    // writeToDisk: true,
     compress: true,
     noInfo: false,
     stats: 'errors-only',

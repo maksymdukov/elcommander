@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { createUseStyles } from 'react-jss';
-import { Theme } from '../../../theme/jss-theme.provider';
-import Tabs, { TabItem } from '../../../components/tabs/tabs';
+import { PluginCategories } from 'elcommander-plugin-sdk';
+import { Theme } from 'theme/jss-theme.provider';
+import Tabs, { TabItem } from 'components/tabs/tabs';
+import TabPanel from 'components/tabs/tab-panel';
 import PluginTabContent from './plugin-tab-content';
-import TabPanel from '../../../components/tabs/tab-panel';
-import { PluginCategories } from '../../../plugins/plugin-categories.type';
 
 const useStyles = createUseStyles<Theme>((theme) => ({
   container: {
@@ -39,7 +39,7 @@ const useStyles = createUseStyles<Theme>((theme) => ({
 
 const pluginTabs: (TabItem & { category: PluginCategories })[] = [
   { label: 'File System', tab: PluginTabContent, category: 'fs' },
-  { label: 'File System', tab: PluginTabContent, category: 'fs' },
+  { label: 'Viewer', tab: PluginTabContent, category: 'fs' },
 ];
 
 const PluginsTabContent = () => {

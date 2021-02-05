@@ -1,8 +1,8 @@
 import { AnyAction, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { FsItemTypeEnum } from 'elcommander-plugin-sdk';
 import { treeStateReducer } from './tree-state.reducer';
 import { initialState } from './views-init-state';
 import { ViewIndexPayload } from './tree-state.interface';
-import { FsItemTypeEnum } from '../../../enums/fs-item-type.enum';
 import { ViewsStateUtils } from './utils/views-state.utils';
 import {
   AddViewAction,

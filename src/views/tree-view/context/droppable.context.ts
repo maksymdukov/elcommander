@@ -1,6 +1,6 @@
 import { createContext } from 'react';
+import { TreeNode } from 'elcommander-plugin-sdk';
 import { noop } from '../../../utils/noop';
-import { TreeNode } from '../../../interfaces/node.interface';
 
 export type OnDragNDrop = (
   index: number,

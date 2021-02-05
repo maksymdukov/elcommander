@@ -1,8 +1,10 @@
+import {
+  TreeNode,
+  IFSRawNode,
+  extractParentPath,
+} from 'elcommander-plugin-sdk';
 import { TreeState } from '../tree-state.interface';
 import { TreeStateUtils } from './tree-state.utils';
-import { TreeNode } from '../../../../interfaces/node.interface';
-import { IFSRawNode } from '../../../../plugins/fs/interfaces/fs-raw-node.interface';
-import { extractParentPath } from '../../../../utils/path';
 
 export class DirectoryStateUtils {
   static convertRawNode(

@@ -1,9 +1,9 @@
 import { MutableRefObject } from 'react';
 import { useDispatch } from 'react-redux';
-import { TreeNode } from 'interfaces/node.interface';
 import { setCursoredAction } from 'store/features/views/actions/tree-cursor.action';
 import { toggleNodeHighlightAction } from 'store/features/views/actions/tree-selection.actions';
 import { useCurrentValue } from 'utils/use-current-value.hook';
+import { TreeNode } from 'elcommander-plugin-sdk';
 import { UNDROPPABLE_NODE_TYPES } from '../tree-view.constants';
 import { useDnd } from './use-dnd.hook';
 import { useDndContext } from './use-dnd-context.hook';

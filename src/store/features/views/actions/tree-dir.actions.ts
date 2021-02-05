@@ -1,6 +1,13 @@
 import { createAction } from '@reduxjs/toolkit';
 import { batch } from 'react-redux';
-import { AppThunk } from '../../../store';
+import {
+  IFSRawNode,
+  TreeNode,
+  splitByDelimiter,
+  FsPlugin,
+} from 'elcommander-plugin-sdk';
+import { AppThunk } from 'store/store';
+import { OPENABLE_NODE_TYPES } from 'views/tree-view/tree-view.constants';
 import {
   getAllPathByIndex,
   getCursorIdx,
@@ -9,15 +16,10 @@ import {
   getNodeById,
   getStartNode,
 } from '../views.selectors';
-import { OPENABLE_NODE_TYPES } from '../../../../views/tree-view/tree-view.constants';
 import { IndexPayload } from './tree-state.actions';
 import { setCursoredAction } from './tree-cursor.action';
 import { ViewIndexPayload, ViewStatePayload } from '../tree-state.interface';
-import { IFSRawNode } from '../../../../plugins/fs/interfaces/fs-raw-node.interface';
-import { TreeNode } from '../../../../interfaces/node.interface';
 import { DirectoryStateUtils } from '../utils/directory-state.utils';
-import { splitByDelimiter } from '../../../../utils/path';
-import { FsPlugin } from '../../../../plugins/fs/abstracts/fs-plugin.abstract';
 
 type OpenDirectoryStart = ViewStatePayload<{
   index: number;

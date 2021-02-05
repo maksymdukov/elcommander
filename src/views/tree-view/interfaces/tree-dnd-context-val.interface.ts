@@ -1,5 +1,5 @@
 import { MutableRefObject } from 'react';
-import { TreeNode } from 'interfaces/node.interface';
+import { TreeNode } from 'elcommander-plugin-sdk';
 import { DNDPreviewState, DNDState } from './tree-dnd-state.interface';
 
 export interface CtxRef {

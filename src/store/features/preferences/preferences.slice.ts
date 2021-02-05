@@ -1,6 +1,10 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { preferencesInitState } from './preferences-init-state';
-import { SetPluginsAction, TogglePluginAction } from './preferences.actions';
+import { preferencesInitState, PreferencesState } from './preferences-state';
+import {
+  SetPluginsAction,
+  SetPreferencesStateAction,
+  TogglePluginAction,
+} from './preferences.actions';
 
 export const preferencesSlice = createSlice({
   name: 'preferences',
@@ -13,8 +17,15 @@ export const preferencesSlice = createSlice({
       const plugin = state.plugins[category][name];
       plugin.enabled = !plugin.enabled;
     },
+    setState(state, { payload: { newState } }: SetPreferencesStateAction) {
+      Object.keys(state).forEach((key) => {
+        state[key as keyof PreferencesState] =
+          newState[key as keyof PreferencesState];
+      });
+    },
   },
 });
 
 export const setPluginsAction = preferencesSlice.actions.setPlugins;
+export const setPreferencesStateAction = preferencesSlice.actions.setState;
 export const togglePluginAction = preferencesSlice.actions.togglePlugin;

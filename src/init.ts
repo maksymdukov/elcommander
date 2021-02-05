@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { app } from 'electron';
-import { CONFIG } from './config/config';
+import { CONFIG } from '../packages/elcommander-plugin-sdk/src/config/config';
 
 export const init = async () => {
   // create app-specific directories

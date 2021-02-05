@@ -1,13 +1,15 @@
 import path from 'path';
 import fs from 'fs';
 import { fork } from 'child_process';
-import { createPromise } from '../../utils/leaked-promise';
-import { NpmExitError } from '../../error/npm/npm-exit.error';
-import { CustomError } from '../../error/custom-error';
+import {
+  NpmExitError,
+  CustomError,
+  CONFIG,
+  createPromise,
+} from 'elcommander-plugin-sdk';
 import { InstalledPackages, SearchedPackages } from './npm.types';
 
-const NODE_MODULES_PATH = path.join(__dirname, 'node_modules');
-const NPM_PATH = path.join(NODE_MODULES_PATH, 'npm', 'bin', 'npm-cli.js');
+const NPM_PATH = path.join(CONFIG.nodeModulesPath, 'npm', 'bin', 'npm-cli.js');
 
 export class Npm {
   pluginPath: string;
@@ -16,7 +18,7 @@ export class Npm {
 
   constructor(pluginPath: string) {
     this.pluginPath = pluginPath;
-    // initialize package.json
+    // initialize package.json if it doesn't exist
     if (!fs.existsSync(path.join(pluginPath, 'package.json'))) {
       this.runCommand(['init', '-y']);
     }

@@ -1,5 +1,5 @@
+import { FsItemTypeEnum } from 'elcommander-plugin-sdk';
 import { ViewsState } from './tree-state.interface';
-import { FsItemTypeEnum } from '../../../enums/fs-item-type.enum';
 
 export const initialState: ViewsState = {
   views: [

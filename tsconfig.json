@@ -22,7 +22,18 @@
     "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true,
     "allowJs": true,
-    "experimentalDecorators": true
+    "experimentalDecorators": true,
+    "paths": {
+      "elcommander-plugin-sdk": ["../packages/elcommander-plugin-sdk/src"],
+      "elcommander-plugin-sdk/*": ["../packages/elcommander-plugin-sdk/src/*"],
+      "elcommander-fs-plugin-google-drive": [
+        "../packages/elcommander-fs-plugin-google-drive/src"
+      ],
+      "elcommander-fs-plugin-google-drive/*": [
+        "../packages/elcommander-fs-plugin-google-drive/src/*"
+      ]
+    },
+    "composite": true
   },
   "exclude": [
     "test",
@@ -30,6 +41,15 @@
     "src/main.prod.js",
     "src/renderer.prod.js",
     "src/dist",
-    ".erb/dll"
+    ".erb/dll",
+    "**/dist/**"
+  ],
+  "references": [
+    {
+      "path": "packages/elcommander-plugin-sdk"
+    },
+    {
+      "path": "packages/elcommander-fs-plugin-google-drive"
+    }
   ]
 }

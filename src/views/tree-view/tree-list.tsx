@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux';
 import { FixedSizeList } from 'react-window';
 import { RootState } from 'store/root-types';
 import { getAllPathByIndex } from 'store/features/views/views.selectors';
-import { FsPlugin } from 'plugins/fs/abstracts/fs-plugin.abstract';
+import { FsPlugin } from 'elcommander-plugin-sdk';
 import TreeListItem from './components/tree-list-item';
 import { useTreeHandlers } from './hook/use-tree-handlers.hook';
 import CustomInnerWindow from './components/custom-inner-window';

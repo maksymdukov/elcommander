@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { createUseStyles } from 'react-jss';
 import { remote } from 'electron';
-import Tabs, { TabItem } from '../../components/tabs/tabs';
-import TabPanel from '../../components/tabs/tab-panel';
+import Tabs, { TabItem } from 'components/tabs/tabs';
+import TabPanel from 'components/tabs/tab-panel';
+import { Theme } from 'theme/jss-theme.provider';
+import PluginIcon from 'components/icons/plugin-icon';
+import Button from 'components/buttons/button';
+import { useStore } from 'react-redux';
 import PluginsTabContent from './components/plugins-tab-content';
-import { Theme } from '../../theme/jss-theme.provider';
-import PluginIcon from '../../components/icons/plugin-icon';
-import Button from '../../components/buttons/button';
 
 const useStyles = createUseStyles<Theme>((theme) => ({
   main: {
@@ -66,8 +67,20 @@ const tabs: TabItem[] = [
 ];
 
 const Main = () => {
+  const store = useStore();
   const classes = useStyles();
   const [currentTab, setCurrentTab] = useState(0);
+
+  const closeRenderer = () => remote.getCurrentWindow().close();
+
+  const onApplyClick = () => {
+    remote
+      .getCurrentWindow()
+      .getParentWindow()
+      .webContents.send('preferencesUpdate', store.getState());
+    closeRenderer();
+  };
+
   return (
     <main className={classes.main}>
       <Tabs
@@ -92,12 +105,13 @@ const Main = () => {
             transparent
             outlined
             color="error"
-            onClick={() => remote.getCurrentWindow().close()}
+            onClick={closeRenderer}
           >
             Close
           </Button>
           <Button
             className={classes.preferenceBtn}
+            onClick={onApplyClick}
             transparent
             outlined
             color="primary"

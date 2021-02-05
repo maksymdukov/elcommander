@@ -2,15 +2,15 @@ import fs, { Dirent } from 'fs';
 import * as Comlink from 'comlink';
 import path from 'path';
 import chokidar from 'chokidar';
-import { ReadWatchDirProps } from '../../abstracts/fs-backend.abstract';
-import { IFSRawNode } from '../../interfaces/fs-raw-node.interface';
-import { FsItemTypeEnum } from '../../../../enums/fs-item-type.enum';
 import {
+  FsItemTypeEnum,
   FSWorker,
-  OnChangeCb,
-  OnErrorCb,
-  OnReadDirCb,
-} from '../../abstracts/fs-worker.abstract';
+  IFSRawNode,
+  ReadWatchDirProps,
+  OnFsChangeBindCb,
+  OnFsErrorBindCb,
+  OnFsReadDirBindCb,
+} from 'elcommander-plugin-sdk';
 
 export class LocalFSWorker extends FSWorker {
   private static getReadDirStartNode({ node }: ReadWatchDirProps): IFSRawNode {
@@ -50,9 +50,9 @@ export class LocalFSWorker extends FSWorker {
 
   async readWatchDir(
     { node, up }: ReadWatchDirProps,
-    onReadDir: OnReadDirCb,
-    onChange: OnChangeCb,
-    onError: OnErrorCb
+    onReadDir: OnFsReadDirBindCb,
+    onChange: OnFsChangeBindCb,
+    onError: OnFsErrorBindCb
   ) {
     const { path: targetPath } = node;
 

@@ -1,16 +1,27 @@
 import * as Comlink from 'comlink';
 // @ts-ignore
 import LocalWorker from 'plugins/fs/impls/local-fs/local-fs.worker';
-import { IFSConstructorProps } from '../../abstracts/fs-backend.abstract';
+import {
+  FSBackendThreaded,
+  FSPersistence,
+  FsPlugin,
+  IFSConstructorProps,
+  WorkerThread,
+} from 'elcommander-plugin-sdk';
+import HardDriveIcon from 'components/icons/hard-drive-icon';
 import type { LocalFSWorker } from './local-fs.worker';
-import { FSBackendThreaded } from '../../abstracts/fs-backend-threaded.abstract';
-import { FsPlugin } from '../../abstracts/fs-plugin.abstract';
-import { FSPersistence } from '../../classes/fs-persistence';
 
 export class LocalFsPlugin extends FsPlugin<FSBackendThreaded<LocalFSWorker>> {
   static FS = FSBackendThreaded;
 
   static Persistence = FSPersistence;
+
+  static get pluginOptions() {
+    return {
+      pluginName: 'Local',
+      icon: HardDriveIcon,
+    };
+  }
 
   static async createInstance({
     viewId,
@@ -18,9 +29,10 @@ export class LocalFsPlugin extends FsPlugin<FSBackendThreaded<LocalFSWorker>> {
     persistence,
     domContainer,
   }: IFSConstructorProps): Promise<LocalFsPlugin> {
-    const LocalFSWorkerClass = Comlink.wrap(
+    const LocalFSWorkerClass = WorkerThread.proxify(
       new LocalWorker()
     ) as Comlink.Remote<typeof LocalFSWorker>;
+
     const workerInstance = await new LocalFSWorkerClass();
     const fs = new FSBackendThreaded({ workerInstance });
     return new LocalFsPlugin({

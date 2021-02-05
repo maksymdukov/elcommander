@@ -11,7 +11,11 @@ import { dependencies as externals } from '../../src/package.json';
 const envVars = dotenv.parse(fs.readFileSync(path.join(process.cwd(), '.env')));
 
 export default {
-  externals: [...Object.keys(externals || {})],
+  externals: {
+    electron: 'commonjs2 electron',
+    react: 'commonjs2 react',
+    'react-dom': 'commonjs2 react-dom',
+  },
 
   module: {
     rules: [
@@ -20,6 +24,7 @@ export default {
         loader: 'worker-loader',
         options: {
           filename: '[name].[contenthash].js',
+          worker: 'WorkerThread',
         },
       },
       {
@@ -46,7 +51,29 @@ export default {
    */
   resolve: {
     extensions: ['.js', '.jsx', '.json', '.ts', '.tsx'],
-    modules: [path.join(__dirname, '..', '..', 'src'), 'node_modules'],
+    modules: [
+      path.join(__dirname, '..', '..', 'src'),
+      'node_modules',
+      path.join(__dirname, '..', '..', 'src', 'node_modules'),
+    ],
+    alias: {
+      'elcommander-plugin-sdk': path.resolve(
+        __dirname,
+        '..',
+        '..',
+        'packages',
+        'elcommander-plugin-sdk',
+        'src'
+      ),
+      'elcommander-fs-plugin-google-drive': path.resolve(
+        __dirname,
+        '..',
+        '..',
+        'packages',
+        'elcommander-fs-plugin-google-drive',
+        'src'
+      ),
+    },
   },
 
   plugins: [

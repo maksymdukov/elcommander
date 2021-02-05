@@ -1,10 +1,9 @@
 import React from 'react';
 import clsx from 'clsx';
+import { TreeNode, FsItemTypeEnum } from 'elcommander-plugin-sdk';
 import { IconProps } from '../../../components/icons/icon.interface';
 import FolderIcon from '../../../components/icons/folder-icon';
 import FileIcon from '../../../components/icons/file-icon';
-import { TreeNode } from '../../../interfaces/node.interface';
-import { FsItemTypeEnum } from '../../../enums/fs-item-type.enum';
 
 interface NodeIconProps {
   node: TreeNode;

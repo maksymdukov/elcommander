@@ -1,0 +1,21 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": "./src",
+    "rootDir": "./src",
+    "outDir": "./dist",
+    "skipLibCheck": true,
+    "noEmit": false,
+    "incremental": false,
+    "composite": false,
+    "paths": {
+      "elcommander-plugin-sdk": ["../../elcommander-plugin-sdk/src"],
+      "elcommander-plugin-sdk/*": ["../../elcommander-plugin-sdk/src/*"]
+    }
+  },
+  "references": [
+    {
+      "path": "../elcommander-plugin-sdk"
+    }
+  ]
+}

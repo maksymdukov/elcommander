@@ -7,10 +7,12 @@ import {
   getViewClassId,
   getViewConfigName,
 } from 'store/features/views/views.selectors';
-import { PluginPersistence } from 'plugins/plugin-persistence';
 import { createAppendedElement, removeElement } from 'utils/dom/element';
-import { UserCancelError } from 'error/fs-plugin/user-cancel.error';
-import { FsPlugin } from 'plugins/fs/abstracts/fs-plugin.abstract';
+import {
+  FsPlugin,
+  PluginPersistence,
+  UserCancelError,
+} from 'elcommander-plugin-sdk';
 
 interface UseDependencyInjectionHookProps {
   viewId: string;

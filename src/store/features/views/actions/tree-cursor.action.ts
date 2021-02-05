@@ -1,6 +1,6 @@
 import { createAction } from '@reduxjs/toolkit';
 import { ScrollRef } from 'views/tree-view/types/scroll-ref';
-import { AppThunk } from '../../../store';
+import { AppThunk } from 'store/store';
 import { getSelectedPaths, getViewByIndex } from '../views.selectors';
 import { IndexPayload } from './tree-state.actions';
 import { resetSelectionAction } from './tree-selection.actions';

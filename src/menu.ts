@@ -261,6 +261,7 @@ export default class MenuBuilder {
               let prefWindow: BrowserWindow | null = null;
               prefWindow = new BrowserWindow({
                 show: false,
+                parent: this.mainWindow,
                 width: 1024,
                 height: 728,
                 webPreferences: {

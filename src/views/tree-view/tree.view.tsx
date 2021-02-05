@@ -5,13 +5,13 @@ import { removeViewAction } from 'store/features/views/views.slice';
 import { initializeViewThunk } from 'store/features/views/actions/tree-dir.actions';
 import DashSpinner from 'components/animated/dash-spinner';
 import Button from 'components/buttons/button';
+import { FsPlugin } from 'elcommander-plugin-sdk';
 import FsPluginCtxProvider from './context/fs-plugin-ctx.provider';
 import TreeViewProvider from './context/treeViewProvider';
 import TreeList from './tree-list';
 import { useStyles } from './tree-view.styles';
 import StatusBar from './components/status-bar';
 import { useFsPluginInjection } from './hook/use-fsplugin-injection.hook';
-import { FsPlugin } from '../../plugins/fs/abstracts/fs-plugin.abstract';
 import { RootState } from '../../store/root-types';
 import { getViewWidth } from '../../store/features/views/views.selectors';
 

@@ -1,5 +1,5 @@
+import { TreeNode } from 'elcommander-plugin-sdk';
 import { TreeState } from '../tree-state.interface';
-import { TreeNode } from '../../../../interfaces/node.interface';
 
 export class CursorStateUtils {
   static trySetCursorAt(state: TreeState, position = 0) {

@@ -7,9 +7,9 @@ import { useDispatch, useSelector } from 'react-redux';
 import { addBookmarkThunk } from 'store/features/bookmarks/bookmarks.actions';
 import { removeBookmarkAction } from 'store/features/bookmarks/bookmarks.slice';
 import { getBookmarks } from 'store/features/bookmarks/bookmarks.selectors';
-import { FsItemTypeEnum } from 'enums/fs-item-type.enum';
 import NativeMenu from 'components/native-menu/native-menu';
 import { MenuItemConstructorOptions } from 'electron';
+import { FsItemTypeEnum } from 'elcommander-plugin-sdk';
 import BookmarkItem from './bookmark-item';
 
 const useStyles = createUseStyles<Theme>((theme) => ({

@@ -1,10 +1,9 @@
 import React, { MouseEventHandler } from 'react';
 import clsx from 'clsx';
+import { TreeNode, FsItemTypeEnum } from 'elcommander-plugin-sdk';
 import ArrowIcon from '../../../components/icons/arrowIcon';
 import CssDot from '../../../components/icons/css-dot';
 import { IconProps } from '../../../components/icons/icon.interface';
-import { TreeNode } from '../../../interfaces/node.interface';
-import { FsItemTypeEnum } from '../../../enums/fs-item-type.enum';
 
 interface NodeControlIconProps {
   node: TreeNode;

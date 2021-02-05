@@ -1,14 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import AddTabIcon from 'components/icons/add-tab-icon';
 import IconButton from 'components/buttons/icon-button';
 import { getFSPluginsMap, IFSPluginDescriptor } from 'plugins/plugin-map';
 import { addViewAction } from 'store/features/views/views.slice';
-import {
-  IUserPluginConfig,
-  PluginPersistence,
-} from 'plugins/plugin-persistence';
 import TreeMenu, { TreeMenuNode } from 'components/menu/tree-menu';
+import { IUserPluginConfig, PluginPersistence } from 'elcommander-plugin-sdk';
+import { getPluginsByCategory } from 'store/features/preferences/preferences.selectors';
+import { RootState } from 'store/root-types';
 import ToolbarIcon from '../toolbar-icon';
 
 interface IFSPluginItem {
@@ -21,7 +20,7 @@ const generateTree = (
   pluginItems: IFSPluginItem[]
 ): TreeMenuNode<IFSPluginItem>[] => {
   return pluginItems.map((beItem) => ({
-    icon: beItem.pluginDescriptor.icon,
+    icon: beItem.pluginDescriptor.klass.pluginOptions.icon,
     label: beItem.pluginDescriptor.name,
     children: generateTree(
       beItem.configs.length
@@ -53,6 +52,9 @@ const generateTree = (
 const AddTab = () => {
   const [backends, setBackends] = useState<TreeMenuNode[]>();
   const [opened, setOpened] = useState(false);
+  const fsPlugins = useSelector((state: RootState) =>
+    getPluginsByCategory(state, 'fs')
+  );
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -78,7 +80,7 @@ const AddTab = () => {
       setBackends(tree);
     })();
     // rerun whenever view[].configName changes
-  }, [setBackends]);
+  }, [setBackends, fsPlugins]);
 
   const closeMenu = () => {
     setOpened(false);
