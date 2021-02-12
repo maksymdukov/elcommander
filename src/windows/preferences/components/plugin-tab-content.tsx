@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { createUseStyles } from 'react-jss';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { PluginCategories } from 'elcommander-plugin-sdk';
 import { Theme } from 'theme/jss-theme.provider';
 import SimpleTable from 'components/table/simple-table';
@@ -18,6 +18,10 @@ import MinusIcon from 'components/icons/minus-icon';
 import UpdateIcon from 'components/icons/update-icon';
 import WithSpinner from 'components/spinner/with-spinner';
 import { setPluginsThunk } from 'store/features/preferences/preferences.actions';
+import Toggle from '../../../components/toggle/toggle';
+import { getPluginsByCategory } from '../../../store/features/preferences/preferences.selectors';
+import { RootState } from '../../../store/root-types';
+import { togglePluginAction } from '../../../store/features/preferences/preferences.slice';
 
 const useStyles = createUseStyles<Theme>((theme) => ({
   tablesWrapper: {
@@ -41,6 +45,7 @@ const useStyles = createUseStyles<Theme>((theme) => ({
   },
   installedActions: {
     display: 'flex',
+    alignItems: 'center',
   },
   pluginHeader: {
     marginLeft: 5,
@@ -60,6 +65,9 @@ const headings = [
 
 const PluginTabContent: React.FC<PluginTabContentProps> = ({ category }) => {
   const classes = useStyles();
+  const currentPlugins = useSelector((state: RootState) =>
+    getPluginsByCategory(state, category)
+  );
   const dispatch = useDispatch();
   const pluginManager = useRef(new PluginManager(category));
   const queryClient = useQueryClient();
@@ -167,6 +175,20 @@ const PluginTabContent: React.FC<PluginTabContentProps> = ({ category }) => {
                         <UpdateIcon className={classes.plusIcon} />
                       </IconButton>
                     )}
+                  <Toggle
+                    size={15}
+                    title="Enable/Disable"
+                    checked={!!currentPlugins[installedPackage.name]?.enabled}
+                    onChange={() => {
+                      dispatch(
+                        togglePluginAction({
+                          name: installedPackage.name,
+                          category,
+                        })
+                      );
+                    }}
+                    id={installedPackage.name}
+                  />
                   <IconButton
                     onButtonClick={() => removePackage.mutate(installedPackage)}
                   >
