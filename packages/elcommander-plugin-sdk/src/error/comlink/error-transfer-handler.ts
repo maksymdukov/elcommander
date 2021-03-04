@@ -29,9 +29,11 @@ Comlink.transferHandlers.set('throw', {
       stack: value.stack,
       code: value.code,
     };
+    console.log('my serialized', serialized);
     return [serialized, []];
   },
   deserialize(serialized: SerializedError) {
+    console.log('serialized.ctorName', serialized.ctorName);
     const Ctor = getErrorCtor(serialized.ctorName) || Error;
     throw Object.assign(new Ctor(serialized.message), serialized);
   },

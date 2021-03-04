@@ -64,7 +64,7 @@ export abstract class FsPlugin<
 
   protected viewId: string;
 
-  protected configName: string;
+  public configName: string;
 
   protected persistence: Persistence;
 

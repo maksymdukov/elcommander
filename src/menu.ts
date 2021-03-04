@@ -268,6 +268,7 @@ export default class MenuBuilder {
                   nodeIntegration: true,
                   nodeIntegrationInWorker: true,
                   enableRemoteModule: true,
+                  devTools: false,
                 },
               });
               prefWindow.setMenu(null);

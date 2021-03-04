@@ -84,6 +84,7 @@ const createWindow = async () => {
       nodeIntegration: true,
       nodeIntegrationInWorker: true,
       enableRemoteModule: true,
+      devTools: false,
     },
   });
 

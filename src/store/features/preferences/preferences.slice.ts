@@ -4,12 +4,17 @@ import {
   SetPluginsAction,
   SetPreferencesStateAction,
   TogglePluginAction,
+  UpdatePluginsAction,
 } from './preferences.actions';
 
 export const preferencesSlice = createSlice({
   name: 'preferences',
   initialState: preferencesInitState,
   reducers: {
+    updateCategory(state, { payload: { category } }: UpdatePluginsAction) {
+      // eslint-disable-next-line no-self-assign
+      state.plugins[category] = { ...state.plugins[category] };
+    },
     setPlugins(state, { payload: { category, plugins } }: SetPluginsAction) {
       state.plugins[category] = plugins;
     },
@@ -29,3 +34,4 @@ export const preferencesSlice = createSlice({
 export const setPluginsAction = preferencesSlice.actions.setPlugins;
 export const setPreferencesStateAction = preferencesSlice.actions.setState;
 export const togglePluginAction = preferencesSlice.actions.togglePlugin;
+export const updateCategoryAction = preferencesSlice.actions.updateCategory;

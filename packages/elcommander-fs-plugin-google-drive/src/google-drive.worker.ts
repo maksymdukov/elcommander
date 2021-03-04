@@ -23,7 +23,7 @@ export class GoogleDriveWorker extends FSWorker {
     const authClient = new google.auth.OAuth2({
       clientId:
         '187570819989-11ur10pk0cch77lj1qhtl415e4aq1eha.apps.googleusercontent.com',
-      clientSecret: 'y5ER0DbGHSZYKOHfel638HnZ',
+      clientSecret: '08dl0Yne_7S_g5pRlEEb3Eux',
     });
     this.driveClient = google.drive({ version: 'v3', auth: authClient });
     this.auth = proxy(new GoogleAuth(authClient));

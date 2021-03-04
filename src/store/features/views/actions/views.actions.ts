@@ -17,3 +17,8 @@ export type ResizeViewAction = PayloadAction<{
   viewWidth: number;
   prevViewWidth: number;
 }>;
+
+export type SetViewConfigNameAction = PayloadAction<{
+  configName: string;
+  viewIndex: number;
+}>;

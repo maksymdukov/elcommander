@@ -1,7 +1,10 @@
 import React, { useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import AutoSizer from 'react-virtualized-auto-sizer';
-import { removeViewAction } from 'store/features/views/views.slice';
+import {
+  removeViewAction,
+  setConfigNameAction,
+} from 'store/features/views/views.slice';
 import { initializeViewThunk } from 'store/features/views/actions/tree-dir.actions';
 import DashSpinner from 'components/animated/dash-spinner';
 import Button from 'components/buttons/button';
@@ -14,6 +17,7 @@ import StatusBar from './components/status-bar';
 import { useFsPluginInjection } from './hook/use-fsplugin-injection.hook';
 import { RootState } from '../../store/root-types';
 import { getViewWidth } from '../../store/features/views/views.selectors';
+import { updateCategoryAction } from '../../store/features/preferences/preferences.slice';
 
 interface TreeViewProps {
   index: number;
@@ -37,6 +41,10 @@ function TreeViewRaw({ index, viewId }: TreeViewProps) {
     onSuccessfulInit: useCallback(
       (fsPlug: FsPlugin, viewIndex: number) => {
         dispatch(initializeViewThunk(viewIndex, fsPlug));
+        dispatch(updateCategoryAction({ category: 'fs' }));
+        dispatch(
+          setConfigNameAction({ viewIndex, configName: fsPlug.configName })
+        );
       },
       [dispatch]
     ),

@@ -11,6 +11,10 @@ export type SetPluginsAction = PayloadAction<{
   plugins: PluginState;
 }>;
 
+export type UpdatePluginsAction = PayloadAction<{
+  category: PluginCategories;
+}>;
+
 export type TogglePluginAction = PayloadAction<{
   name: string;
   category: PluginCategories;

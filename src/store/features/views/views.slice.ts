@@ -8,6 +8,7 @@ import {
   AddViewAction,
   RemoveViewAction,
   ResizeViewAction,
+  SetViewConfigNameAction,
 } from './actions/views.actions';
 
 function isTreeStateAction(
@@ -77,6 +78,12 @@ export const viewsSlice = createSlice({
       // resize previous one
       state.views[viewIndex - 1].width = prevViewWidth;
     },
+    setConfigName(
+      state,
+      { payload: { configName, viewIndex } }: SetViewConfigNameAction
+    ) {
+      state.views[viewIndex].configName = configName;
+    },
   },
   extraReducers: (builder) => {
     builder.addMatcher(isTreeStateAction, (state, action) => {
@@ -90,3 +97,5 @@ export const {
   removeView: removeViewAction,
   resizeView: resizeViewAction,
 } = viewsSlice.actions;
+
+export const setConfigNameAction = viewsSlice.actions.setConfigName;
